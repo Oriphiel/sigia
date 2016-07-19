@@ -46,7 +46,6 @@ coverage.xml
 # Django stuff:
 *.log
 *.pot
-/static
 /media
 /initial_media
 
