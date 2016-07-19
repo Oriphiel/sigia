@@ -1,0 +1,20 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block title %}Ayuda{% endblock %}
+
+{% block content %}
+<section class="featured">
+    <div class="content-wrapper">
+        <hgroup class="title">
+            <h1>Ayuda.</h1>
+            <h2>Documentación en línea del Sistema Integrado de Gestión de la Información Académica (SIGIA).</h2>
+        </hgroup>
+    </div>
+</section>
+
+<article>
+    <h2>        
+        Página en construcción, disculpe las molestias que esto pueda ocasionar…
+    </h2>
+</article>		
+{% endblock %}

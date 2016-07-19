@@ -1,0 +1,88 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+
+<h1 class="page-header">Generar Libro de Matrículas</h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+	<blockquote>
+    	<p>
+    		Para generar el libro de matrícula por favor seleccione
+            el período y el semestre.
+        </p>
+    </blockquote>
+
+<div class="fieldWrapper">  
+	<div class="row">
+		<div class="col-sm-6">
+			<label for="{{ gen_enbook.period.auto_id }}">{{ gen_enbook.period.label }}</label>
+			<label style="visibility: hidden" class="error" data-toggle="tooltip" data-placement="top" 
+				id="period_lbl" data-original-title='Este campo es obligatorio.'>*</label>
+			{{ gen_enbook.period }}
+			
+		</div>
+		
+		<div class="col-sm-6">
+			<label for="{{ gen_enbook.semester.auto_id }}">{{ gen_enbook.semester.label }}</label>
+			<label style="visibility: hidden" class="error" data-toggle="tooltip" data-placement="top" 
+				data-original-title='Este campo es obligatorio.'>*</label>
+			{{ gen_enbook.semester }}
+			
+		</div>			
+	</div>
+</div>
+		
+<div style="display: none; margin-top:20px" id="pnl_error" class="panel panel-danger">
+    <div class="panel-heading"><h3 class="panel-title">Errores:</h3></div>
+    <div class="panel-body">
+    		<b>Errores detectados de la carrera:</b><br />
+    		<ul>
+				<li>Período: Este campo es requerido.</li>
+			</ul>
+    </div>
+</div>
+
+<br />
+
+<div style="width: 100%; text-align: right">
+    	<button class="btn btn-default" id="btn_gen_enbook">Generar Líbro de Matrícula</button>
+</div>
+
+</div>
+</div>
+
+{% endblock %}
+
+{% block body_scripts %}
+<script>	
+	$(function() {
+		$('[data-toggle="tooltip"]').tooltip({html:true}); 
+		$('#btn_gen_enbook').click(function() {
+			if ($('#id_period')[0].value == ''){
+				$("#period_lbl").css('visibility', 'visible');
+				$("#pnl_error").css('display', 'block');
+				$('.top-right').notify({
+				    message: 'Debe corregir los errores para poder generar el Líbro de Matrícula',
+				    type: 'danger',
+				  }).show();
+			} else {
+				$("#period_lbl").css('visibility', 'hidden');
+				$("#pnl_error").css('display', 'none');
+				
+				var period = $("#id_period").find("option[value='" + $("#id_period").val() + "']").text();
+				var semester = $("#id_semester")[0].value;
+				
+			var url = "http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Aenrollment_book.prpt/generatedContent?userid=admin&password=password&output-type=pageable/pdf&semestre=" + semester + "&periodo=" + period;
+				
+				$.jsPanel({
+					  title: 'Libro de Matrícula: ',
+					  bootstrap: true,
+					  position: "center",
+					  size:     { width:  800, height: 600 },
+					  content: '<embed src="' + url + '" width="100%" height="100%">',
+					});
+			}
+		});
+	});
+</script>
+{% endblock %}

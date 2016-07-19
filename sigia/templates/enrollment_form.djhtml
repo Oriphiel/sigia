@@ -1,0 +1,233 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+<h1 class="page-header">{{title}}</h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+		<blockquote>
+            <p>Por favor llene los datos del formulario a continuación mostrados para 
+            	{% if action == 'CREATE' %}matricular  el{% else %}actualizar la matrícula del{% endif %} 
+            	estudiante en un curso.
+            </p>
+        </blockquote>
+
+	<form id="enrollment_form" method="post" enctype="multipart/form-data">{% csrf_token %}
+		<div class="fieldWrapper">  
+			<div class="row">
+				<div class="col-sm-6">
+					<label for="{{ enrollment_form.student.auto_id }}">{{ enrollment_form.student.label }}</label>
+					{% if enrollment_form.student.errors %}
+					<label class="error" data-toggle="tooltip" data-placement="top" 
+						data-original-title='{{enrollment_form.student.errors}}'>*</label>
+					{% endif %} 
+					<div class="row">
+							<div class="col-sm-10">
+								{{ enrollment_form.student }}
+							</div>
+							<div class="col-sm-2">
+								<button type="button" class="btn btn-default" id="find_user_dialog_button">
+									<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+									Buscar
+								</button>
+							</div>
+						</div>
+					
+					<label for="{{ enrollment_form.type.auto_id }}">{{ enrollment_form.type.label }}</label>
+					{% if enrollment_form.type.errors %}
+					<label class="error" data-toggle="tooltip" data-placement="top" 
+						data-original-title='{{enrollment_form.type.errors}}'>*</label>
+					{% endif %} 
+					{{ enrollment_form.type }}									
+					
+					<label for="{{ enrollment_form.condition.auto_id }}">{{ enrollment_form.condition.label }}</label>
+					{% if enrollment_form.condition.errors %}
+					<label class="error" data-toggle="tooltip" data-placement="top" 
+						data-original-title='{{enrollment_form.condition.errors}}'>*</label>
+					{% endif %} 
+					{{ enrollment_form.condition }}
+				</div>
+				
+				<div class="col-sm-6">
+					<label for="{{ enrollment_form.course.auto_id }}">{{ enrollment_form.course.label }}</label>
+					{% if enrollment_form.course.errors %}
+					<label class="error" data-toggle="tooltip" data-placement="top" 
+						data-original-title='{{enrollment_form.course.errors}}'>*</label>
+					{% endif %} 
+					{{ enrollment_form.course }}
+					
+					<label for="{{ enrollment_form.date.auto_id }}">{{ enrollment_form.date.label }}</label>
+					{% if enrollment_form.date.errors %}
+					<label class="error" data-toggle="tooltip" data-placement="top" 
+						data-original-title='{{enrollment_form.date.errors}}'>*</label>
+					{% endif %} 
+						<div class='input-group date' id='datetimepicker1'>
+	            		<input type='text' class="form-control" name="date" id="id_date" value="{{ enrollment_form.date.value|date:"d/m/Y"|default_if_none:"" }}"/>
+	            		<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+	            		</span>
+	        		</div>
+					
+					<label for="{{ enrollment_form.financing_sys.auto_id }}">{{ enrollment_form.financing_sys.label }}</label>
+					{% if enrollment_form.financing_sys.errors %}
+					<label class="error" data-toggle="tooltip" data-placement="top" 
+						data-original-title='{{enrollment_form.financing_sys.errors}}'>*</label>
+					{% endif %} 
+					{{ enrollment_form.financing_sys }}
+					
+					{% if action != 'UPGRADE' %}
+						<div style="display:none;"> 
+					{% else %}
+						<div>
+					{% endif %}
+						<label for="{{ enrollment_form.scholarship.auto_id }}">{{ enrollment_form.scholarship.label }}</label>
+						{% if enrollment_form.scholarship.errors %}
+						<label class="error" data-toggle="tooltip" data-placement="top" 
+							data-original-title='{{enrollment_form.scholarship.errors}}'>*</label>
+						{% endif %} 
+						{{ enrollment_form.scholarship }}
+					</div>
+				</div>			
+			</div>
+		</div>
+			
+		<br />
+			
+		{% if enrollment_form.errors %}
+			<div class="panel panel-danger">
+			    <div class="panel-heading"><h3 class="panel-title">Errores:</h3></div>
+			    <div class="panel-body">
+			    		<b>Errores detectados de la carrera:</b><br />
+			    		<ul>
+							{% for field in enrollment_form %}
+								{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+							{% endfor %}
+							{% for field in personal_info_form %}
+								{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+							{% endfor %}
+						</ul>
+			    </div>
+			</div>
+		{% endif %}
+		
+		<div style="width: 100%; text-align: right">
+			{% if action == 'CREATE' %}
+		    	<input class="btn btn-default" id="btn_add_enrollment" type="button" value="Matricular"/>
+		    {% else %}
+		    	<input class="btn btn-default" id="btn_upd_enrollment" type="button" value="Actualizar Matrícula"/>
+		    {% endif %}
+		</div>
+	
+	</form>
+</div>
+</div>
+
+<div style="display:none" id="find_user_dialog_container">
+	<div id="find_user_div" style="padding: 10px">
+		<table id="student-table"></table>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block body_scripts %}
+<script>	
+	$(function() {
+		
+		$('#student-table').mutate('height width', function(el,info) {
+	        $('#student-table').bootstrapTable('resetView');
+	    });
+    	
+    	$('#student-table').bootstrapTable({
+                method: 'get',
+                url: '/students/api/list/',
+                cache: false,
+                striped: true,
+                height: 430,
+                pagination: true,
+                search: true,
+                showColumns: true,
+                showRefresh: true,
+                minimumCountColumns: 2,
+                clickToSelect: true,
+                columns: [{
+                    field: 'state',
+                    radio: true
+                }, {
+                    field: 'id',
+                    title: 'ID',
+                    sortable: true
+                }, {
+                    field: 'last_name',
+                    title: 'Apellidos',
+                    sortable: true,
+                }, {
+                    field: 'first_name',
+                    title: 'Nombre',
+                    sortable: true,
+                }, {
+                    field: 'email',
+                    title: 'Correo',
+                    sortable: true,
+                }]
+            });
+		
+		$('#find_user_dialog_button').click(function(){
+			
+			var toolbar_footer = [{
+		        item: '<button type="button"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>',
+		        event: 'click',
+		        btnclass: 'btn btn-default',
+		        btntext: ' Seleccionar',
+		        callback: function( event ){
+		        	var user = $('#student-table').bootstrapTable('getSelections')[0];
+					if (user == null){
+						bootbox.alert('Debe seleccionar una persona primero.');
+					} else {
+						$('#id_student').val(user.id);
+						event.data.close();
+					}
+		        }
+		    }];
+			
+			$.jsPanel({
+			  id:       "find_user_dialog",
+			  selector: "#e-jspanelclosed",
+			  title: 'Buscar Usuario: ',
+			  bootstrap: true,
+			  position: "center",
+			  resizable: "disabled",
+			  controls: {
+			    maximize:     'disable',
+			    minimize:     'disable',
+			    normalize:    'disable',
+			    smallify:     'disable',
+			    maxtoScreen:  'disable'
+			  },
+			  toolbarFooter: toolbar_footer,
+			  size:     { width:  1000, height: 450 },
+			  content: $('#find_user_div'),
+			});
+			
+			$("#find_user_dialog").on("jspanelbeforeclose", function (event, id) {
+			    if( id === "find_user_dialog" ) {
+			        $('#find_user_div').appendTo('#user_dialog_container');
+			    }
+			});
+		});
+		
+		{% if action == 'UPGRADE' %}
+			$('#btn_upd_enrollment').click(function(){
+				$('#enrollment_form')[0].action="/enrollment/" + {{enrollment_id}} + "/upgrade/";
+				PostAndLoadAjaxContent($('#enrollment_form'));
+			});
+		{% else %}
+			$('#btn_add_enrollment').click(function(){
+				$('#enrollment_form')[0].action="/enrollment/new/";
+				PostAndLoadAjaxContent($('#enrollment_form'));
+			});
+		{% endif %}
+		
+		$('#datetimepicker1').datepicker({language: "es-ES"});
+		$('[data-toggle="tooltip"]').tooltip({html:true}); 
+	});
+</script>
+{% endblock %}

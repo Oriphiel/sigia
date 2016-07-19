@@ -1,0 +1,85 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+<h1 class="page-header">{{ title }} </h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+		<blockquote>
+            <p>Por favor llene los datos del formulario a continuación mostrados 
+            	para {% if action == 'CREATE' %}registrar un {% else %}actualizar el {% endif %}provincia.</p>
+        </blockquote>
+
+<form id="province_form" method="post" enctype="multipart/form-data">{% csrf_token %}
+	<div class="fieldWrapper">  
+		<div class="row">
+			<div class="col-sm-6">
+				<label for="{{ province_form.name.auto_id }}">{{ province_form.name.label }}</label>
+				{% if province_form.name.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{province_form.name.errors}}'>*</label>
+				{% endif %} 
+				{{ province_form.name }}
+			</div>
+			
+			<div class="col-sm-6">
+				<label for="{{ province_form.country.auto_id }}">{{ province_form.country.label }}</label>
+				{% if province_form.country.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{province_form.country.errors}}'>*</label>
+				{% endif %} 
+				{{ province_form.country }}
+				
+			</div>			
+		</div>
+	</div>
+		
+	<br />
+		
+	{% if province_form.errors %}
+		<div class="panel panel-danger">
+		    <div class="panel-heading"><h3 class="panel-title">Errores:</h3></div>
+		    <div class="panel-body">
+		    		<b>Errores detectados de la carrera:</b><br />
+		    		<ul>
+						{% for field in province_form %}
+							{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+						{% endfor %}
+						{% for field in personal_info_form %}
+							{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+						{% endfor %}
+					</ul>
+		    </div>
+		</div>
+	{% endif %}
+	
+	<div style="width: 100%; text-align: right">
+		{% if action == 'CREATE' %}
+	    	<input class="btn btn-default" type="button" id="btn_add_province" value="Registrar provincia"/>
+	    {% else %}
+	    	<input class="btn btn-default" type="button" id="btn_upd_province" value="Actualizar provincia"/>
+	    {% endif %}
+	</div>
+
+</form>
+
+{% endblock %}
+
+{% block body_scripts %}
+<script>	
+	$(function() {
+		{% if action == 'UPGRADE' %}
+		$('#btn_upd_province').click(function(){
+			$('#province_form')[0].action="/province/" + {{province_id}} + "/upgrade/";
+			PostAndLoadAjaxContent($('#province_form'));
+		});
+		{% else %}
+		$('#btn_add_province').click(function(){
+			$('#province_form')[0].action="/province/new/";
+			PostAndLoadAjaxContent($('#province_form'));
+		});
+		{% endif %}
+		
+		$('[data-toggle="tooltip"]').tooltip({html:true}); 
+	});
+</script>
+{% endblock %}

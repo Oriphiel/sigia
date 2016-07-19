@@ -1,0 +1,165 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% load sigia_auth_filters %}
+
+{% block content %}
+<div id="custom-toolbar">
+    <div class="btn-group" role="group">
+        <button class="btn btn-default" onclick="LoadAjaxContent('/event_type/new/');" title="Registrar Tipo de Evento">
+			<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Nuevo
+    	</button>
+        <button class="btn btn-default" id="tbb_edit" title="Editar Datos Tipo de Evento">
+			<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Editar
+    	</button>
+    	{% if user|has_group:"general_secretary" %}
+        <button class="btn btn-default" id="tbb_delete" title="Eliminar Tipo de Evento">
+			<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Eliminar
+    	</button>      
+    	{% endif %}
+    </div>
+    
+    <div class="btn-group" role="group">
+    	<button class="btn btn-default" id="tbb_event_for_student" title="Crear Evento para Estudiante">
+			<span class="glyphicon glyphicon-log-in" aria-hidden="true"></span> Crear Evento para Estudiante
+    	</button>   
+    </div>
+</div>
+
+<h1 class="page-header">{{ title }}</h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+		<table id="table-pagination"></table>
+	</div>
+</div>
+
+<div id="option-content"></div>
+
+<form id="du_form">{% csrf_token %}
+	<input type="hidden" id="du_event_type_id" name="id" />
+</form>
+{% endblock %}
+
+{% block body_scripts %}
+
+<script>
+    $(document).ready(function() {
+    	 $('#table-pagination').mutate('height width', function(el,info) {
+	        $('#table-pagination').bootstrapTable('resetView');
+	    });
+    	
+    	$('#table-pagination').bootstrapTable({
+                method: 'get',
+                url: '/event_type/api/list/',
+                cache: false,
+                height: 600,
+                striped: true,
+                pagination: true,
+                search: true,
+                showColumns: true,
+                showRefresh: true,
+                trimOnSearch: false,
+                minimumCountColumns: 2,
+                clickToSelect: true,
+                toolbar: '#custom-toolbar',
+                columns: [{
+                    field: 'state',
+                    radio: true
+                }, {
+                    field: 'id',
+                    title: 'ID',
+                    sortable: true
+                }, {
+                    field: 'name',
+                    title: 'Nombre',
+                    sortable: true,
+                }, {
+                    field: 'description',
+                    title: 'Descripción',
+                    sortable: true,
+                }, {
+                    field: 'student_type',
+                    title: 'Tipo de Estudiante',
+                    sortable: true,
+                }, {
+                    field: 'created',
+                    title: 'Creado',
+                    sortable: true,
+                    visible: false,
+                }, {
+                    field: 'created_by',
+                    title: 'Creado por',
+                    sortable: true,
+                    visible: false,
+                }, {
+                    field: 'modified',
+                    title: 'Modificado',
+                    sortable: true,
+                    visible: false,
+                }, {
+                    field: 'modified_by',
+                    title: 'Modificado por',
+                    sortable: true,
+                    visible: false,
+                }]
+            });
+    
+	    $('#tbb_edit').click(function(){
+			var event_type = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (event_type == null){
+				bootbox.alert('Debe seleccionar un profesor primero.');
+			} else {
+				LoadAjaxContent("/event_type/" + event_type.id + "/upgrade/");
+			}
+		});
+		
+		$('#tbb_export').click(function(){
+			window.open("http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Aevent_type_excel.prpt/viewer", '_blank');
+		});
+		
+		$('#tbb_print').click(function(){
+		var event_type = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (event_type == null){
+				bootbox.alert('Debe seleccionar un profesor primero.');
+			} else {
+				$.jsPanel({
+				  title: 'Datos del profesor: ',
+				  bootstrap: true,
+				  position: "center",
+				  size:     { width:  800, height: 600 },
+				  content: '<embed src="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Aevent_type.prpt/generatedContent?userid=admin&password=password&output-type=pageable/pdf&event_type_id=' + event_type.id + '" width="100%" height="100%">'
+				});
+			}
+		});
+		
+		$('#tbb_event_for_student').click(function(){
+			var event_type = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (event_type == null){
+				bootbox.alert('Debe seleccionar un profesor primero.');
+			} else {
+				LoadAjaxContent("/student_event/new/event_type/" + event_type.id +  "/");
+			}
+		});
+		
+		$('#tbb_delete').click(function(){
+			var event_type = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (event_type == null){
+				bootbox.alert('Debe seleccionar un profesor primero.');
+			} else {
+				bootbox.confirm("Por favor confirme que desea eliminar al profesor: " + event_type.name, function(result) {
+					if(result){
+						$('#du_form')[0].action= "/event_type/" + event_type.id + "/delete/";
+						$('#du_form')[0].method = "POST";
+						$('#du_event_type_id')[0].value = event_type.id;
+						PostAndLoadAjaxContent($('#du_form'));
+					} else {
+						$('.top-right').notify({
+						    message: { text: 'Operación cancelada por el usuario.' },
+						    type: 'warning',
+						  }).show();
+					}
+				}); 
+			}
+		});
+	});
+</script>
+{% endblock %}

@@ -1,0 +1,267 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+    <h1 class="page-header">{{ title }} </h1>
+    <div class="box">
+        <div class="box-content" style="display: block;">
+
+            <blockquote>
+                Por favor llene los datos del paciente
+            </blockquote>
+
+            <form id="medicoform" class="form-horizontal" method="post" enctype="multipart/form-data">{% csrf_token %}
+                <div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+                    <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all"
+                        role="tablist">
+                        <li class="ui-state-default ui-corner-top ui-tabs-active ui-state-active" role="tab"
+                            tabindex="0" aria-controls="tabs-1" aria-labelledby="ui-id-4" aria-selected="true"><a
+                                href="#tabs-1" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-4">REGISTRO
+                            DE ADMISION</a></li>
+                        <li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-2"
+                            aria-labelledby="ui-id-5" aria-selected="false"><a href="#tabs-2" class="ui-tabs-anchor"
+                                                                               role="presentation" tabindex="-1"
+                                                                               id="ui-id-5">ANTECEDENTES PERSONALES</a>
+                        </li>
+                    </ul>
+                    <div id="tabs-1" aria-labelledby="ui-id-4" class="ui-tabs-panel ui-widget-content ui-corner-bottom"
+                         role="tabpanel" aria-expanded="true" aria-hidden="false">
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <label for="{{ medic_form.id_patient.auto_id }}"
+                                           class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ medic_form.id_patient.label }}</label>
+                                    <div class="col-sm-9 col-md-9 col-lg-9">
+                                        {{ medic_form.id_patient }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="apellido"
+                                           class="control-label col-sm-2 col-md-2 col-lg-2">Apellidos</label>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                        <input type="text" id="apellido" disabled class="form-control">
+                                    </div>
+                                    <label for="nombre" class="control-label col-sm-1 col-md-1 col-lg-1">Nombres</label>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                        <input type="text" id="nombre" disabled class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="nacionalidad" class="control-label col-sm-2 col-md-2 col-lg-2">Nacionalidad</label>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                        <input type="text" id="nacionalidad" disabled class="form-control">
+                                    </div>
+                                    <label for="cedula"
+                                           class="control-label col-sm-1 col-md-1 col-lg-1">N° Cedula</label>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                        <input type="text" id="cedula" disabled class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="direccion"
+                                           class="control-label col-sm-2 col-md-2 col-lg-2">Direccion</label>
+                                    <div class="col-sm-5 col-md-5 col-lg-5">
+                                        <input type="text" id="direccion" disabled class="form-control">
+                                    </div>
+                                    <label for="telefono"
+                                           class="control-label col-sm-2 col-md-2 col-lg-2">Telefono</label>
+                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                        <input type="text" id="telefono" disabled class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="canton" class="control-label col-sm-2 col-md-2 col-lg-2">Canton</label>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                        <input type="text" id="canton" disabled class="form-control">
+                                    </div>
+                                    <label for="provincia"
+                                           class="control-label col-sm-1 col-md-1 col-lg-1">Provincia</label>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                        <input type="text" id="provincia" disabled class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="marital"
+                                           class="control-label col-sm-2 col-md-2 col-lg-2">Estado
+                                        Civil</label>
+                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                        <select class="form-control" id="marital" disabled>
+                                            <option value="S">Soltero</option>
+                                            <option value="C">Casado</option>
+                                            <option value="D">Divorciado</option>
+                                            <option value="U">Union Libre</option>
+                                        </select>
+                                    </div>
+                                    <label for="date1" class="control-label col-sm-1 col-md-1 col-lg-1">Fecha</label>
+                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                        <input type="date" class="form-control" id="date1" required name="fecha">
+                                    </div>
+                                    <label for="time1" class="control-label col-sm-2 col-md-2 col-lg-2">Hora</label>
+                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                        <input type="time" class="form-control" id="time1" required name="hora">
+                                    </div>
+                                </div>
+                                <div class="form-group contactos">
+                                    <label class="control-label col-sm-2 col-md-2 col-lg-2">Contacto</label>
+                                    <div class="col-sm-3 col-md-3 col-lg-3">
+                                        <input type="text" class="form-control" name="contacto.name"
+                                               placeholder="Nombre"/>
+                                    </div>
+                                    <div class="col-sm-3 col-md-3 col-lg-3">
+                                        <input type="text" class="form-control" name="contacto.relation"
+                                               placeholder="Tipo de relacion"/>
+                                    </div>
+                                    <div class="col-sm-3 col-md-3 col-lg-3">
+                                        <input type="text" class="form-control" name="contacto.phone"
+                                               placeholder="Telefono"/>
+                                    </div>
+                                    <div class="col-xs-1">
+                                        <button type="button" class="btn btn-default addButton"><i
+                                                class="fa fa-plus"></i></button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="{{ medic_form.form_arrival.auto_id }}"
+                                           class="control-label col-sm-2 col-md-2 col-lg-2">{{ medic_form.form_arrival.label }}</label>
+                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                        {{ medic_form.form_arrival }}
+                                    </div>
+                                    <div class="col-sm-3 col-md-3 col-lg-3">
+                                        {{ medic_form.source_information }}
+                                    </div>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                        {{ medic_form.delivery_patient }}
+                                    </div>
+                                    <label class="control-label col-sm-2 col-md-2 col-lg-2"></label>
+                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                        {{ medic_form.phone_delivery }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-lg-11 col-xs-11 col-md-11 col-sm-11">
+                                        <input class="btn btn-primary pull-right" type="button"
+                                               value="Registrar Paciente"
+                                               id="formulario"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div id="tabs-2" aria-labelledby="ui-id-4" class="ui-tabs-panel ui-widget-content ui-corner-bottom"
+                         role="tabpanel" aria-expanded="true" aria-hidden="false">
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <label for="{{ personal_form.type_background.auto_id }}"
+                                           class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ personal_form.type_background.label }}</label>
+                                    <div class="col-sm-9 col-md-9 col-lg-9">
+                                        {{ personal_form.type_background }}
+                                    </div>
+                                    <div class="col-xs-1">
+                                        <button type="button" class="btn btn-default"><i
+                                                class="fa fa-plus"></i></button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2 col-md-2 col-lg-2"
+                                           for="{{ personal_form.detail_background.auto_id }}">{{ personal_form.detail_background.label }}</label>
+                                    <div class="col-sm-9 col-md-9 col-lg-9">
+                                        {{ personal_form.detail_background }}
+                                    </div>
+                                </div>
+                                {{ formset.management_form }}
+                                {% for form in formset %}
+                                    {{ form }}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_scripts %}
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
+
+    <!-- (Optional) Latest compiled and minified JavaScript translation files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/i18n/defaults-*.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            Date.prototype.toDateInputValue = (function () {
+                var local = new Date(this);
+                local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+                return local.toJSON().slice(0, 10);
+            });
+            $('#date1').val(new Date().toDateInputValue());
+            var dt = new Date();
+            var time = dt.toTimeString().split(' ')[0];
+            $('#time1').val(time);
+            $('#id_Medico-id_patient').change(function () {
+                        var num = $('#id_Medico-id_patient').children("option").filter(":selected").val();
+                        $.ajax({
+                            type: 'GET',
+                            url: '/user/api/lista/',
+                            data: {
+                                ids: num
+                            },
+                            contentType: 'json',
+                            success: function (data) {
+                                var nuevo = JSON.parse(data);
+                                $('#apellido').val(nuevo[1].fields.last_name);
+                                $('#nombre').val(nuevo[1].fields.first_name);
+                                $('#direccion').val(nuevo[0].fields.address);
+                                $('#telefono').val(nuevo[0].fields.cellphone);
+                                $('#cedula').val(nuevo[0].fields.id_doc_num);
+                                $("#marital").val(nuevo[0].fields.marital_status);
+                                if (Object.keys(nuevo).length > 2) {
+                                    $('#nacionalidad').val(nuevo[2].fields.name);
+                                    $('#canton').val(nuevo[4].fields.name);
+                                    $('#provincia').val(nuevo[3].fields.name);
+                                } else {
+                                    $('#nacionalidad').val("Sin datos");
+                                    $('#canton').val("Sin datos");
+                                    $('#provincia').val("Sin datos");
+                                }
+                            }
+                        });
+                    }
+            );
+
+            var max_fields = 2; //maximum input boxes allowed
+            var wrapper = $(".contactos"); //Fields wrapper
+            var add_button = $(".addButton"); //Add button ID
+
+            var x = 1; //initlal text box count
+            $(add_button).click(function (e) { //on add input button click
+                e.preventDefault();
+                if (x < max_fields) { //max input box allowed
+                    x++; //text box increment
+                    $(wrapper).append('<div><label class="control-label col-sm-2 col-md-2 col-lg-2"></label><div class="col-sm-3 col-md-3 col-lg-3"><input type="text" class="form-control" name="contacto.name" placeholder="Nombre"/></div><div class="col-sm-3 col-md-3 col-lg-3"><input type="text" class="form-control" name="contacto.relation" placeholder="Tipo de relacion"/></div><div class="col-sm-3 col-md-3 col-lg-3"><input type="text" class="form-control" name="contacto.phone" placeholder="Telefono"/></div><a class="col-xs-1 remove_field"><button class="btn btn-default"><i class="fa fa-minus "></i></button></a></div>'); //add input box
+                }
+            });
+
+            $(wrapper).on("click", ".remove_field", function (e) { //user click on remove text
+                e.preventDefault();
+                $(this).parent('div').remove();
+                x--;
+            })
+        });
+        $(function () {
+            $("#tabs").tabs();
+        });
+
+        $('#formulario').click(function () {
+            $('#medicoform')[0].action = "/hola/";
+            PostAndLoadAjaxContent($('#medicoform'));
+        });
+    </script>
+{% endblock %}

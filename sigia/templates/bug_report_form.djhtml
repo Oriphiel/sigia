@@ -1,0 +1,103 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+    <h1 class="page-header">{{ title }} </h1>
+    <div class="box">
+        <div class="box-content" style="display: block;">
+            <blockquote>
+                <p>Por favor llene los datos del formulario a continuación mostrados
+                    para {% if action == 'CREATE' %}registrar un {% else %}actualizar el {% endif %}error.</p>
+            </blockquote>
+
+            <form id="bug_report_form" method="post" enctype="multipart/form-data">{% csrf_token %}
+                <div class="fieldWrapper">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label for="{{ bug_report_form.name.auto_id }}">{{ bug_report_form.name.label }}</label>
+                            {% if bug_report_form.name.errors %}
+                                <label class="error" data-toggle="tooltip" data-placement="top"
+                                       data-original-title='{{ bug_report_form.name.errors }}'>*</label>
+                            {% endif %}
+                            {{ bug_report_form.name }}
+
+                            <label for="{{ bug_report_form.gravity.auto_id }}">{{ bug_report_form.gravity.label }}</label>
+                            {% if bug_report_form.gravity.errors %}
+                                <label class="error" data-toggle="tooltip" data-placement="top"
+                                       data-original-title='{{ bug_report_form.gravity.errors }}'>*</label>
+                            {% endif %}
+                            {{ bug_report_form.gravity }}
+
+                            <label for="{{ bug_report_form.snapshot.auto_id }}">{{ bug_report_form.snapshot.label }}</label>
+                            {% if bug_report_form.snapshot.errors %}
+                                <label class="error" data-toggle="tooltip" data-placement="top"
+                                       data-original-title='{{ bug_report_form.snapshot.errors }}'>*</label>
+                            {% endif %}
+                            {{ bug_report_form.snapshot }}
+
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label for="{{ bug_report_form.description.auto_id }}">{{ bug_report_form.description.label }}</label>
+                            {% if bug_report_form.description.errors %}
+                                <label class="error" data-toggle="tooltip" data-placement="top"
+                                       data-original-title='{{ bug_report_form.description.errors }}'>*</label>
+                            {% endif %}
+                            {{ bug_report_form.description }}
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <br/>
+
+                {% if bug_report_form.errors %}
+                    <div class="panel panel-danger">
+                        <div class="panel-heading"><h3 class="panel-title">Errores:</h3></div>
+                        <div class="panel-body">
+                            <b>Errores detectados de la carrera:</b><br/>
+                            <ul>
+                                {% for field in bug_report_form %}
+                                    {% if field.errors %}
+                                        <li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+                                {% endfor %}
+                                {% for field in personal_info_form %}
+                                    {% if field.errors %}
+                                        <li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div style="width: 100%; text-align: right">
+                    {% if action == 'CREATE' %}
+                        <input class="btn btn-default" type="button" id="btn_add_bug_report" value="Registrar error"/>
+                    {% else %}
+                        <input class="btn btn-default" type="button" id="btn_upd_bug_report" value="Actualizar error"/>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_scripts %}
+    <script>
+        $(function () {
+            {% if action == 'UPGRADE' %}
+                $('#btn_upd_bug_report').click(function () {
+                    $('#bug_report_form')[0].action = "/bug_report/" + {{bug_report_id}} +"/upgrade/";
+                    PostAndLoadAjaxContent($('#bug_report_form'));
+                });
+            {% else %}
+                $('#btn_add_bug_report').click(function () {
+                    $('#bug_report_form')[0].action = "/bug_report/new/";
+                    PostAndLoadAjaxContent($('#bug_report_form'));
+                });
+            {% endif %}
+
+            $('[data-toggle="tooltip"]').tooltip({html: true});
+        });
+    </script>
+{% endblock %}

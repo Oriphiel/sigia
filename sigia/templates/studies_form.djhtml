@@ -1,0 +1,133 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+    <h1 class="page-header">{{ title }} </h1>
+    <div class="box">
+        <div class="box-content" style="display: block;">
+            <blockquote>
+                <p>Por favor llene los datos del formulario a continuación mostrados
+                    para {% if action == 'CREATE' %}registrar un {% else %}actualizar la {% endif %}información de
+                    estudios.</p>
+            </blockquote>
+
+            <form id="studies_form" method="post" enctype="multipart/form-data">{% csrf_token %}
+                <div class="fieldWrapper">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label for="{{ studies_form.teacher.auto_id }}">{{ studies_form.teacher.label }}</label>
+                            {% if studies_form.teacher.errors %}
+                                <label class="error" data-toggle="tooltip" data-placement="top"
+                                       data-original-title='{{ studies_form.teacher.errors }}'>*</label>
+                            {% endif %}
+                            {{ studies_form.teacher }}
+
+                            <label for="{{ studies_form.academic_level.auto_id }}">{{ studies_form.academic_level.label }}</label>
+                            {% if studies_form.academic_level.errors %}
+                                <label class="error" data-toggle="tooltip" data-placement="top"
+                                       data-original-title='{{ studies_form.academic_level.errors }}'>*</label>
+                            {% endif %}
+                            {{ studies_form.academic_level }}
+
+                            <label for="{{ studies_form.title_img.auto_id }}">{{ studies_form.title_img.label }}</label>
+                            {% if studies_form.title_img.errors %}
+                                <label class="error" data-toggle="tooltip" data-placement="top"
+                                       data-original-title='{{ studies_form.title_img.errors }}'>*</label>
+                            {% endif %}
+                            {{ studies_form.title_img }}
+
+                            <label for="{{ studies_form.country.auto_id }}">{{ studies_form.country.label }}</label>
+                            {% if studies_form.country.errors %}
+                                <label class="error" data-toggle="tooltip" data-placement="top"
+                                       data-original-title='{{ studies_form.country.errors }}'>*</label>
+                            {% endif %}
+                            {{ studies_form.country }}
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label for="{{ studies_form.institute.auto_id }}">{{ studies_form.institute.label }}</label>
+                            {% if studies_form.institute.errors %}
+                                <label class="error" data-toggle="tooltip" data-placement="top"
+                                       data-original-title='{{ studies_form.institute.errors }}'>*</label>
+                            {% endif %}
+                            {{ studies_form.institute }}
+
+                            <label for="{{ studies_form.title.auto_id }}">{{ studies_form.title.label }}</label>
+                            {% if studies_form.title.errors %}
+                                <label class="error" data-toggle="tooltip" data-placement="top"
+                                       data-original-title='{{ studies_form.title.errors }}'>*</label>
+                            {% endif %}
+                            {{ studies_form.title }}
+
+                            <label for="{{ studies_form.date_award.auto_id }}">{{ studies_form.date_award.label }}</label>
+                            {% if studies_form.date_award.errors %}
+                                <label class="error" data-toggle="tooltip" data-placement="top"
+                                       data-original-title='{{ studies_form.date_award.errors }}'>*</label>
+                            {% endif %}
+                            {{ studies_form.date_award }}
+
+                            <label for="{{ studies_form.senescyt_id.auto_id }}">{{ studies_form.senescyt_id.label }}</label>
+                            {% if studies_form.senescyt_id.errors %}
+                                <label class="error" data-toggle="tooltip" data-placement="top"
+                                       data-original-title='{{ studies_form.senescyt_id.errors }}'>*</label>
+                            {% endif %}
+                            {{ studies_form.senescyt_id }}
+                        </div>
+
+                    </div>
+                </div>
+
+                <br/>
+
+                {% if studies_form.errors %}
+                    <div class="panel panel-danger">
+                        <div class="panel-heading"><h3 class="panel-title">Errores:</h3></div>
+                        <div class="panel-body">
+                            <b>Errores detectados de la carrera:</b><br/>
+                            <ul>
+                                {% for field in studies_form %}
+                                    {% if field.errors %}
+                                        <li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+                                {% endfor %}
+                                {% for field in personal_info_form %}
+                                    {% if field.errors %}
+                                        <li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div style="width: 100%; text-align: right">
+                    {% if action == 'CREATE' %}
+                        <input class="btn btn-default" type="button" id="btn_add_studies"
+                               value="Registrar Información de Estudios"/>
+                    {% else %}
+                        <input class="btn btn-default" type="button" id="btn_upd_studies"
+                               value="Actualizar Información de Estudios"/>
+                    {% endif %}
+                </div>
+
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_scripts %}
+    <script>
+        $(function () {
+            {% if action == 'UPGRADE' %}
+                $('#btn_upd_studies').click(function () {
+                    $('#studies_form')[0].action = "/studies/" + {{id_studies}} +"/upgrade/";
+                    PostAndLoadAjaxContent($('#studies_form'));
+                });
+            {% else %}
+                $('#btn_add_studies').click(function () {
+                    $('#studies_form')[0].action = "/studies/new/";
+                    PostAndLoadAjaxContent($('#studies_form'));
+                });
+            {% endif %}
+
+            $('[data-toggle="tooltip"]').tooltip({html: true});
+        });
+    </script>
+{% endblock %}

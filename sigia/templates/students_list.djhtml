@@ -1,0 +1,552 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% load sigia_auth_filters %}
+
+{% block content %}
+<div id="custom-toolbar">
+    <div class="btn-group" role="group">
+	    {% if user|has_group:"secretary" %}
+	        <button class="btn btn-default" onclick="LoadAjaxContent('/students/new/');" title="Registrar Estudiante">
+				<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Nuevo
+	    	</button>
+	        <button class="btn btn-default" id="tbb_edit" title="Editar Datos Estudiante">
+				<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Editar
+	    	</button>
+	    {% endif %}
+    	{% if user|has_group:"general_secretary" %}
+        <button class="btn btn-default" id="tbb_delete" title="Eliminar Estudiante">
+			<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Eliminar
+    	</button>      
+    	{% endif %}
+    </div>
+    
+    <div class="btn-group" role="group">
+    	<button class="btn btn-default" id="tbb_print" title="Ver/Imprimir">
+			<span class="glyphicon glyphicon-print" aria-hidden="true"></span> Ver/Imprimir
+    	</button>
+    	<button class="btn btn-default" id="tbb_export" title="Exportar a Excel">
+			<span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Excel
+    	</button>
+    </div>
+   
+   {% if user|has_group:"secretary" %}
+    <div class="btn-group">
+	  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true">
+    	<span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Acción
+	    <span class="caret"></span>
+	  </button>
+	  <ul class="dropdown-menu" role="menu">
+	    <li>
+		    <a id="tbb_enrollment" title="Matricular Estudiante">
+		    	<span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>Matricular
+		    </a>
+    	</li> 
+    	<li>
+		    <a id="tbb_student_event" title="Registrar Evento de Estudiante">
+		    	<span class="glyphicon glyphicon-time" aria-hidden="true"></span>Registar Evento
+		    </a>
+    	</li>
+    	<li>
+		    <a id="tbb_assign_eventgroup_dialog" title="Asociar Grupo de Eventos al Estudiante">
+		    	<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>Asociar Grupo de Eventos 
+		    </a>
+    	</li> 
+    	<li>
+		    <a id="tbb_payment_order" title="Emitir orden de pago a estudiante">
+		    	<span class="glyphicon glyphicon-usd" aria-hidden="true"></span>Emitir Orden de Pago
+		    </a>
+    	</li>
+    	
+<!---	    <li class="divider"></li> -->
+	  </ul>
+	</div>
+	
+	{% endif %}
+	
+	<div class="btn-group">
+	  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true">
+    	<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Ver
+	    <span class="caret"></span>
+	  </button>
+	  <ul class="dropdown-menu" role="menu">
+	  	<li>
+		    <a id="tbb_view_enrollment" title="Ver Matrículas de Estudiante">
+		    	<span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>Matrículas
+		    </a>
+    	</li> 	  
+       <li>
+		    <a id="tbb_view_student_event" title="Ver Eventos del Estudiante">
+		    	<span class="glyphicon glyphicon-time" aria-hidden="true"></span>Eventos del Estudiante
+		    </a>
+    	</li>
+    	<li>
+		    <a id="tbb_view_student_event_print" title="Ver Eventos del Estudiante (Imprimir)">
+		    	<span class="glyphicon glyphicon-time" aria-hidden="true"></span>Eventos del Estudiante (Imprimir)
+		    </a>
+    	</li> 
+    	<li>
+		    <a id="tbb_view_eventgroup_dialog" title="Ver Grupo de Eventos Asociados al Estudiante">
+		    	<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>Ver Grupo de Eventos 
+		    </a>
+    	</li> 
+	    <li>
+		    <a id="tbb_view_payment_orders" title="Ver órdenes de pago de este estudiante">
+		    	<span class="glyphicon glyphicon-usd" aria-hidden="true"></span>Órdenes de Pago
+		    </a>
+    	</li> 
+	  </ul>
+	</div>
+</div>
+
+<h1 class="page-header">Listado de Estudiantes</h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+		<table id="table-pagination"></table>
+	</div>
+</div>
+
+<div id="option-content"></div>
+
+<form id="du_form">{% csrf_token %}
+	<input type="hidden" id="du_student_id" name="id" />
+	<input type="hidden" id="du_comentario" name="comenta" />
+</form>
+
+<div style="display:none" id="eventgroup_dialog_container">
+	<div id="find_eventgroup_div" style="padding: 10px">
+		<table id="eventgroup-table"></table>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block body_scripts %}
+
+<script>
+	function studentListRowStyle(row, index) {
+        var classes = ['active-text', 'success-text', 'info-text', 'warning-text', 'danger-text'];
+
+        if (row.approved == false ) return {classes: 'warning-text'};
+        return {classes: 'success-text'};
+    };
+    
+    $(document).ready(function() {
+    	 $('#table-pagination').mutate('height width', function(el,info) {
+	        $('#table-pagination').bootstrapTable('resetView');
+	    });
+    	
+    	$('#table-pagination').bootstrapTable({
+                method: 'get',
+                url: '/students/api/list/',
+                cache: false,
+                height: 600,
+                striped: true,
+                pagination: true,
+                search: false,
+                filterControl: true,
+                filterShowClear: true,
+                showColumns: true,
+                searchTimeOut: 1500,
+                trimOnSearch: false,
+                showRefresh: true,
+                minimumCountColumns: 2,
+                clickToSelect: true,
+                rowStyle: studentListRowStyle,
+                showExport: true,
+                exportDataType: 'all',
+                exportTypes: ['txt', 'csv', 'excel'],
+                toolbar: '#custom-toolbar',
+                columns: [{
+                    field: 'state',
+                    radio: true
+                }, {
+                    field: 'id',
+                    title: 'ID',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'last_name',
+                    title: 'Apellidos',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'first_name',
+                    title: 'Nombre',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'email',
+                    title: 'Correo',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'career',
+                    title: 'Carrera',
+                    sortable: true,
+                    filterControl: 'select',
+                    filterData: "var:CAREER_CHOICES"
+                }, {
+                    field: 'student_type',
+                    title: 'Tipo',
+                    sortable: true,
+                    formatter: studentTypeFormatter,
+                    filterControl: 'select',
+                    filterData: "var:STUDENT_TYPE_CHOICES"
+                }, {
+                    field: 'working',
+                    title: 'Trabaja',
+                    sortable: true,
+                    sorter: booleanSorter,
+                    formatter: boobleanFormatter,
+                    filterControl: 'select',
+                    filterData: "var:YESNO_CHOICES"
+                }, {
+                    field: 'campus_orig',
+                    title: 'Campus de Origen',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'approved',
+                    title: 'Datos Aprobados',
+                    sortable: true,
+                    sorter: booleanSorter,
+                    formatter: boobleanFormatter,
+                    filterControl: 'select',
+                    filterData: "var:YESNO_CHOICES"
+                }, {
+                    field: 'created',
+                    title: 'Creado',
+                    sortable: true,
+                    visible: false,
+                    filterControl: 'input'
+                }, {
+                    field: 'created_by',
+                    title: 'Creado por',
+                    sortable: true,
+                    visible: false,
+                    filterControl: 'input'
+                }, {
+                    field: 'modified',
+                    title: 'Modificado',
+                    sortable: true,
+                    visible: false,
+                    filterControl: 'input'
+                }, {
+                    field: 'modified_by',
+                    title: 'Modificado por',
+                    sortable: true,
+                    visible: false,
+                    filterControl: 'input'
+                }]
+            });
+    
+    	$('#eventgroup-table').mutate('height width', function(el,info) {
+	        $('#eventgroup-table').bootstrapTable('resetView');
+	    });
+    	
+    	$('#eventgroup-table').bootstrapTable({
+                method: 'get',
+                url: '/event_group/api/list/',
+                cache: false,
+                striped: true,
+                height: 430,
+                pagination: true,
+                search: true,
+                showColumns: true,
+                showRefresh: true,
+                minimumCountColumns: 2,
+                clickToSelect: true,
+                columns: [{
+                    field: 'state',
+                    radio: true
+                }, {
+                    field: 'id',
+                    title: 'ID',
+                    sortable: true
+                }, {
+                    field: 'name',
+                    title: 'Nombre',
+                    sortable: true,
+                }, {
+                    field: 'description',
+                    title: 'Descripción',
+                    sortable: true,
+                }, {
+                    field: 'student_type',
+                    title: 'Tipo de Estudiante',
+                    sortable: true,
+                }]
+            });
+    
+    	$('#tbb_assign_eventgroup_dialog').click(function(){
+			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (student == null){
+				bootbox.alert('Debe seleccionar un estudiante primero.');
+			} else {
+				if (student.approved){
+					var toolbar_footer = [{
+				        item: '<button type="button"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>',
+				        event: 'click',
+				        btnclass: 'btn btn-default',
+				        btntext: ' Asignar',
+				        callback: function( event ){
+				        	var event_group = $('#eventgroup-table').bootstrapTable('getSelections')[0];
+							if (event_group == null){
+								bootbox.alert('Debe seleccionar un grupo de eventos primero.');
+							} else {
+								$('#du_form')[0].action= "event_group/assign/" + event_group.id + "/to_student/" + student.id + "/";
+								$('#du_form')[0].method = "POST";
+								$('#du_student_id')[0].value = student.id;
+								PostAndLoadAjaxContent($('#du_form'));
+								event.data.close();
+							}
+				        }
+				    }];
+					
+					$.jsPanel({
+					  id:       "find_eventgroup_dialog",
+					  selector: "#e-jspanelclosed",
+					  title: 'Buscar Grupo de Eventos: ',
+					  bootstrap: true,
+					  position: "center",
+					  resizable: "disabled",
+					  controls: {
+					    maximize:     'disable',
+					    minimize:     'disable',
+					    normalize:    'disable',
+					    smallify:     'disable',
+					    maxtoScreen:  'disable'
+					  },
+					  toolbarFooter: toolbar_footer,
+					  size:     { width:  1000, height: 450 },
+					  content: $('#find_eventgroup_div'),
+					});
+					
+					$("#find_eventgroup_dialog").on("jspanelbeforeclose", function (event, id) {
+					    if( id === "find_eventgroup_dialog" ) {
+					        $('#find_eventgroup_div').appendTo('#eventgroup_dialog_container');
+					    }
+					});
+					} else {
+						bootbox.alert('El estudiante subió sus datos on-line, estos deben ser aprobados para poder ejecutar una acción sobre el mismo.');
+					}
+				}
+		});
+    
+	    $('#tbb_edit').click(function(){
+			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (student == null){
+				bootbox.alert('Debe seleccionar un estudiante primero.');
+			} else {
+				LoadAjaxContent("/students/" + student.id + "/upgrade/");
+			}
+		});
+		
+		$('#tbb_view_student_event').click(function(){
+			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (student == null){
+				bootbox.alert('Debe seleccionar un estudiante primero.');
+			} else {
+				LoadAjaxContent("/student_event/student/" + student.id + "/");
+			}
+		});
+		
+		$('#tbb_export').click(function(){
+			window.open("http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudent_excel.prpt/viewer", '_blank');
+		});
+		
+		$('#tbb_print').click(function(){
+		var student = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (student == null){
+				bootbox.alert('Debe seleccionar un estudiante primero.');
+			} else {
+				$.jsPanel({
+				  title: 'Datos del estudiante: ',
+				  bootstrap: true,
+				  position: "center",
+				  size:     { width:  800, height: 600 },
+				  content: '<embed src="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudent.prpt/generatedContent?userid=admin&password=password&output-type=pageable/pdf&student_id=' + student.id + '" width="100%" height="100%">'
+				});
+			}
+		});
+		
+		$('#tbb_view_student_event_print').click(function(){
+		var student = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (student == null){
+				bootbox.alert('Debe seleccionar un estudiante primero.');
+			} else {
+				$.jsPanel({
+				  title: 'Eventos de estudiante: ',
+				  bootstrap: true,
+				  position: "center",
+				  size:     { width:  800, height: 600 },
+				  content: '<embed src="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudent_events.prpt/generatedContent?userid=admin&password=password&output-type=pageable/pdf&pStudent=' + student.id + '" width="100%" height="100%">'
+				});
+			}
+		});
+		
+		$('#tbb_view_eventgroup_dialog').click(function(){
+			var toolbar_footer = [{
+		        item: '<button type="button"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>',
+		        event: 'click',
+		        btnclass: 'btn btn-default',
+		        btntext: ' Cerrar',
+		        callback: function( event ){
+					event.data.close();
+		        }
+		    }];
+					    
+			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
+				if (student == null){
+					bootbox.alert('Debe seleccionar un estudiante primero.');
+				} else {
+					$.jsPanel({
+					  title: 'Grupos de Eventos Relacionados con el Estudiante: ',
+					  bootstrap: true,
+					  position: "center",
+					  toolbarFooter: toolbar_footer,
+					  size:     { width:  800, height: 600 },
+					  load: {
+	        				url: "event_group/of_student/" + student.id + "/"
+	    				},
+					});
+				}
+		});
+		
+		$('#tbb_enrollment').click(function(){
+			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (student == null){
+				bootbox.alert('Debe seleccionar un estudiante primero.');
+			} else {
+				if (student.approved){
+					LoadAjaxContent("/enrollment/new/student/" +student.id +  "/");
+				} else {
+					bootbox.alert('El estudiante subió sus datos on-line, estos deben ser aprobados para poder ejecutar una acción sobre el mismo.');
+				}
+			}
+		});
+		
+		$('#tbb_view_enrollment').click(function(){
+			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (student == null){
+				bootbox.alert('Debe seleccionar un estudiante primero.');
+			} else {
+				if (student.approved){
+					LoadAjaxContent("/enrollment/student/" +student.id +  "/");
+				} else {
+					bootbox.alert('El estudiante subió sus datos on-line, estos deben ser aprobados para poder ejecutar una acción sobre el mismo.');
+				}
+			}
+		});
+		
+		$('#tbb_student_event').click(function(){
+			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (student == null){
+				bootbox.alert('Debe seleccionar un estudiante primero.');
+			} else {
+				if (student.approved){
+					LoadAjaxContent("/student_event/new/for_student/" + student.id +  "/");
+				} else {
+					bootbox.alert('El estudiante subió sus datos on-line, estos deben ser aprobados para poder ejecutar una acción sobre el mismo.');
+				}
+			}
+		});
+		
+		$('#tbb_view_payment_orders').click(function(){
+			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (student == null){
+				bootbox.alert('Debe seleccionar un estudiante primero.');
+			} else {
+				if (student.approved){
+					LoadAjaxContent("/payment_order/student/" + student.id +  "/");
+				} else {
+					bootbox.alert('El estudiante subió sus datos on-line, estos deben ser aprobados para poder ejecutar una acción sobre el mismo.');
+				}
+			}
+		});
+		
+		$('#tbb_payment_order').click(function(){
+			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (student == null){
+				bootbox.alert('Debe seleccionar un estudiante primero.');
+			} else {
+				if (student.approved){
+					LoadAjaxContent("/payment_order/new/student/" + student.id +  "/");
+				} else {
+					bootbox.alert('El estudiante subió sus datos on-line, estos deben ser aprobados para poder ejecutar una acción sobre el mismo.');
+				}
+			}
+		});
+		
+		$('#tbb_delete').click(function(){
+			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (student == null){
+				bootbox.alert('Debe seleccionar un estudiante primero.');
+			} else {
+				
+				var toolbar_footer = [{
+			        item: '<button type="button"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>',
+			        event: 'click',
+			        btnclass: 'btn btn-default',
+			        btntext: 'Aceptar',
+			         callback: function( event ){
+			        	$('#du_form')[0].action= "/students/" + student.id + "/delete/";
+						$('#du_form')[0].method = "POST";
+						$('#du_student_id')[0].value = student.id;
+					//	$('#du_student_id')[0].value = student.id;
+						$('#du_comentario').val($("#id_end_obs").val());
+						PostAndLoadAjaxContent($('#du_form'));
+			        	
+			    //    <!--	var student_event = $('#table-pagination').bootstrapTable('getAllSelections');
+			    //    	var str_ids = "";
+		       // 		for (var x = 0; x < student_event.length; x++){ 
+	        	//			str_ids  += student_event[x].id + ",";		        			
+		        //		}
+		        		
+		        //		$('#du_ids').val(str_ids.substring(0, str_ids.length - 1));
+			     //   	$('#du_form')[0].action="/student_event/change_state/ABO/";
+			     //   	$("#du_end_obs").val($("#id_end_obs").val());
+				//		PostAndLoadAjaxContent($('#du_form'));
+				//		event.data.close(); -->
+			    	}
+			    }, {
+			        item: '<button type="button"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>',
+			        event: 'click',
+			        btnclass: 'btn btn-default',
+			        btntext: 'Cancel',
+			         callback: function( event ){
+			        	$('.top-right').notify({
+						    message: { text: 'Operación cancelada por el usuario.' },
+						    type: 'warning',
+						  }).show();
+						  event.data.close();
+			    	}
+			    }];
+				
+				
+					$.jsPanel({
+				  id:       "obs_dialog",
+				  selector: "#e-jspanelclosed",
+				  title: 'Eliminar razones: ',
+				  bootstrap: true,
+				  position: "center",
+				  resizable: "disabled",
+				  controls: {
+				    maximize:     'disable',
+				    minimize:     'disable',
+				    normalize:    'disable',
+				    smallify:     'disable',
+				    maxtoScreen:  'disable'
+				  },
+				  toolbarFooter: toolbar_footer,
+				  size:     { width:  600, height: 350 },
+				  content: '<div style="padding:10px"> \
+				            <label for="id_end_obs">Introduzca las observaciones o razones por la cual va ha Eliminar.</label> \
+				            <textarea class="form-control" cols="80" id="id_end_obs" name="end_obs" rows="15"></textarea> \
+				            </div>',
+				});
+			}
+		});
+	});
+</script>
+{% endblock %}

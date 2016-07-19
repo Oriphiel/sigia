@@ -1,0 +1,85 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+<h1 class="page-header">{{ title }} </h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+		<blockquote>
+            <p>Por favor llene los datos del formulario a continuación mostrados 
+            	para {% if action == 'CREATE' %}registrar un {% else %}actualizar el {% endif %}parroquia.</p>
+        </blockquote>
+
+<form id="parish_form" method="post" enctype="multipart/form-data">{% csrf_token %}
+	<div class="fieldWrapper">  
+		<div class="row">
+			<div class="col-sm-6">
+				<label for="{{ parish_form.name.auto_id }}">{{ parish_form.name.label }}</label>
+				{% if parish_form.name.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{parish_form.name.errors}}'>*</label>
+				{% endif %} 
+				{{ parish_form.name }}
+			</div>
+			
+			<div class="col-sm-6">
+				<label for="{{ parish_form.canton.auto_id }}">{{ parish_form.canton.label }}</label>
+				{% if parish_form.canton.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{parish_form.canton.errors}}'>*</label>
+				{% endif %} 
+				{{ parish_form.canton }}
+				
+			</div>			
+		</div>
+	</div>
+		
+	<br />
+		
+	{% if parish_form.errors %}
+		<div class="panel panel-danger">
+		    <div class="panel-heading"><h3 class="panel-title">Errores:</h3></div>
+		    <div class="panel-body">
+		    		<b>Errores detectados de la carrera:</b><br />
+		    		<ul>
+						{% for field in parish_form %}
+							{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+						{% endfor %}
+						{% for field in personal_info_form %}
+							{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+						{% endfor %}
+					</ul>
+		    </div>
+		</div>
+	{% endif %}
+	
+	<div style="width: 100%; text-align: right">
+		{% if action == 'CREATE' %}
+	    	<input class="btn btn-default" type="button" id="btn_add_parish" value="Registrar parroquia"/>
+	    {% else %}
+	    	<input class="btn btn-default" type="button" id="btn_upd_parish" value="Actualizar parroquia"/>
+	    {% endif %}
+	</div>
+
+</form>
+
+{% endblock %}
+
+{% block body_scripts %}
+<script>	
+	$(function() {
+		{% if action == 'UPGRADE' %}
+		$('#btn_upd_parish').click(function(){
+			$('#parish_form')[0].action="/parish/" + {{parish_id}} + "/upgrade/";
+			PostAndLoadAjaxContent($('#parish_form'));
+		});
+		{% else %}
+		$('#btn_add_parish').click(function(){
+			$('#parish_form')[0].action="/parish/new/";
+			PostAndLoadAjaxContent($('#parish_form'));
+		});
+		{% endif %}
+		
+		$('[data-toggle="tooltip"]').tooltip({html:true}); 
+	});
+</script>
+{% endblock %}

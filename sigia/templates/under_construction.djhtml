@@ -1,0 +1,17 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+<h1 class="page-header">En Construcción</h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+		<img src="{{ STATIC_URL }}img/under_construction.png" alt="Imagen En Construcción" width="100%">
+		<blockquote>
+            <p style="text-align: justify;">Lo sentimos esta sección se encuentra actualmente en construcción. Para más detalles o hacer una
+            sugerencia sobre el contenido que debería presentarse en esta sección, contactar con el desarrollador:
+            <b>Ing. Dario Jorge Vázquez Arguija &#60;dvazquez@aitec.edu.ec&#62;</b>.</p>
+            <div style="text-align: right;">Gracias por su cooperación y disculpe las molestias.</div>
+        </blockquote>
+ 	</div>
+ </div>
+ 
+ {% endblock %}

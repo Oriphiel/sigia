@@ -1,0 +1,18 @@
+{# Include the hidden fields in the form #}
+{% if forloop.first %}
+    {% for hidden in form.hidden_fields %}
+    {{ hidden }}
+    {% endfor %}
+{% endif %}
+
+{% for field in form.visible_fields %}
+    <div class="fieldWrapper">        
+        <strong>{{ field.label_tag }}</strong> <br/>
+        {{ field }}
+        {{ field.errors }}
+    </div>
+{% endfor %}
+{% if error %}
+	<div style="color: red;">{{ error|escape }}</div>
+	<br />
+{% endif %}

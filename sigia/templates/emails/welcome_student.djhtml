@@ -1,0 +1,22 @@
+Estimado/a Estudiante
+
+{{ user_full_name }}
+Del curso:  {{ course_full_name }}
+
+( Correo de Pruebas # 3 )
+
+Nos complace darle la más cordial bienvenida al sistema de Notificaciones Automáticas del Sistema Integrado de Gestión de Información Académica del AITEC (SIGIA-AITEC).
+
+El cual nos ayudará a establecer una comunicación entre el tecnológico y usted sobre asuntos:
+·	Académicos,
+·	Financieros, y
+·	Social
+
+Este correo ha sido generado automáticamente por SIGIA-AITEC y no debe ser respondido, en caso de que los datos sean incorrectos, el correo haya sido clasificado como SPAM o tenga alguna sugerencia por favor háganos saber a las direcciones dvazquez@aitec.edu.ec o fmoya@aitec.edu.ec, reenviando el correo y los datos o sugerencias.
+Dado que estamos en período de pruebas es posible que este correo le llegue más de una vez, nos disculpamos por los inconvenientes que esto le pueda causar.
+
+Atentamente
+
+Sistema Integrado de Gestión de Información Académica
+AITEC
+Tecnológico Almirante Illingworth

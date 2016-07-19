@@ -1,0 +1,83 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+
+<h1 class="page-header">{{title}}</h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+		<blockquote>Por favor llene los datos del formulario a continuación mostrados para {% if action == 'CREATE' %}registrar una carrera nueva{% else %}actualizar la carrera{% endif %}.</blockquote>
+		<form id="career_form" method="post" enctype="multipart/form-data">{% csrf_token %}
+			<div class="fieldWrapper">  
+				<div class="row">
+					<div class="col-sm-6">
+						<label for="{{ career_form.name.auto_id }}">{{ career_form.name.label }}</label>
+						{% if career_form.name.errors %}
+						<label class="error" data-toggle="tooltip" data-placement="top" 
+							data-original-title='{{career_form.name.errors}}'>*</label>
+						{% endif %} 
+						{{ career_form.name }}
+					</div>
+					
+					<div class="col-sm-6">
+						<label for="{{ career_form.description.auto_id }}">{{ career_form.description.label }}</label>
+						{% if career_form.description.errors %}
+						<label class="error" data-toggle="tooltip" data-placement="top" 
+							data-original-title='{{career_form.description.errors}}'>*</label>
+						{% endif %} 
+						{{ career_form.description }}
+					</div>			
+				</div>
+			</div>
+				
+			<br />
+				
+			{% if career_form.errors %}
+				<div class="panel panel-danger">
+				    <div class="panel-heading"><h3 class="panel-title">Errores:</h3></div>
+				    <div class="panel-body">
+				    		<b>Errores detectados de la carrera:</b><br />
+				    		<ul>
+								{% for field in career_form %}
+									{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+								{% endfor %}
+								{% for field in personal_info_form %}
+									{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+								{% endfor %}
+							</ul>
+				    </div>
+				</div>
+			{% endif %}
+			
+			<div style="width: 100%; text-align: right">
+				{% if action == 'CREATE' %}
+			    	<input class="btn btn-default" id="btn_new_career" type="button" value="Registrar Carrera"/>
+			    {% else %}
+			    	<input class="btn btn-default" id="btn_upd_career" type="button" value="Actualizar Carrera"/>
+			    {% endif %}
+			</div>
+		
+		</form>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block body_scripts %}
+<script>	
+	$(function() {		
+		{% if action == 'UPGRADE' %}
+			$('#btn_upd_career').click(function(){
+				$('#career_form')[0].action="/career/" + {{career_id}} + "/upgrade/";
+				PostAndLoadAjaxContent($('#career_form'));
+			});
+		{% else %}
+			$('#btn_new_career').click(function(){
+				$('#career_form')[0].action="/career/new/";
+				PostAndLoadAjaxContent($('#career_form'));
+			});
+		{% endif %}
+		
+		$('[data-toggle="tooltip"]').tooltip({html:true}); 
+	});
+</script>
+{% endblock %}

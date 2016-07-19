@@ -1,0 +1,204 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+
+<h1 class="page-header">Listado de Errores</h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+<div id="custom-toolbar">
+    <div class="btn-group" role="group">
+        <button class="btn btn-default" onclick="LoadAjaxContent('/bug_report/new/');"  title="Registrar Error">
+			<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Nuevo
+    	</button>
+    	<button class="btn btn-default" id="tbb_print" title="Imprimir lista de errores">
+			<span class="glyphicon glyphicon-print" aria-hidden="true"></span> Ver/Imprimir
+    	</button>
+        <button class="btn btn-default" id="tbb_edit" title="Editar Error">
+			<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Editar
+    	</button>
+        <button class="btn btn-default" id="tbb_delete" title="Eliminar Error">
+			<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Eliminar
+    	</button>      
+    </div>
+    
+    <div class="btn-group" role="group">
+    	<button class="btn btn-default" id="tbb_accept" title="Aceptar Error">
+			<span class="glyphicon glyphicon-log-in" aria-hidden="true"></span> Aceptar
+    	</button>
+        <button class="btn btn-default" id="tbb_solve" title="Dar Por Solucionado Error">
+			<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Solucionado
+    	</button>    
+    </div>
+</div>
+
+<table id="table-pagination"></table>
+
+<div id="option-content"></div>
+
+<form id="du_form">{% csrf_token %}
+	<input type="hidden" id="du_bug_report_id" name="id" />
+</form>
+
+</div>
+</div>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+	function rowStyle(row, index) {
+        var classes = ['active-text', 'success-text', 'info-text', 'warning-text', 'danger-text'];
+
+        if (row.approved == false ) return {classes: 'warning-text'};
+        return {classes: 'success-text'};
+    }
+    var $table = null;
+    $(document).ready(function() {
+    	$('#table-pagination').mutate('height width', function(el,info) {
+	        $('#table-pagination').bootstrapTable('resetView');
+	    });
+    	
+    	$('#table-pagination').bootstrapTable({
+                method: 'get',
+                url: '/bug_report/api/list/',
+                cache: false,
+                height: 600,
+                striped: true,
+                pagination: true,
+                search: true,
+                showColumns: true,
+                showRefresh: true,
+                minimumCountColumns: 2,
+                clickToSelect: true,
+                //rowStyle: studentListRowStyle,
+                toolbar: '#custom-toolbar',
+                columns: [{
+                    field: 'state',
+                    radio: true
+                }, {
+                    field: 'id',
+                    title: 'ID',
+                    sortable: true
+                }, {
+                    field: 'name',
+                    title: 'Nombre',
+                    sortable: true,
+                }, {
+                    field: 'gravity',
+                    title: 'Gravedad',
+                    sortable: true,
+                }, {
+                    field: 'description',
+                    title: 'Descripción',
+                    sortable: true,
+                }, {
+                    field: 'bug_state',
+                    title: 'Estado',
+                    sortable: true,
+                }]
+            });
+		
+		$('#tbb_edit').click(function(){
+			var bug_report = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (bug_report == null){
+				bootbox.alert('Debe seleccionar un Error primero.');
+			} else {
+				LoadAjaxContent("/bug_report/" + bug_report.id + "/upgrade/");
+			}
+		});
+		
+		$('#tbb_solve').click(function(){
+			var bug_report = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (bug_report == null){
+				bootbox.alert('Debe seleccionar un Error primero.');
+			} else {				
+				if (bug_report.active){
+					var message = "Por favor confirme que desea terminar el Error: " + bug_report.name;
+					bootbox.confirm(message, 
+						function(result) {
+							if(result){
+								$('#du_form')[0].action = "/bug_report/" + bug_report.id + "/terminate/";
+								$('#du_form')[0].method = "POST";
+								$('#du_bug_report_id')[0].value = bug_report.id;
+								PostAndLoadAjaxContent($('#du_form'));
+							} else {
+								$('.top-right').notify({
+								    message: { text: 'Operación cancelada por el usuario.' },
+								    type: 'warning',
+								  }).show();
+							}
+						});
+				} else {
+					bootbox.alert('El Error debe estar activo antes de ser finalizado.');
+				}
+			}
+		});
+		
+		$('#tbb_accept').click(function(){
+			var bug_report = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (bug_report == null){
+				bootbox.alert('Debe seleccionar un Error primero.');
+			} else {
+				if (bug_report.active){
+					bootbox.alert('El Error ya se encuentra activado.');
+					return;
+				}
+				if (bug_report.finalized){
+					bootbox.alert('Un Error finalizado no puede ser reactivado.');
+					return;
+				}
+				
+				var active = false;
+				var array = $table.bootstrapTable('getData');
+				for (i = 0; i < array.length; i++){
+					if (array[i].active){
+						active = true;
+						break;
+					}
+				}
+				
+				if (active){
+					bootbox.alert('No se puede activar un Error si se encuentra otro activo.');
+					return;
+				} else {
+					var message = "Por favor confirme que desea activar el Error: " + bug_report.name;
+					bootbox.confirm(message, 
+						function(result) {
+							if(result){
+								$('#du_form')[0].action= "/bug_report/" + bug_report.id + "/activate/";
+								$('#du_form')[0].method = "POST";
+								$('#du_bug_report_id')[0].value = bug_report.id;
+								PostAndLoadAjaxContent($('#du_form'));
+							} else {
+								$('.top-right').notify({
+								    message: { text: 'Operación cancelada por el usuario.' },
+								    type: 'warning',
+								  }).show();
+							}
+					}); 
+				}
+			}
+		});
+		
+		$('#tbb_delete').click(function(){
+			var bug_report = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (bug_report == null){
+				bootbox.alert('Debe seleccionar un Error primero.');
+			} else {
+				bootbox.confirm("Por favor confirme que desea eliminar el Error: " + bug_report.name, function(result) {
+					if(result){
+						$('#du_form')[0].action= "/bug_report/" + bug_report.id + "/delete/";
+						$('#du_form')[0].method = "POST";
+						$('#du_bug_report_id')[0].value = bug_report.id;
+						PostAndLoadAjaxContent($('#du_form'));
+					} else {
+						$('.top-right').notify({
+						    message: { text: 'Operación cancelada por el usuario.' },
+						    type: 'warning',
+						  }).show();
+					}
+				}); 
+			}
+		});
+	});
+</script>
+{% endblock %}

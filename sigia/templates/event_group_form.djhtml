@@ -1,0 +1,160 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+
+<h1 class="page-header">{{ title }} </h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+	
+	<blockquote>
+    	Por favor llene los datos del formulario a continuación mostrados para 
+		{% if action == 'CREATE' %}registrar un{% else %}actualizar al{% endif %} grupo de eventos.
+    </blockquote>
+
+	<form class="form-horizontal" id="event_group_form" method="post" enctype="multipart/form-data">{% csrf_token %}
+	
+	<label for="{{ event_group_form.name.auto_id }}">{{ event_group_form.name.label }}</label>
+	{% if event_group_form.name.errors %}
+	<label class="error" data-toggle="tooltip" data-placement="top" 
+		data-original-title='{{event_group_form.name.errors}}'>*</label>
+	{% endif %} 
+	{{ event_group_form.name }}
+	
+	<label for="{{ event_group_form.description.auto_id }}">{{ event_group_form.description.label }}</label>
+	{% if event_group_form.description.errors %}
+	<label class="error" data-toggle="tooltip" data-placement="top" 
+		data-original-title='{{event_group_form.description.errors}}'>*</label>
+	{% endif %} 
+	{{ event_group_form.description }}
+	
+	<label for="{{ event_group_form.student_type.auto_id }}">{{ event_group_form.student_type.label }}</label>
+	{% if event_group_form.student_type.errors %}
+	<label class="error" data-toggle="tooltip" data-placement="top" 
+		data-original-title='{{event_group_form.student_type.errors}}'>*</label>
+	{% endif %} 
+	{{ event_group_form.student_type }}
+		
+	<label>Eventos que conformarán el grupo (en orden):</label>
+	  <div class="row">
+		<div class="col-sm-6">
+		<div style="text-align: right;">
+		    <button class="btn btn-default" type="button" id="btn-add">
+		    	<span class="fa fa-arrow-right" aria-hidden="true"></span> Añadir
+		    </button>
+		</div>
+		<label for="select-from">No Seleccionados:</label>
+	    <select name="selectfrom" id="select-from" multiple size="10" class="form-control" style="width:100%; margin-bottom: 7px;">  
+	      {% for event_type in event_types %}
+	      	<option value="{{ event_type.id }}">{{ event_type.name }}</option>
+	      {% endfor %}
+	    </select>
+	    
+	    </div>
+	    <div class="col-sm-6">
+	    	<div>
+		    	<button class="btn btn-default" type="button" id="btn-remove">
+					<span class="fa fa-arrow-left" aria-hidden="true"></span> Eliminar
+				</button>
+				<button class="btn btn-default" type="button" id="btn-up">
+					<span class="fa fa-arrow-up" aria-hidden="true"></span> Subir
+				</button>
+				<button class="btn btn-default" type="button" id="btn-down">
+					<span class="fa fa-arrow-down" aria-hidden="true"></span> Bajar
+				</button>
+	    	</div>
+		    <label for="events">Seleccionados:</label>
+		    <select name="events" id="events" multiple="multiple" size="10" class="form-control" style="width:100%; margin-bottom: 7px;">
+		    {% if action == 'UPGRADE' %}	
+		    	{% for event_type in selected_event_types %}
+			      	<option value="{{ event_type.id }}">{{ event_type.name }}</option>
+			    {% endfor %}
+			{% endif %}
+		    </select>
+	    </div>
+	  </div>
+	  
+	{% if event_group_form.errors %}
+		<div class="panel panel-danger">
+		    <div class="panel-heading"><h3 class="panel-title">Errores:</h3></div>
+		    <div class="panel-body">
+		    		<b>Errores detectados de la carrera:</b><br />
+		    		<ul>
+						{% for field in event_group_form %}
+							{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+						{% endfor %}
+						{% for field in personal_info_form %}
+							{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+						{% endfor %}
+					</ul>
+		    </div>
+		</div>
+	{% endif %}
+	  
+	<div style="width: 100%; text-align: right; vertical-align: middle">
+		{% if action == 'CREATE' %}
+	    	<input class="btn btn-primary" type="button" value="Registrar Tipo de Evento" id="btn_reg_event_group"/>
+	    {% else %}
+	    	<input class="btn btn-primary" type="button" value="Actualizar Tipo de Evento" id="btn_upd_event_group"/>
+	    {% endif %}
+	</div>		
+
+	</form>
+	</div>
+</div>
+	
+
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+	$(function() {
+		{% if action == 'UPGRADE' %}
+			$('#btn_upd_event_group').click(function(){
+				$('#events option').prop('selected', 'selected');
+				$('#event_group_form')[0].action="/event_group/" + {{id_event_group}} + "/upgrade/";
+				PostAndLoadAjaxContent($('#event_group_form'));
+			});
+		{% else %}
+			$('#btn_reg_event_group').click(function(){
+				$('#events option').prop('selected', 'selected');
+				$('#event_group_form')[0].action="/event_group/new/";
+				PostAndLoadAjaxContent($('#event_group_form'));
+			});
+		{% endif %}
+		
+		$('#btn-add').click(function(){
+	        $('#select-from option:selected').each( function() {
+	                $('#events').append("<option value='"+$(this).val()+"'>"+$(this).text()+"</option>");
+	            $(this).remove();
+	        });
+	    });
+	    $('#btn-remove').click(function(){
+	        $('#events option:selected').each( function() {
+	            $('#select-from').append("<option value='"+$(this).val()+"'>"+$(this).text()+"</option>");
+	            $(this).remove();
+	        });
+	    });
+	    $('#btn-up').bind('click', function() {
+	        $('#events option:selected').each( function() {
+	            var newPos = $('#events option').index(this) - 1;
+	            if (newPos > -1) {
+	                $('#events option').eq(newPos).before("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+	                $(this).remove();
+	            }
+	        });
+	    });
+	    $('#btn-down').bind('click', function() {
+	        var countOptions = $('#events option').size();
+	        $('#events option:selected').each( function() {
+	            var newPos = $('#events option').index(this) + 1;
+	            if (newPos < countOptions) {
+	                $('#events option').eq(newPos).after("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+	                $(this).remove();
+	            }
+	        });
+	    });
+		
+		 $('[data-toggle="tooltip"]').tooltip({html:true}); 
+	});
+</script>
+{% endblock %}

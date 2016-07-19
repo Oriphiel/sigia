@@ -1,0 +1,537 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% load sigia_auth_filters %}
+
+{% block content %}
+
+<h1 class="page-header">Enviar Correo a Estudiantes</h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+	<form id="email_form" action="/email/students/" method="post" enctype="multipart/form-data">{% csrf_token %}
+			<div class="row">
+				<div class="form-group">
+					<div class="control-label col-sm-1">
+						<label for="{{ email_form.to.auto_id }}">Para: </label>			
+						{% if email_form.to.errors %}
+						<label class="error" data-toggle="tooltip" data-placement="top" 
+							data-original-title='{{email_form.to.errors}}'>*</label>
+						{% endif %} 
+					</div>
+					<div class="col-sm-10">
+						{{ email_form.to }}
+					</div>
+					<div class="col-sm-1">
+						<button id="btn_to" type="button" style="width:100%" title="Seleccionar Estudiantes a Enviar">
+							<span class="glyphicon glyphicon-search" aria-hidden="true"></span> Buscar
+						</button>
+					</div>
+				</div>
+			</div>
+			<div style="text-align:right">
+			<button type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+			  <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span> Mostrar Más Opciones
+			</button>
+			</div>
+			
+			<div class="collapse" id="collapseExample">
+			  <div class="well">
+			    <div class="row">
+				<div class="form-group">
+					<div class="control-label col-sm-2">
+						<label for="{{ email_form.cc.auto_id }}">Copia: </label>			
+						{% if email_form.cc.errors %}
+						<label class="error" data-toggle="tooltip" data-placement="top" 
+							data-original-title='{{email_form.cc.errors}}'>*</label>
+						{% endif %} 
+					</div>
+					<div class="col-sm-9">
+						{{ email_form.cc }}
+					</div>
+					<div class="col-sm-1">
+						<button type="button" id="btn_cc" style="width:100%" title="Seleccionar Usuarios a Enviar una Copia">
+							<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="form-group">
+					<div class="control-label col-sm-2">
+						<label for="{{ email_form.cco.auto_id }}">Copia Oculta:</label>			
+						{% if email_form.cco.errors %}
+						<label class="error" data-toggle="tooltip" data-placement="top" 
+							data-original-title='{{email_form.cco.errors}}'>*</label>
+						{% endif %} 
+					</div>
+					<div class="col-sm-9">
+						{{ email_form.cco }}
+					</div>
+					<div class="col-sm-1">
+						<button type="button" id="btn_cco" style="width:100%" title="Seleccionar Usuarios a Enviar una Copia Oculta">
+							<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+			  </div>
+			</div>
+			
+			<div class="row">
+				<div class="form-group">
+					<div class="control-label col-sm-1">
+						<label for="{{ email_form.subject.auto_id }}">Asunto:</label>			
+						{% if email_form.subject.errors %}
+						<label class="error" data-toggle="tooltip" data-placement="top" 
+							data-original-title='{{email_form.subject.errors}}'>*</label>
+						{% endif %} 
+					</div>
+					<div class="col-sm-11">
+						{{ email_form.subject }}
+					</div>
+				</div>
+			</div>
+			
+			<br />
+	
+			<div id="option-content" style="display:none">
+				{{ email_form.to_ids }}
+				{{ email_form.cc_ids }}
+				{{ email_form.cco_ids }}
+			</div>
+			
+			{{ email_form.body }}
+			
+			<!-- <textarea class="form-control" rows="15" id="id_body" name="body"></textarea> -->
+		</div>
+	</div>
+	
+	{% if email_form.errors %}
+	
+	<div class="panel panel-danger">
+	    <div class="panel-heading"><h3 class="panel-title">Errores:</h3></div>
+	    <div class="panel-body">
+    		<b>Errores detectados al enviar el correo:</b><br />
+    		<ul>
+				{% for field in email_form %}
+					{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+				{% endfor %}
+			</ul>
+	    </div>
+	</div>
+	
+	{% endif %}
+	
+	<div style="text-align:right">
+		<button class="btn" type="submit" id="btn_send_email">
+			<span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Enviar Correo
+		</button>
+	</div>
+
+</form>
+
+<form id="du_form">{% csrf_token %}
+	<input type="hidden" id="du_student_id" name="id" />
+</form>
+
+<div style="display:none" id="email_dialog_container">
+	<div id="email_div" style="padding: 10px">
+        <table id="student_table"></table>
+	</div>
+</div>
+
+<div style="display:none" id="cc_dialog_container">
+	<div id="cc_div" style="padding: 10px">
+        <table id="cc_table"></table>
+	</div>
+</div>
+
+<div style="display:none" id="cco_dialog_container">
+	<div id="cco_div" style="padding: 10px">
+        <table id="cco_table"></table>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block body_scripts %}
+
+<script>
+	function typeFormatter(value, row) {
+		if (value == 'PRE') return 'Pre-Tecnológico';
+		if (value == 'EST') return 'Estudiando';
+		if (value == 'EGR') return 'Egresado';
+		if (value == 'TIT') return 'Titulado';
+		if (value == 'BAJ') return 'Baja';
+		if (value == 'ENE') return 'ENES';
+		if (value == 'SBA') return 'Ser Bachiller';
+		if (value == 'CON') return 'Educación Continua';
+		return value;
+    }
+
+	function studentListRowStyle(row, index) {
+        var classes = ['active-text', 'success-text', 'info-text', 'warning-text', 'danger-text'];
+
+        if (row.approved == false ) return {classes: 'warning-text'};
+        return {classes: 'success-text'};
+    };
+    
+    $(document).ready(function() {
+    	 $('#student_table').mutate('height width', function(el,info) {
+	        $('#student_table').bootstrapTable('resetView');
+	    });
+	    
+	    $('#cc_table').mutate('height width', function(el,info) {
+	        $('#cc_table').bootstrapTable('resetView');
+	    });
+    	
+    	$('#cco_table').mutate('height width', function(el,info) {
+	        $('#cc_table').bootstrapTable('resetView');
+	    });
+    	
+    	TinyMCEStart('#id_body', 'extreme');
+    	
+    	$('#student_table').bootstrapTable({
+                method: 'get',
+                url: '/students/api/list/',
+                cache: false,
+                height: 450,
+                striped: true,
+                search: false,
+                showColumns: true,
+                showRefresh: true,
+                showFooter: false,
+                trimOnSearch: false,
+                minimumCountColumns: 2,
+                pagination: true,
+                clickToSelect: true,
+                filterControl: true,
+                filterShowClear: true,
+                maintainSelected: true,
+                showExport: true,
+                exportDataType: 'all',
+                exportTypes: ['txt', 'csv', 'excel'],
+                rowStyle: studentListRowStyle,
+                columns: [{
+                    field: 'state',
+                    checkbox: true
+                }, {
+                    field: 'id',
+                    title: 'ID',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'last_name',
+                    title: 'Apellidos',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'first_name',
+                    title: 'Nombre',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'email',
+                    title: 'Correo',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'career',
+                    title: 'Carrera',
+                    sortable: true,
+                    filterControl: 'select',
+                    filterData: "var:CAREER_CHOICES"
+                }, {
+                    field: 'student_type',
+                    title: 'Tipo',
+                    sortable: true,
+                    formatter: typeFormatter,
+                    filterControl: 'select',
+                    filterData: "var:STUDENT_TYPE_CHOICES"
+                }, {
+                    field: 'working',
+                    title: 'Trabaja',
+                    sortable: true,
+                    sorter: booleanSorter,
+                    formatter: boobleanFormatter,
+                    filterControl: 'select',
+                    filterData: "var:YESNO_CHOICES"
+                }, {
+                    field: 'campus_orig',
+                    title: 'Campus de Origen',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'approved',
+                    title: 'Datos Aprobados',
+                    sortable: true,
+                    sorter: booleanSorter,
+                    formatter: boobleanFormatter,
+                    filterControl: 'select',
+                    filterData: "var:YESNO_CHOICES"
+                }, {
+                    field: 'created',
+                    title: 'Creado',
+                    sortable: true,
+                    visible: false,
+                    filterControl: 'input'
+                }, {
+                    field: 'created_by',
+                    title: 'Creado por',
+                    sortable: true,
+                    visible: false,
+                    filterControl: 'input'
+                }, {
+                    field: 'modified',
+                    title: 'Modificado',
+                    sortable: true,
+                    visible: false,
+                    filterControl: 'input'
+                }, {
+                    field: 'modified_by',
+                    title: 'Modificado por',
+                    sortable: true,
+                    visible: false,
+                    filterControl: 'input'
+                }]
+            });
+            
+            $('#cc_table').bootstrapTable({
+                method: 'get',
+                url: '/teachers_admins/api/list/',
+                cache: false,
+                height: 450,
+                striped: true,
+                search: false,
+                showColumns: true,
+                showRefresh: true,
+                showFooter: false,
+                trimOnSearch: false,
+                minimumCountColumns: 2,
+                pagination: false,
+                clickToSelect: true,
+                filterControl: true,
+                filterShowClear: true,
+                maintainSelected: true,
+                showExport: true,
+                exportDataType: 'all',
+                exportTypes: ['txt', 'csv', 'excel'],
+                rowStyle: studentListRowStyle,
+                columns: [{
+                    field: 'state',
+                    checkbox: true
+                }, {
+                    field: 'id',
+                    title: 'ID',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'last_name',
+                    title: 'Apellidos',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'first_name',
+                    title: 'Nombre',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'email',
+                    title: 'Correo',
+                    sortable: true,
+                    filterControl: 'input'
+                }]
+            });
+            
+            $('#cco_table').bootstrapTable({
+                method: 'get',
+                url: '/teachers_admins/api/list/',
+                cache: false,
+                height: 450,
+                striped: true,
+                search: false,
+                showColumns: true,
+                showRefresh: true,
+                showFooter: false,
+                trimOnSearch: false,
+                minimumCountColumns: 2,
+                pagination: false,
+                clickToSelect: true,
+                filterControl: true,
+                filterShowClear: true,
+                maintainSelected: true,
+                showExport: true,
+                exportDataType: 'all',
+                exportTypes: ['txt', 'csv', 'excel'],
+                rowStyle: studentListRowStyle,
+                columns: [{
+                    field: 'state',
+                    checkbox: true
+                }, {
+                    field: 'id',
+                    title: 'ID',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'last_name',
+                    title: 'Apellidos',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'first_name',
+                    title: 'Nombre',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'email',
+                    title: 'Correo',
+                    sortable: true,
+                    filterControl: 'input'
+                }]
+            });
+    
+    	$('#btn_send_email').click(function(){
+    		$('#id_body').tinymce().save();
+    		$('#id_body').val(tinymce.activeEditor.getContent({format: 'raw'}));
+			PostAndLoadAjaxContent($('#email_form'));
+    	});
+    
+		$('#btn_to').click(function(){
+			var toolbar_footer = [{
+		        item: '<button type="button"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>',
+		        event: 'click',
+		        btnclass: 'btn btn-default',
+		        btntext: ' Seleccionar',
+		        callback: function( event ){
+		        	var students = $('#student_table').bootstrapTable('getAllSelections');
+		        	if (students.length != 0){
+		        		var str_emails_and_names = "";
+		        		var str_ids = "";
+		        		
+		        		for (var x = 0; x < students.length; x++){ 
+		        			if (students[x].email != "\"anonimous@noserver.nodomain\"" && students[x].email != "noemail@nodomain.com"){
+		        				str_emails_and_names += students[x].first_name.split(" ")[0] + 
+		        					" " +students[x].last_name.split(" ")[0] + " <" + students[x].email + ">;";
+		        				str_ids  += students[x].id + ",";
+		        			}		        			
+		        		}
+		        		$('#id_to').val(str_emails_and_names.substring(0, str_emails_and_names.length - 1));
+		        		$('#id_to_ids').val(str_ids.substring(0, str_ids.length - 1));
+		        		event.data.close();
+		        	} else {
+		        		bootbox.alert('Debe seleccionar al menos un estudiante.');
+		        	}
+		        }
+		    }];
+		    
+			$.jsPanel({
+			  id:       "email_write_dialog",
+			  selector: "#e-jspanelclosed",
+			  title: 'Redactar email: ',
+			  bootstrap: true,
+			  position: "center",
+			  toolbarFooter: toolbar_footer,
+			  size:     { width:  1000, height: 450 },
+			  content: $('#email_div'),
+			});
+			
+			$("#email_write_dialog").on("jspanelbeforeclose", function (event, id) {
+			    if( id === "email_write_dialog" ) {
+			        $('#email_div').appendTo('#email_dialog_container');
+			    }
+			});
+		});
+		
+		$('#btn_cc').click(function(){
+			var toolbar_footer = [{
+		        item: '<button type="button"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>',
+		        event: 'click',
+		        btnclass: 'btn btn-default',
+		        btntext: ' Seleccionar',
+		        callback: function( event ){
+		        	var students = $('#cc_table').bootstrapTable('getAllSelections');
+		        	if (students.length != 0){
+		        		var str_emails_and_names = "";
+		        		var str_ids = "";
+		        		for (var x = 0; x < students.length; x++){ 
+		        			if (students[x].email != "\"anonimous@noserver.nodomain\"" && students[x].email != "noemail@nodomain.com"){
+		        				str_emails_and_names += students[x].first_name.split(" ")[0] + 
+		        					" " +students[x].last_name.split(" ")[0] + " <" + students[x].email + ">;";
+		        				str_ids  += students[x].id + ",";
+		        			}		        			
+		        		}
+		        		$('#id_cc').val(str_emails_and_names.substring(0, str_emails_and_names.length - 1));
+		        		$('#id_cc_ids').val(str_ids.substring(0, str_ids.length - 1));
+		        		event.data.close();
+		        	} else {
+		        		bootbox.alert('Debe seleccionar al menos una persona.');
+		        	}
+		        }
+		    }];
+		    
+			$.jsPanel({
+			  id:       "cc_dialog",
+			  selector: "#e-jspanelclosed",
+			  title: 'Redactar email: ',
+			  bootstrap: true,
+			  position: "center",
+			  toolbarFooter: toolbar_footer,
+			  size:     { width:  1000, height: 450 },
+			  content: $('#cc_div'),
+			});
+			
+			$("#cc_dialog").on("jspanelbeforeclose", function (event, id) {
+			    if( id === "cc_dialog" ) {
+			        $('#cc_div').appendTo('#cc_dialog_container');
+			    }
+			});
+		});
+		
+		$('#btn_cco').click(function(){
+			var toolbar_footer = [{
+		        item: '<button type="button"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>',
+		        event: 'click',
+		        btnclass: 'btn btn-default',
+		        btntext: ' Seleccionar',
+		        callback: function( event ){
+		        	var students = $('#cco_table').bootstrapTable('getAllSelections');
+		        	if (students.length != 0){
+		        		var str_emails_and_names = "";
+		        		var str_ids = "";
+		        		for (var x = 0; x < students.length; x++){ 
+		        			if (students[x].email != "\"anonimous@noserver.nodomain\"" && students[x].email != "noemail@nodomain.com"){
+		        				str_emails_and_names += students[x].first_name.split(" ")[0] + 
+		        					" " +students[x].last_name.split(" ")[0] + " <" + students[x].email + ">;";
+		        				str_ids  += students[x].id + ",";
+		        			}		        			
+		        		}
+		        		$('#id_cco').val(str_emails_and_names.substring(0, str_emails_and_names.length - 1));
+		        		$('#id_cco_ids').val(str_ids.substring(0, str_ids.length - 1));
+		        		event.data.close();
+		        	} else {
+		        		bootbox.alert('Debe seleccionar al menos una persona.');
+		        	}
+		        }
+		    }];
+		    
+			$.jsPanel({
+			  id:       "cco_dialog",
+			  selector: "#e-jspanelclosed",
+			  title: 'Redactar email: ',
+			  bootstrap: true,
+			  position: "center",
+			  toolbarFooter: toolbar_footer,
+			  size:     { width:  1000, height: 450 },
+			  content: $('#cco_div'),
+			});
+			
+			$("#cco_dialog").on("jspanelbeforeclose", function (event, id) {
+			    if( id === "cco_dialog" ) {
+			        $('#cco_div').appendTo('#cco_dialog_container');
+			    }
+			});
+		});
+		
+	});
+</script>
+{% endblock %}

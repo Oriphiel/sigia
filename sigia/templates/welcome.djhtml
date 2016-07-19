@@ -1,0 +1,64 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+	
+	<h1 class="page-header">Sistema Integrado de Gestión de la Información Académica (SIGIA)</h1>
+	
+	<div class="box">
+		<div class="box-content">
+
+		    <blockquote>
+		    	<p>
+			        El Sistema Integrado de Gestión de la Información Académica (SIGIA) 
+			        es un software web que permite automatizar y centralizar 
+			        los procesos de gestión de la información académica del instituto 
+			        tecnológico "Almirante Illingworth".
+		        </p>
+			</blockquote>
+			
+			<h3><b>Módulos:</b></h3>
+			<ol class="round">
+			    <li class="one">
+			        <h5 class="bold-link">Matrícula</h5>
+			        El módulo Matrícula permite gestionar la matrícula del tecnológico, así como imprimir repostes y el Libro de Matrícula.
+			        <a href="/help/">Ver más…</a>
+			    </li>
+			    <li class="two">
+			        <h5 class="bold-link">Docente</h5>
+			        El módulo Docente permite gestionar lo relativo a la vida docente del tecnológico (docentes, asignaturas, asistencia, etc), 
+			        así como imprimir repostes de estos.
+			        <a href="/help/">Ver más…</a>
+			    </li>
+			    <li class="three">
+			        <h5 class="bold-link">Horarios</h5>
+			        El módulo Horario permite gestionar los horarios de cada ciclo lectivo y su impresión.
+			        <a href="/help/">Ver más…</a>
+			    </li>
+			</ol>
+			
+			<article>
+			    <h3>Nuevas Funcionalidades</h3>	
+			    <h4>Registro en línea:</h4>	
+			    <p style="padding-left: 20px">        
+			        Ahora puede registrarse desde su casa, pruebe nuestro registro en línea, haga click <a id="registration_online" href="/students/new/">AQUÍ</a>
+			    </p>
+			
+			    <p>        
+			        Use this area to provide additional information.
+			    </p>
+			</article>
+			
+			<aside>
+			    <h3>Aside Title</h3>
+			    <p>        
+			        Use this area to provide additional information.
+			    </p>
+			    <ul>
+			        <li><a href="~/">Home</a></li>
+			        <li><a href="~/About">About</a></li>
+			        <li><a href="~/Contact">Contact</a></li>
+			    </ul>
+			</aside>
+		</div>
+	</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+<div class="bootstrap-table" style="margin:10px">
+	{% if event_groups %}
+	<label>Listado de Grupos de Eventos Relacionados con el Estudiante:</label>
+	<div class="fixed-table-container">		
+		<table class="table table-hover table-striped">
+			<thead>
+				<tr>
+					<th>
+						<div class="th-inner">Nombre</div>
+						<div class="fht-cell" style="width: 32px;"></div>
+					</th>
+					<th style="">
+						<div class="th-inner">Descripción</div>
+						<div class="fht-cell" style="width: 124px;"></div>
+					</th>
+						<th style=""><div class="th-inner">Cant. Eventos</div>
+						<div class="fht-cell" style="width: 110px;"></div>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for event_group in event_groups %}
+				<tr>
+					<td>{{ event_group.name }}</td>
+					<td>{{ event_group.description }}</td>
+					<td>{{ event_group.events.count }}</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	{% else %}
+		<blockquote>
+			<p>Este estudiante no tiene asociado ningún grupo de eventos. </p>
+		</blockquote>
+	{% endif %}
+</div>

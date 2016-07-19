@@ -1,0 +1,16 @@
+Estimado/a Estudiante
+
+{{ user_full_name }}
+Del curso:  {{ course_full_name }}
+
+Esta notificación es un recordatorio de que se encuentra próximo a incumplir la siguiente cuota:
+{{ quota }}
+
+Solicito se acerque a realizar la correspondiente cancelación.
+
+Atentamente
+
+
+Ing. Ricardo Jara Balbin
+Rector
+Tecnológico Almirante Illingworth

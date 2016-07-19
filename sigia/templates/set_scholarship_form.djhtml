@@ -1,0 +1,26 @@
+<div id="scholarship_content">
+	<form id="scholarship_form">{% csrf_token %}
+		<div class="form-group">	
+			<div class="control-label col-sm-6">
+				<label>Asignar Porcentaje de Beca: </label> <label id="scholarship_label_error" style="color:red; display:none"> *</label>
+			</div>
+			<div class="col-sm-5">
+				<input type="text" name="in_scholarship" id="in_scholarchip" value="" maxlength="3"></input>
+			</div>
+			<div class="col-sm-1">
+				<label>%</label>
+			</div>
+		</div>
+		
+		<div id="set_scholarship_errors" style="display:none; width:100%; margin: 10px 0px 0px 10px">
+			<b style="color:red">Errores:</b><br />
+			<ul>
+				<li><b>El porcentaje de beca debe ser un número entre 0 y 100</b></li>
+			</ul>
+		</div>
+		
+		<div style="text-align: right; width:100%">
+			<input type="button" class="btn btn-primary" onclick="SetScholarship()" style="margin-top:5px;margin-right: 10px;" id="btn_set_scholarship" value="Asignar"/>
+		</div>
+	</form>
+</div>

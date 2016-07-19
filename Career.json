@@ -1,0 +1,62 @@
+[
+{
+  "fields": {
+    "modified_with_session_key": "9wki1h7xzh2sbp5h55fqrkbgwefpzty9",
+    "name": "INFORM\u00c1TICA",
+    "created": "2015-04-10T16:59:18.789",
+    "modified": "2015-04-10T16:59:18.793",
+    "created_by": 1,
+    "live": true,
+    "created_with_session_key": "9wki1h7xzh2sbp5h55fqrkbgwefpzty9",
+    "modified_by": 1,
+    "description": "."
+  },
+  "model": "sigia.career",
+  "pk": 1
+},
+{
+  "fields": {
+    "modified_with_session_key": "9wki1h7xzh2sbp5h55fqrkbgwefpzty9",
+    "name": "ADMINISTRACI\u00d3N DE EMPRESAS, MENCI\u00d3N CONTABILIDAD Y AUDITOR\u00cdA",
+    "created": "2015-04-10T16:59:30.164",
+    "modified": "2015-04-10T16:59:30.168",
+    "created_by": 1,
+    "live": true,
+    "created_with_session_key": "9wki1h7xzh2sbp5h55fqrkbgwefpzty9",
+    "modified_by": 1,
+    "description": "."
+  },
+  "model": "sigia.career",
+  "pk": 2
+},
+{
+  "fields": {
+    "modified_with_session_key": "9wki1h7xzh2sbp5h55fqrkbgwefpzty9",
+    "name": "SECRETARIADO EJECUTIVO",
+    "created": "2015-04-10T16:59:41.181",
+    "modified": "2015-04-10T16:59:41.185",
+    "created_by": 1,
+    "live": true,
+    "created_with_session_key": "9wki1h7xzh2sbp5h55fqrkbgwefpzty9",
+    "modified_by": 1,
+    "description": "."
+  },
+  "model": "sigia.career",
+  "pk": 3
+},
+{
+  "fields": {
+    "modified_with_session_key": "pxcvv41uv9u7grd7v2eldbw13fo731ak",
+    "name": "ASISTENTE DE GERENCIA",
+    "created": "2015-04-10T17:34:41.325",
+    "modified": "2015-04-10T17:34:41.329",
+    "created_by": 11,
+    "live": true,
+    "created_with_session_key": "pxcvv41uv9u7grd7v2eldbw13fo731ak",
+    "modified_by": 11,
+    "description": "ASISTENTE DEGERENCIA"
+  },
+  "model": "sigia.career",
+  "pk": 4
+}
+]

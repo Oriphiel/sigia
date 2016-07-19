@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<head>
+	<style>
+		.panel-body {
+			padding: 12px;
+		}
+	</style>
+	<script>		
+		$(function() {
+			$('#date_payment').datepicker({language: "es-ES"});
+		});
+	</script>
+</head>
+
+<body>
+	<form id="payment_order_form" method="post" action="/payment_order/{{ payment_order.id }}/cancel/" enctype="multipart/form-data">{% csrf_token %}
+		<div class="fieldWrapper">  
+			<div class="row">
+				<div class="col-sm-6">
+					<label>Usuario:</label>					
+					{{ payment_order.user.first_name }} {{ payment_order.user.last_name }}
+					<br />
+					
+					<label>Nivel:</label>
+					{{ payment_order.level }}
+					<br />
+					
+					<label>Semestre:</label>
+					{{ payment_order.semester }}
+					<br />
+					
+					<label>Valor a pagar:</label><br />
+					<spam class="money"> {{ payment_order.value }} USD</spam>
+					<br />
+				</div>
+				
+				<div class="col-sm-6">
+					
+					<label>Fecha de emisión:</label>
+					{{ payment_order.date_issue }}
+					<br />
+					
+					<label>Período:</label>
+					{{ payment_order.period }}
+					<br />
+					
+					<label>Concepto de pago:</label>
+					{{ payment_order.get_payment_concept_display }}
+					<br />
+					<label for="{{ payment_order_form.date_payment.auto_id }}">{{ payment_order_form.date_payment.label }}:</label>
+					{% if payment_order_form.date_payment.errors %}
+					<label class="error" data-toggle="tooltip" data-placement="top" 
+						data-original-title='{{payment_order_form.date_payment.errors}}'>*</label>
+					{% endif %} 
+						<div class='input-group date' id='date_payment'>
+	            		<input type='text' class="form-control" name="date_payment" id="id_date_payment" value="{{ payment_order_form.date_payment.value|date:"d/m/Y"|default_if_none:"" }}"/>
+	            		<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+	            		</span>
+	        		</div>
+				</div>			
+			</div>
+		</div>
+			
+		<br />
+			
+		{% if payment_order_form.errors %}
+			<div class="panel panel-danger">
+			    <div class="panel-heading"><h3 class="panel-title">Errores:</h3></div>
+			    <div class="panel-body">
+			    		<b>Errores detectados de la carrera:</b><br />
+			    		<ul>
+							{% for field in payment_order_form %}
+								{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+							{% endfor %}
+							{% for field in personal_info_form %}
+								{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+							{% endfor %}
+						</ul>
+			    </div>
+			</div>
+		{% endif %}
+		
+		<div style="width: 100%; text-align: right">
+			<input class="btn btn-success" type="button" id="btn_cancel_payment" value="Cancelar Orden de Pago"/>
+		</div>
+		<div style="display:none">
+			{{payment_order_form.user}}
+			{{payment_order_form.date_issue}}
+			{{payment_order_form.payout}}
+			{{payment_order_form.level}}
+			{{payment_order_form.period}}
+			{{payment_order_form.semester}}
+			{{payment_order_form.value}}
+			{{payment_order_form.payment_concept}}
+		</div>
+	</form>
+	
+<script>
+	$('#btn_cancel_payment').click(function(){
+		PostAndLoadAjaxContent($('#payment_order_form'));
+		$('#PanelCancelPaymentOrder').remove();
+	});
+</script>
+
+</body>

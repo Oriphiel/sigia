@@ -1,0 +1,151 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% load sigia_auth_filters %}
+
+{% block content %}
+<div id="custom-toolbar">
+    <div class="btn-group" role="group">
+        <button class="btn btn-default" onclick="LoadAjaxContent('/ethnic_group/new/');" title="Registrar Grupo Etnico">
+			<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Nuevo
+    	</button>
+        <button class="btn btn-default" id="tbb_edit" title="Editar Datos de Grupo Etnico">
+			<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Editar
+    	</button>
+    	<button class="btn btn-default" id="tbb_print" title="Ver/Imprimir">
+			<span class="glyphicon glyphicon-print" aria-hidden="true"></span> Ver/Imprimir
+    	</button>
+    	{% if user|has_group:"general_secretary" %}
+        <button class="btn btn-default" id="tbb_delete" title="Eliminar Grupo Etnico">
+			<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Eliminar
+    	</button>      
+    	{% endif %}
+    </div>
+</div>
+
+<h1 class="page-header">Listado de Grupos Étnicos</h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+		<table id="table-pagination"></table>
+	</div>
+</div>
+		
+		
+
+
+<div id="option-content"></div>
+
+<form id="du_form">{% csrf_token %}
+	<input type="hidden" id="du_student_id" name="id" />
+</form>
+{% endblock %}
+
+{% block body_scripts %}
+
+<script>
+	function rowStyle(row, index) {
+        var classes = ['active-text', 'success-text', 'info-text', 'warning-text', 'danger-text'];
+
+        if (row.approved == false ) return {classes: 'warning-text'};
+        return {classes: 'success-text'};
+    }
+
+    $(document).ready(function() {
+    	$('#table-pagination').bootstrapTable('refresh', {silent: true});
+    	
+    	$('#table-pagination').bootstrapTable({
+                method: 'get',
+                url: '/ethnic_group/api/list/',
+                cache: false,
+                height: 600,
+                striped: true,
+                pagination: true,
+                pageSize: 50,
+                pageList: [10, 25, 50, 100, 200],
+                search: true,
+                showColumns: true,
+                showRefresh: true,
+                minimumCountColumns: 2,
+                clickToSelect: true,
+                toolbar: '#custom-toolbar',
+                columns: [{
+                    field: 'state',
+                    radio: true
+                }, {
+                    field: 'id',
+                    title: 'ID',
+                    sortable: true
+                }, {
+                    field: 'name',
+                    title: 'Nombre',
+                    sortable: true,
+                }, {
+                    field: 'description',
+                    title: 'Descripción',
+                    sortable: false,
+                }]
+            });
+    
+	    $('#tbb_edit').click(function(){
+			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (student == null){
+				bootbox.alert('Debe seleccionar un estudiante primero.');
+			} else {
+				LoadAjaxContent("/ethnic_group/" + student.id + "/upgrade/");
+			}
+		});
+		
+		$('#tbb_export').click(function(){
+			window.open("http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudent_excel.prpt/viewer", '_blank');
+		});
+		
+		$('#tbb_print').click(function(){
+		var student = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (student == null){
+				bootbox.alert('Debe seleccionar un estudiante primero.');
+			} else {
+				$.jsPanel({
+				  title: 'Datos del estudiante: ',
+				  bootstrap: true,
+				  position: "center",
+				  size:     { width:  800, height: 600 },
+				  content: '<embed src="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudent.prpt/generatedContent?userid=admin&password=password&output-type=pageable/pdf&student_id=' + student.id + '" width="100%" height="100%">'
+				});
+			}
+		});
+		
+		$('#tbb_enrollment').click(function(){
+			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (student == null){
+				bootbox.alert('Debe seleccionar un estudiante primero.');
+			} else {
+				if (student.approved){
+					LoadAjaxContent("/enrollment/new/student/" +student.id +  "/");
+				} else {
+					bootbox.alert('El estudiante subió sus datos on-line, estos deben ser aprobados para que este pueda ser matriculado en algún curso.');
+				}
+			}
+		});
+		
+		$('#tbb_delete').click(function(){
+			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (student == null){
+				bootbox.alert('Debe seleccionar un estudiante primero.');
+			} else {
+				bootbox.confirm("Por favor confirme que desea eliminar al estudiante: " + student.name, function(result) {
+					if(result){
+						$('#du_form')[0].action= "/ethnic_group/" + student.id + "/delete/";
+						$('#du_form')[0].method = "POST";
+						$('#du_student_id')[0].value = student.id;
+						PostAndLoadAjaxContent($('#du_form'));
+					} else {
+						$('.top-right').notify({
+						    message: { text: 'Operación cancelada por el usuario.' },
+						    type: 'warning',
+						  }).show();
+					}
+				}); 
+			}
+		});
+	});
+</script>
+{% endblock %}

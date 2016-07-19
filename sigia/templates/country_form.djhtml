@@ -1,0 +1,85 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+<h1 class="page-header">{{ title }} </h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+		<blockquote>
+            <p>Por favor llene los datos del formulario a continuación mostrados 
+            	para {% if action == 'CREATE' %}registrar un {% else %}actualizar el {% endif %}país.</p>
+        </blockquote>
+
+<form id="country_form" method="post" enctype="multipart/form-data">{% csrf_token %}
+	<div class="fieldWrapper">  
+		<div class="row">
+			<div class="col-sm-6">
+				<label for="{{ country_form.name.auto_id }}">{{ country_form.name.label }}</label>
+				{% if country_form.name.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{country_form.name.errors}}'>*</label>
+				{% endif %} 
+				{{ country_form.name }}
+			</div>
+			
+			<div class="col-sm-6">
+				<label for="{{ country_form.gentilicio.auto_id }}">{{ country_form.gentilicio.label }}</label>
+				{% if country_form.gentilicio.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{country_form.gentilicio.errors}}'>*</label>
+				{% endif %} 
+				{{ country_form.gentilicio }}
+				
+			</div>			
+		</div>
+	</div>
+		
+	<br />
+		
+	{% if country_form.errors %}
+		<div class="panel panel-danger">
+		    <div class="panel-heading"><h3 class="panel-title">Errores:</h3></div>
+		    <div class="panel-body">
+		    		<b>Errores detectados de la carrera:</b><br />
+		    		<ul>
+						{% for field in country_form %}
+							{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+						{% endfor %}
+						{% for field in personal_info_form %}
+							{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+						{% endfor %}
+					</ul>
+		    </div>
+		</div>
+	{% endif %}
+	
+	<div style="width: 100%; text-align: right">
+		{% if action == 'CREATE' %}
+	    	<input class="btn btn-default" type="button" id="btn_add_country" value="Registrar país"/>
+	    {% else %}
+	    	<input class="btn btn-default" type="button" id="btn_upd_country" value="Actualizar país"/>
+	    {% endif %}
+	</div>
+
+</form>
+
+{% endblock %}
+
+{% block body_scripts %}
+<script>	
+	$(function() {
+		{% if action == 'UPGRADE' %}
+		$('#btn_upd_country').click(function(){
+			$('#country_form')[0].action="/country/" + {{country_id}} + "/upgrade/";
+			PostAndLoadAjaxContent($('#country_form'));
+		});
+		{% else %}
+		$('#btn_add_country').click(function(){
+			$('#country_form')[0].action="/country/new/";
+			PostAndLoadAjaxContent($('#country_form'));
+		});
+		{% endif %}
+		
+		$('[data-toggle="tooltip"]').tooltip({html:true}); 
+	});
+</script>
+{% endblock %}

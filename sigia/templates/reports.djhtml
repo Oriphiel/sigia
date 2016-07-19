@@ -1,0 +1,58 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block title %}Reportes{% endblock %}
+
+{% block content %}
+<h1 class="page-header">Reportes</h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+		<blockquote>
+            <p>En esta página podrá ver y generar todos los reportes que es capaz de producir el 
+            Sistema Integrado de Gestión de Información Académica (SIGIA).</p>
+        </blockquote>
+        
+        <h4 class="page-header">Estudiantes</h4>
+        	<ul>        		
+        		<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudent_by_course.prpt/viewer">Listado Estudiantes por Curso</a></li>
+        		<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudents_work.prpt/viewer">Listado con Información Laboral</a></li>
+        		<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudent_by_course_contact_info.prpt/viewer">Listado Estudiantes por Curso (Inf. de Contacto)</a></li>
+        		<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudent_events.prpt/viewer">Eventos de Estudiante</a></li>
+        		<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudent_event_by_event_and_tutor.prpt/viewer">Eventos de Estudiante (Tipo Est. y Tipo Evento)</a></li>
+        		<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Aevents_of_type.prpt/viewer">Estudiantes por Tipo de Evento</a></li>
+        		<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudent_by_income_sys.prpt/viewer">Estudiantes por Sistema de Ingreso</a></li>
+        		<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudent_assists.prpt/viewer">Asistencia de Estudiantes</a></li>	
+				<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudent_for_elearning_platform.prpt/viewer">Información de Estudiantes para la Plataforma Virtual</a></li>
+				<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudent_id.prpt/viewer">Tarjetas de Identificación Personal para Estudiantes</a></li>				
+				<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudents_with_cid.prpt/viewer">Listado de Estudiantes con Cédula de Identidad</a></li>
+        	</ul>
+        <h4 class="page-header">Matriculación</h4>
+        	<ul>
+        		<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Aenrollment_book.prpt/viewer">Libro de Matrícula</a></li>
+        		<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Aenrolled_by_carrer.prpt/viewer">Matriculados por Carrera</a></li>
+				<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Aenrolled_by_course.prpt/viewer">Matriculados por Curso</a></li>
+				<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudent_by_optional_courses.prpt/viewer">Matriculados por Curso (Sin Carrera)</a></li>
+				<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Aenrolled_by_canton.prpt/viewer">Matriculados por Cantón</a></li>
+				<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Aenrolled_by_canton_and_career.prpt/viewer">Matriculados por Cantón (Agrupados por Carrera)</a></li>
+				<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Aenrolled_by_ethnic_group.prpt/viewer">Matriculados por Grupo Étnico</a></li>
+				<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Aenrolled_by_parish.prpt/viewer">Matriculados por Parroquia</a></li>
+				<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudents_with_scholarship.prpt/viewer">Matriculados con Beca</a></li>
+        	</ul>
+        <h4 class="page-header">Colecturía</h4>
+        	<ul>
+        		<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Aunpaid_bills.prpt/viewer">Órdenes de Pago por Cobrar</a></li>
+        		<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Adeudores.prpt/viewer">Deudores por Curso</a></li>
+        		<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Adeudores_mat.prpt/viewer">Deudores por Curso (Matrícula)</a></li>
+        		<li><a target="_blank" href="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Aestadodecuenta.prpt/viewer">Estado de Cuenta</a></li>
+			<!--	<li><a target="_blank" generated_total_profit" href="#">Informe de Ingresos</a></li> -->
+        	</ul>
+        <h4 class="page-header">Docentes</h4>
+	</div>
+</div>
+{% endblock %}
+
+{% block body_scripts %}
+<script>	
+	$(function() {		
+	});
+</script>
+{% endblock %}

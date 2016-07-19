@@ -1,0 +1,499 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+
+<h1 class="page-header">{{ title }} </h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+	<blockquote>
+    	Por favor llene los datos del formulario a continuación mostrados para 
+		{% if action == 'CREATE' %}registrar su{% else %}actualizar su{% endif %} perfil de usuario del sistema.
+    </blockquote>
+
+	<form class="form-horizontal" id="student_form" method="post" enctype="multipart/form-data">{% csrf_token %}
+		<div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+			<ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist">
+				<li class="ui-state-default ui-corner-top ui-tabs-active ui-state-active" role="tab" tabindex="0" aria-controls="tabs-1" aria-labelledby="ui-id-1" aria-selected="true"><a href="#tabs-1" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-1">Datos Personales</a></li>
+				<li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-2" aria-labelledby="ui-id-2" aria-selected="false"><a href="#tabs-2" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-2">Discapacidad</a></li>
+				<li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-3" aria-labelledby="ui-id-3" aria-selected="false"><a href="#tabs-3" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-3">Documentos Personales</a></li>
+			</ul>
+			<div id="tabs-1" aria-labelledby="ui-id-1" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="true" aria-hidden="false">
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+								<label for="{{ user_form.first_name.auto_id }}">Nombre</label>			
+								{% if user_form.first_name.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{user_form.first_name.errors}}'>*</label>
+								{% endif %} 
+							</div>
+							<div class="col-sm-8">
+								{{ user_form.first_name }}
+							</div>
+						</div>
+						
+						<div class="form-group">
+						<div class="control-label col-sm-4">
+							<label for="{{ user_form.last_name.auto_id }}">Apellido</label>
+							{% if user_form.last_name.errors %}
+							<label class="error" data-toggle="tooltip" data-placement="top" 
+								data-original-title='{{user_form.last_name.errors}}'>*</label>
+							{% endif %}
+						</div> 
+						<div class="col-sm-8">
+							{{ user_form.last_name }}
+						</div>
+					</div>
+				</div>
+				
+				<div class="col-sm-6">
+					<div class="form-group">
+						<div class="control-label col-sm-4">
+							<label for="{{ user_form.email.auto_id }}">Correo Electrónico</label>
+							{% if user_form.email.errors %}
+							<label class="error" data-toggle="tooltip" data-placement="top" 
+								data-original-title='{{user_form.first_name.errors}}'>*</label>
+							{% endif %} 
+						</div>
+						<div class="col-sm-8">
+							{{ user_form.email }}
+						</div>
+					</div>
+				</div>
+				</div>
+				
+				
+				
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+								<label for="{{ personal_info_form.id_doc_type.auto_id }}">{{ personal_info_form.id_doc_type.label }}</label>
+								{% if personal_info_form.id_doc_type.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{personal_info_form.id_doc_type.errors}}'>*</label>
+								{% endif %} 
+							</div>
+							<div class="col-sm-8">
+								{{ personal_info_form.id_doc_type }}
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+								<label for="{{ personal_info_form.gender.auto_id }}">{{ personal_info_form.gender.label }}</label>
+								{% if personal_info_form.gender.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{personal_info_form.gender.errors}}'>*</label>
+								{% endif %}  
+							</div>
+							<div class="col-sm-8">
+								{{ personal_info_form.gender }}
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+								<label for="{{ personal_info_form.ethnic_group.auto_id }}">{{ personal_info_form.ethnic_group.label }}</label>
+								{% if personal_info_form.ethnic_group.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{personal_info_form.ethnic_group.errors}}'>*</label>
+								{% endif %} 
+							</div>
+							<div class="col-sm-8">
+								{{ personal_info_form.ethnic_group }}
+							</div>	
+						</div>
+						
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+								<label for="{{ personal_info_form.nationality.auto_id }}">{{ personal_info_form.nationality.label }}</label>
+								{% if personal_info_form.nationality.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{personal_info_form.nationality.errors}}'>*</label>
+								{% endif %} 
+							</div>
+							<div class="col-sm-8">
+								{{ personal_info_form.nationality }}
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+								<label for="{{ personal_info_form.birthplace_country.auto_id }}">{{ personal_info_form.birthplace_country.label }}</label>
+								{% if personal_info_form.birthplace_country.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{personal_info_form.birthplace_country.errors}}'>*</label>
+								{% endif %} 
+							</div>
+							<div class="col-sm-8">
+								{{ personal_info_form.birthplace_country }}
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+								<label for="{{ personal_info_form.birthplace_province.auto_id }}">{{ personal_info_form.birthplace_province.label }}</label>
+								{% if personal_info_form.birthplace_province.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{personal_info_form.birthplace_province.errors}}'>*</label>
+								{% endif %} 
+							</div>
+							<div class="col-sm-8">
+								{{ personal_info_form.birthplace_province }}
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+								<label for="{{ personal_info_form.birthplace_canton.auto_id }}">{{ personal_info_form.birthplace_canton.label }}</label>
+								{% if personal_info_form.birthplace_canton.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{personal_info_form.birthplace_canton.errors}}'>*</label>
+								{% endif %} 
+							</div>
+							<div class="col-sm-8">
+								{{ personal_info_form.birthplace_canton }}
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+								<label for="{{ personal_info_form.birthplace_parish.auto_id }}">{{ personal_info_form.birthplace_parish.label }}</label>
+								{% if personal_info_form.birthplace_parish.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{personal_info_form.birthplace_parish.errors}}'>*</label>
+								{% endif %} 
+							</div>
+							<div class="col-sm-8">
+								{{ personal_info_form.birthplace_parish }}
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+								<label for="{{ personal_info_form.address_province.auto_id }}">{{ personal_info_form.address_province.label }}</label>
+								{% if personal_info_form.address_province.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{personal_info_form.address_province.errors}}'>*</label>
+								{% endif %} 
+							</div>
+							<div class="col-sm-8">
+								{{ personal_info_form.address_province }}
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+								<label for="{{ personal_info_form.address_canton.auto_id }}">{{ personal_info_form.address_canton.label }}</label>
+								{% if personal_info_form.address_canton.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{personal_info_form.address_canton.errors}}'>*</label>
+								{% endif %} 
+							</div>
+							<div class="col-sm-8">
+								{{ personal_info_form.address_canton }}
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+								<label for="{{ personal_info_form.address_parish.auto_id }}">{{ personal_info_form.address_parish.label }}</label>
+								{% if personal_info_form.address_parish.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{personal_info_form.address_parish.errors}}'>*</label>
+								{% endif %} 
+							</div>
+							<div class="col-sm-8">
+								{{ personal_info_form.address_parish }}
+							</div>
+						</div>
+												
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+								<label for="{{ personal_info_form.cellphone.auto_id }}">{{ personal_info_form.cellphone.label }}</label>
+								{% if personal_info_form.cellphone.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{personal_info_form.cellphone.errors}}'>*</label>
+								{% endif %}
+							</div>
+							<div class="col-sm-8">
+								{{ personal_info_form.cellphone }}
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<div class="control-label col-sm-2">
+								<label for="{{ personal_info_form.photo.auto_id }}">{{ personal_info_form.photo.label }}</label>
+						    	{% if personal_info_form.photo.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{personal_info_form.photo.errors}}'>*</label>
+								{% endif %} 
+							</div>
+							<div class="col-sm-10">
+								{{ personal_info_form.photo }}
+							</div>
+						</div>
+					
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+								<label for="{{ personal_info_form.id_doc_num.auto_id }}">{{ personal_info_form.id_doc_num.label }}</label>
+								{% if personal_info_form.id_doc_num.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{personal_info_form.id_doc_num.errors}}'>*</label>
+								{% endif %} 
+							</div>
+							<div class="col-sm-8">
+								{{ personal_info_form.id_doc_num }}
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+							<label for="{{ personal_info_form.birthday.auto_id }}">{{ personal_info_form.birthday.label }}</label>
+							{% if personal_info_form.birthday.errors %}
+							<label class="error" data-toggle="tooltip" data-placement="top" 
+								data-original-title='{{personal_info_form.birthday.errors}}'>*</label>
+							{% endif %} 
+							</div>
+							<div class="col-sm-8">
+								{{ personal_info_form.birthday }}
+				        	</div>
+		        		</div>
+						
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+								<label for="{{ personal_info_form.marital_status.auto_id }}">{{ personal_info_form.marital_status.label }}</label>
+								{% if personal_info_form.marital_status.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{personal_info_form.marital_status.errors}}'>*</label>
+								{% endif %} 
+							</div>
+							<div class="col-sm-8">
+								{{ personal_info_form.marital_status }}
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+								<label for="{{ personal_info_form.address.auto_id }}">{{ personal_info_form.address.label }}</label>
+								{% if personal_info_form.address.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{personal_info_form.address.errors}}'>*</label>
+								{% endif %}
+							</div> 
+							<div class="col-sm-8">
+								{{ personal_info_form.address }}
+							</div>	
+						</div>
+						
+						<div class="form-group">
+							<div class="control-label col-sm-4">
+								<label for="{{ personal_info_form.telephone.auto_id }}">{{ personal_info_form.telephone.label }}</label>
+								{% if personal_info_form.telephone.errors %}
+								<label class="error" data-toggle="tooltip" data-placement="top" 
+									data-original-title='{{personal_info_form.telephone.errors}}'>*</label>
+								{% endif %} 
+							</div>
+							<div class="col-sm-8">
+								{{ personal_info_form.telephone }}
+							</div>	
+						</div>
+						
+					</div>
+				</div>
+			</div>
+			
+			<div id="tabs-2" aria-labelledby="ui-id-2" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="true" aria-hidden="false">
+				<div class="form-group">
+					<div class="control-label col-sm-4">
+						<label for="{{ personal_info_form.disability.auto_id }}">{{ personal_info_form.disability.label }}</label>
+						{% if personal_info_form.disability.errors %}
+						<label class="error" data-toggle="tooltip" data-placement="top" 
+							data-original-title='{{personal_info_form.disability.errors}}'>*</label>
+						{% endif %}
+					</div>
+					<div class="col-sm-8">
+						{{ personal_info_form.disability }}
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<div class="control-label col-sm-4">
+						<label for="{{ personal_info_form.disability_percent.auto_id }}">{{ personal_info_form.disability_percent.label }}</label>
+						{% if personal_info_form.disability_percent.errors %}
+						<label class="error" data-toggle="tooltip" data-placement="top" 
+							data-original-title='{{personal_info_form.disability_percent.errors}}'>*</label>
+						{% endif %}
+					</div>
+					<div class="col-sm-8">
+						{{ personal_info_form.disability_percent }}
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<div class="control-label col-sm-4">
+						<label for="{{ personal_info_form.disability_id.auto_id }}">{{ personal_info_form.disability_id.label }}</label>
+						{% if personal_info_form.disability_id.errors %}
+						<label class="error" data-toggle="tooltip" data-placement="top" 
+							data-original-title='{{personal_info_form.disability_id.errors}}'>*</label>
+						{% endif %}
+					</div>
+					<div class="col-sm-8">
+						{{ personal_info_form.disability_id }}
+					</div>
+				</div>
+			</div>	
+			<div id="tabs-3" aria-labelledby="ui-id-3" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="true" aria-hidden="false">
+				<div class="form-group">
+					<div class="control-label col-sm-4">
+						<label for="{{ personal_info_form.id_doc_img.auto_id }}">{{ personal_info_form.id_doc_img.label }}</label>
+				    	{% if personal_info_form.id_doc_img.errors %}
+						<label class="error" data-toggle="tooltip" data-placement="top" 
+							data-original-title='{{personal_info_form.id_doc_img.errors}}'>*</label>
+						{% endif %} 
+					</div>
+					<div class="col-sm-8">
+						{{ personal_info_form.id_doc_img }}
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<div class="control-label col-sm-4">
+						<label for="{{ personal_info_form.voting_cert_img.auto_id }}">{{ personal_info_form.voting_cert_img.label }}</label>
+				    	{% if personal_info_form.voting_cert_img.errors %}
+						<label class="error" data-toggle="tooltip" data-placement="top" 
+							data-original-title='{{personal_info_form.voting_cert_img.errors}}'>*</label>
+						{% endif %} 
+					</div>
+					<div class="col-sm-8">
+						{{ personal_info_form.voting_cert_img }}
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<div class="control-label col-sm-4">
+						<label for="{{ personal_info_form.handed_degree_img.auto_id }}">{{ personal_info_form.handed_degree_img.label }}</label>
+				    	{% if personal_info_form.handed_degree_img.errors %}
+						<label class="error" data-toggle="tooltip" data-placement="top" 
+							data-original-title='{{personal_info_form.handed_degree_img.errors}}'>*</label>
+						{% endif %} 
+					</div>
+					<div class="col-sm-8">
+						{{ personal_info_form.handed_degree_img }}
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<div class="control-label col-sm-4">
+						<label for="{{ personal_info_form.medical_cert_img.auto_id }}">{{ personal_info_form.medical_cert_img.label }}</label>
+				    	{% if personal_info_form.medical_cert_img.errors %}
+						<label class="error" data-toggle="tooltip" data-placement="top" 
+							data-original-title='{{personal_info_form.medical_cert_img.errors}}'>*</label>
+						{% endif %} 
+					</div>
+					<div class="col-sm-8">
+						{{ personal_info_form.id_doc_img }}
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<div class="control-label col-sm-4">
+						<label for="{{ personal_info_form.birth_cert_img.auto_id }}">{{ personal_info_form.birth_cert_img.label }}</label>
+				    	{% if personal_info_form.birth_cert_img.errors %}
+						<label class="error" data-toggle="tooltip" data-placement="top" 
+							data-original-title='{{personal_info_form.birth_cert_img.errors}}'>*</label>
+						{% endif %} 
+					</div>
+					<div class="col-sm-8">
+						{{ personal_info_form.birth_cert_img }}
+					</div>
+				</div>
+			</div>
+	
+	{% if user_form.errors or personal_info_form.errors or academic_info_form.errors or work_info_form.errors %}
+	
+	<div class="panel panel-danger">
+	    <div class="panel-heading"><h3 class="panel-title">Errores:</h3></div>
+	    <div class="panel-body">
+	    	{% if user_form.errors or personal_info_form.errors %}
+	    		<b>Errores detectados en los datos personales del usuario:</b><br />
+	    		<ul>
+					{% for field in user_form %}
+						{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+					{% endfor %}
+					{% for field in personal_info_form %}
+						{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+					{% endfor %}
+				</ul>
+	    	{% endif %}
+	    	{% if academic_info_form.errors %}
+	    		<b>Errores detectados en los datos académicos del usuario:</b><br />
+	    		<ul>
+					{% for field in academic_info_form %}
+						{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+					{% endfor %}
+				</ul>
+	    	{% endif %}
+	    	{% if work_info_form.errors %}
+	    		<b>Errores detectados en los datos laborales del usuario:</b><br />
+	    		<ul>
+					{% for field in work_info_form %}
+						{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+					{% endfor %}
+				</ul>
+	    	{% endif %}
+	    </div>
+	</div>
+	
+	{% endif %}
+	
+	{% if user.is_authenticated and student and not student.modified_by %}
+		<div class="panel panel-warning">
+		    <div class="panel-heading"><h3 class="panel-title">Advertencia:</h3></div>
+		    <div class="panel-body">
+		    	<p>Estos datos fueron introducidos en línea por el estudiante, revíselos y tenga en cuenta que al actualizar la información estará validando
+		    	los mismos.</p>
+		    </div>
+		</div>
+	{% endif %}
+	
+	<div style="display:none">
+		{{ user_form.username }}
+	</div>
+	
+	<div style="width: 100%; text-align: right; vertical-align: middle">
+    	<input class="btn btn-primary" type="button" value="Actualizar Perfil" id="btn_upd_profile"/>
+	</div>		
+
+	</form>
+	</div>
+</div>
+	
+
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+	$(function() {
+		$( "#tabs" ).tabs();
+		
+		$('#btn_upd_profile').click(function(){
+			$('#student_form')[0].action="/user/" + {{id_user}} + "/upgrade/";
+			PostAndLoadAjaxContent($('#student_form'));
+		});
+		
+		$("#id_province").change(function(){ 
+			 loadlist($('#id_canton')[0], '/api/cantons/by_province/' + $("#id_province")[0].value + '/', 'name', 'id');
+		});
+		
+		$("#id_canton").change(function(){ 
+			 loadlist($('#id_parish')[0], '/api/parishes/by_canton/' + $("#id_canton")[0].value + '/', 'name', 'id');
+		});
+		
+		 $('[data-toggle="tooltip"]').tooltip({html:true});
+	});
+</script>
+{% endblock %}

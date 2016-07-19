@@ -1,0 +1,148 @@
+<header class="navbar">
+	<div class="container-fluid expanded-panel">
+		<div class="row">
+			<div id="logo" class="col-xs-12 col-sm-2">
+				<a>SIGIA</a>
+			</div>
+			<div id="top-panel" class="col-xs-12 col-sm-10">
+				<div class="row">
+					<div class="col-xs-8 col-sm-4">
+						<a href="#" class="show-sidebar">
+						  <i class="fa fa-bars"></i>
+						</a>
+						<div id="search">
+							<input type="text" placeholder="search"/>
+							<i class="fa fa-search"></i>
+						</div>
+					</div>
+					<div class="col-xs-4 col-sm-8 top-panel-right">
+						<ul class="nav navbar-nav pull-right panel-menu">
+						<!--
+							<li class="hidden-xs">
+								<a href="index.html" class="modal-link">
+									<i class="fa fa-bell"></i>
+									<span class="badge">7</span>
+								</a>
+							</li>
+							<li class="hidden-xs">
+								<a class="ajax-link" href="ajax/calendar.html">
+									<i class="fa fa-calendar"></i>
+									<span class="badge">7</span>
+								</a>
+							</li>
+							<li class="hidden-xs">
+								<a href="ajax/page_messages.html" class="ajax-link">
+									<i class="fa fa-envelope"></i>
+									<span class="badge">7</span>
+								</a>
+							</li>
+							-->
+							{% if user.is_authenticated %}
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle account" data-toggle="dropdown">
+									<div class="avatar">
+										<img src="{{ MEDIA_URL }}{{ user.profile.photo }}" class="img-rounded" alt="avatar" />
+									</div>
+									<i class="fa fa-angle-down pull-right"></i>
+									<div class="user-mini pull-right">
+									    <span class="welcome">Bienvenido</span>
+										<span>{{ user.get_username }}</span>
+									</div>
+								</a>
+								<ul class="dropdown-menu">
+									<li>
+										<a class="ajax-link" href="/user/{{ user.id }}/upgrade/">
+											<i class="fa fa-user"></i>
+											<span>Editar Perfil</span>
+										</a>
+									</li>
+									<!--
+									
+									<li>
+										<a href="ajax/page_messages.html" class="ajax-link">
+											<i class="fa fa-envelope"></i>
+											<span>Mensajes</span>
+										</a>
+									</li>
+									<li>
+										<a href="ajax/gallery_simple.html" class="ajax-link">
+											<i class="fa fa-picture-o"></i>
+											<span>Fotos</span>
+										</a>
+									</li>
+									<li>
+										<a href="ajax/calendar.html" class="ajax-link">
+											<i class="fa fa-tasks"></i>
+											<span>Tareas</span>
+										</a>
+									</li>
+									<li>
+										<a href="#">
+											<i class="fa fa-cog"></i>
+											<span>Configuraciones</span>
+										</a>
+									</li>
+									-->
+									<li>
+										<a href="/logout/" class="modal-link">
+											<i class="fa fa-power-off"></i>
+											<span>Cerrar Sesión</span>
+										</a>
+									</li>
+								</ul>
+							</li>
+							{% else %}
+								<li class="hidden-xs">
+									<a href="/login/" class="modal-link">
+										<i class="fa fa-user"></i>
+										<span><b>Iniciar Sesión</b></span>
+									</a>
+								</li>
+							{% endif %}
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</header>
+
+<!--
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">SIGIA</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+            	{% if user.is_authenticated %}
+            	{% include 'includes/menu/teacher_secretariat.djhtml' %}
+                {% include 'includes/menu/enrollment.djhtml' %}
+                {% include 'includes/menu/collectorship.djhtml' %}
+                {% include 'includes/menu/horary.djhtml' %}
+                {% endif %}
+                {% if not user.is_authenticated %}
+                	<li><a id="registration_online" href="/students/new/">Registro en línea</a></li>
+                {% endif %}
+                <li><a href="/contact/">Contáctenos</a></li>
+                <li><a href="/help/">Ayuda</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                {% if not user.is_authenticated %}
+                	<li><a id="loginLink" href="/login/"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Iniciar Sesión</a></li>
+                {% else %}
+                	<li><a id="logoutLink" href="/logout/"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Cerrar Sesión</a></li>
+                {% endif %}
+    		</ul>
+	
+        </div>
+        <!--/.nav-collapse 
+    </div>
+</div>
+-->

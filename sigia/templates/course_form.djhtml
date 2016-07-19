@@ -1,0 +1,170 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+<h1 class="page-header">{{ title }} </h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+		<blockquote>
+            <p class="header_message">Por favor llene los datos del formulario a continuación mostrados para 
+            	{% if action == 'CREATE' %}registrar un curso {% else %}actualizar el curso{% endif %}.</p>
+        </blockquote>
+
+<form id="course_form" method="post" enctype="multipart/form-data">{% csrf_token %}
+	<div class="fieldWrapper">  
+		<div class="row">
+			<div class="col-sm-6">
+				<label for="{{ course_form.career.auto_id }}">{{ course_form.career.label }}</label>
+				{% if course_form.career.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{course_form.career.errors}}'>*</label>
+				{% endif %} 
+				{{ course_form.career }}
+				
+				<label for="{{ course_form.type.auto_id }}">{{ course_form.type.label }}</label>
+				{% if course_form.type.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{course_form.type.errors}}'>*</label>
+				{% endif %} 
+				{{ course_form.type }}
+				
+				<label for="{{ course_form.period.auto_id }}">{{ course_form.period.label }}</label>
+				{% if course_form.period.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{course_form.period.errors}}'>*</label>
+				{% endif %} 
+				{{ course_form.period }}
+				
+				<label for="{{ course_form.level.auto_id }}">{{ course_form.level.label }}</label>
+				{% if course_form.level.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{course_form.level.errors}}'>*</label>
+				{% endif %} 
+				{{ course_form.level }}
+				
+				<label for="{{ course_form.payment_reg.auto_id }}">{{ course_form.payment_reg.label }}</label>
+				{% if course_form.payment_reg.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{course_form.payment_reg.errors}}'>*</label>
+				{% endif %} 
+				{{ course_form.payment_reg }}
+				
+				<label for="{{ course_form.payment_esp.auto_id }}">{{ course_form.payment_esp.label }}</label>
+				{% if course_form.payment_esp.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{course_form.payment_esp.errors}}'>*</label>
+				{% endif %} 
+				{{ course_form.payment_esp }}
+				
+				<label for="{{ course_form.value_payments.auto_id }}">{{ course_form.value_payments.label }}</label>
+				{% if course_form.value_payments.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{course_form.value_payments.errors}}'>*</label>
+				{% endif %} 
+				{{ course_form.value_payments }}
+			</div>
+			
+			<div class="col-sm-6">
+				<label for="{{ course_form.description.auto_id }}">{{ course_form.description.label }}</label>
+				{% if course_form.description.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{course_form.description.errors}}'>*</label>
+				{% endif %} 
+				{{ course_form.description }}
+				
+				<label for="{{ course_form.semester.auto_id }}">{{ course_form.semester.label }}</label>
+				{% if course_form.semester.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{course_form.semester.errors}}'>*</label>
+				{% endif %} 
+				{{ course_form.semester }}
+				
+				<label for="{{ course_form.parallel.auto_id }}">{{ course_form.parallel.label }}</label>
+				{% if course_form.parallel.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{course_form.parallel.errors}}'>*</label>
+				{% endif %} 
+				{{ course_form.parallel }}
+				
+				<label for="{{ course_form.max_quota.auto_id }}">{{ course_form.max_quota.label }}</label>
+				{% if course_form.max_quota.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{course_form.max_quota.errors}}'>*</label>
+				{% endif %} 
+				{{ course_form.max_quota }}
+				
+				<label for="{{ course_form.payment_ext.auto_id }}">{{ course_form.payment_ext.label }}</label>
+				{% if course_form.payment_ext.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{course_form.payment_ext.errors}}'>*</label>
+				{% endif %} 
+				{{ course_form.payment_ext }}
+				
+				<label for="{{ course_form.amount_payments.auto_id }}">{{ course_form.amount_payments.label }}</label>
+				{% if course_form.amount_payments.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{course_form.amount_payments.errors}}'>*</label>
+				{% endif %} 
+				{{ course_form.amount_payments }}
+				
+				<label for="{{ course_form.applied_scholarship_from.auto_id }}">{{ course_form.applied_scholarship_from.label }}</label>
+				{% if course_form.applied_scholarship_from.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{course_form.applied_scholarship_from.errors}}'>*</label>
+				{% endif %} 
+				{{ course_form.applied_scholarship_from }}
+			</div>			
+		</div>
+	</div>
+		
+	<br />
+		
+	{% if course_form.errors %}
+		<div class="panel panel-danger">
+		    <div class="panel-heading"><h3 class="panel-title">Errores:</h3></div>
+		    <div class="panel-body">
+		    		<b>Errores detectados de la carrera:</b><br />
+		    		<ul>
+						{% for field in course_form %}
+							{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+						{% endfor %}
+						{% for field in personal_info_form %}
+							{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+						{% endfor %}
+					</ul>
+		    </div>
+		</div>
+	{% endif %}
+	
+	<div style="width: 100%; text-align: right">
+		{% if action == 'CREATE' %}
+	    	<input class="btn btn-default" type="button" id="btn_add_course" value="Registrar Curso"/>
+	    {% else %}
+	    	<input class="btn btn-default" type="button" id="btn_upd_course" value="Actualizar Curso"/>
+	    {% endif %}
+	</div>
+
+</form>
+
+</div>
+</div>
+{% endblock %}
+
+{% block body_scripts %}
+<script>	
+	$(function() {
+		{% if action == 'UPGRADE' %}
+			$('#btn_upd_course').click(function(){
+				$('#course_form')[0].action="/course/" + {{course_id}} + "/upgrade/";
+				PostAndLoadAjaxContent($('#course_form'));
+			});
+		{% else %}
+			$('#btn_add_course').click(function(){
+				$('#course_form')[0].action="/course/new/";
+				PostAndLoadAjaxContent($('#course_form'));
+			});
+		{% endif %}
+		
+		$('[data-toggle="tooltip"]').tooltip({html:true}); 
+	});
+</script>
+{% endblock %}

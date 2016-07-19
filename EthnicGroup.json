@@ -1,0 +1,107 @@
+[
+{
+  "fields": {
+    "modified_with_session_key": "kdr09zkkp4ge7gquvsvxugl0344ae7c5",
+    "name": "BLANCOS",
+    "created": "2015-04-10T17:07:49.553",
+    "modified": "2015-04-10T20:40:45.004",
+    "created_by": 11,
+    "live": true,
+    "created_with_session_key": "pxcvv41uv9u7grd7v2eldbw13fo731ak",
+    "modified_by": 11,
+    "description": ""
+  },
+  "model": "sigia.ethnicgroup",
+  "pk": 1
+},
+{
+  "fields": {
+    "modified_with_session_key": "kdr09zkkp4ge7gquvsvxugl0344ae7c5",
+    "name": "MESTIZOS",
+    "created": "2015-04-10T17:07:58.062",
+    "modified": "2015-04-10T20:40:57.027",
+    "created_by": 11,
+    "live": true,
+    "created_with_session_key": "pxcvv41uv9u7grd7v2eldbw13fo731ak",
+    "modified_by": 11,
+    "description": ""
+  },
+  "model": "sigia.ethnicgroup",
+  "pk": 2
+},
+{
+  "fields": {
+    "modified_with_session_key": "kdr09zkkp4ge7gquvsvxugl0344ae7c5",
+    "name": "INDIGENAS",
+    "created": "2015-04-10T20:40:23.768",
+    "modified": "2015-04-10T20:41:02.314",
+    "created_by": 11,
+    "live": true,
+    "created_with_session_key": "kdr09zkkp4ge7gquvsvxugl0344ae7c5",
+    "modified_by": 11,
+    "description": ""
+  },
+  "model": "sigia.ethnicgroup",
+  "pk": 3
+},
+{
+  "fields": {
+    "modified_with_session_key": "kdr09zkkp4ge7gquvsvxugl0344ae7c5",
+    "name": "MONTUBIO",
+    "created": "2015-04-10T20:40:34.739",
+    "modified": "2015-04-10T20:41:07.173",
+    "created_by": 11,
+    "live": true,
+    "created_with_session_key": "kdr09zkkp4ge7gquvsvxugl0344ae7c5",
+    "modified_by": 11,
+    "description": ""
+  },
+  "model": "sigia.ethnicgroup",
+  "pk": 4
+},
+{
+  "fields": {
+    "modified_with_session_key": "kdr09zkkp4ge7gquvsvxugl0344ae7c5",
+    "name": "AFROECUATORIANO",
+    "created": "2015-04-10T20:41:30.129",
+    "modified": "2015-04-10T20:41:30.133",
+    "created_by": 11,
+    "live": true,
+    "created_with_session_key": "kdr09zkkp4ge7gquvsvxugl0344ae7c5",
+    "modified_by": 11,
+    "description": ""
+  },
+  "model": "sigia.ethnicgroup",
+  "pk": 5
+},
+{
+  "fields": {
+    "modified_with_session_key": "kdr09zkkp4ge7gquvsvxugl0344ae7c5",
+    "name": "NEGROS",
+    "created": "2015-04-10T20:41:45.098",
+    "modified": "2015-04-10T20:41:45.101",
+    "created_by": 11,
+    "live": true,
+    "created_with_session_key": "kdr09zkkp4ge7gquvsvxugl0344ae7c5",
+    "modified_by": 11,
+    "description": ""
+  },
+  "model": "sigia.ethnicgroup",
+  "pk": 6
+},
+{
+  "fields": {
+    "modified_with_session_key": "kdr09zkkp4ge7gquvsvxugl0344ae7c5",
+    "name": "MULATOS",
+    "created": "2015-04-10T20:41:50.743",
+    "modified": "2015-04-10T20:41:50.746",
+    "created_by": 11,
+    "live": true,
+    "created_with_session_key": "kdr09zkkp4ge7gquvsvxugl0344ae7c5",
+    "modified_by": 11,
+    "description": ""
+  },
+  "model": "sigia.ethnicgroup",
+  "pk": 7
+}
+]

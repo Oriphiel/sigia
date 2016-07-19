@@ -1,0 +1,21 @@
+[
+{
+  "fields": {
+    "predecessor": null,
+    "end_notes": null,
+    "modified_with_session_key": "pxcvv41uv9u7grd7v2eldbw13fo731ak",
+    "name": "2015-2016",
+    "created": "2015-04-10T17:14:57.824",
+    "finalized": false,
+    "modified": "2015-04-10T17:15:02.838",
+    "created_by": 11,
+    "live": true,
+    "created_with_session_key": "pxcvv41uv9u7grd7v2eldbw13fo731ak",
+    "start_notes": "",
+    "active": true,
+    "modified_by": 11
+  },
+  "model": "sigia.period",
+  "pk": 1
+}
+]

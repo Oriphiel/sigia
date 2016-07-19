@@ -1,0 +1,234 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% load sigia_auth_filters %}
+
+{% block content %}
+
+<h1 class="page-header">Listado de Estudios de Profesores</h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+<div id="custom-toolbar">
+{% if user|has_group:"secretary" %}
+    <div class="btn-group" role="group">
+        <button class="btn btn-default" onclick="LoadAjaxContent('/studies/new/');"  title="Registrar Estudios de Profesor">
+			<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Nuevo
+    	</button>
+    	<button class="btn btn-default" id="tbb_print" title="Imprimir lista de perídos">
+			<span class="glyphicon glyphicon-print" aria-hidden="true"></span> Ver/Imprimir
+    	</button>
+        <button class="btn btn-default" id="tbb_edit" title="Editar Estudios de Profesor">
+			<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Editar
+    	</button>
+        <button class="btn btn-default" id="tbb_delete" title="Eliminar Estudios de Profesor">
+			<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Eliminar
+    	</button>      
+    </div>
+{% endif %}
+
+</div>
+
+<table id="table-pagination"></table>
+
+<div id="option-content"></div>
+
+<form id="du_form">{% csrf_token %}
+	<input type="hidden" id="du_studies_id" name="id" />
+</form>
+
+</div>
+</div>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+	function rowStyle(row, index) {
+        var classes = ['active-text', 'success-text', 'info-text', 'warning-text', 'danger-text'];
+
+        if (row.approved == false ) return {classes: 'warning-text'};
+        return {classes: 'success-text'};
+    }
+    var $table = null;
+    
+    $(document).ready(function() {
+		$('#table-pagination').mutate('height width', function(el,info) {
+	        $('#table-pagination').bootstrapTable('resetView');
+	    });
+    	
+    	$('#table-pagination').bootstrapTable({
+                method: 'get',
+                url: '/studies/api/list/',
+                cache: false,
+                height: 600,
+                striped: true,
+                pagination: true,
+                search: true,
+                showColumns: true,
+                showRefresh: true,
+                minimumCountColumns: 2,
+                clickToSelect: true,
+                rowStyle: rowStyle,
+                toolbar: '#custom-toolbar',
+                columns: [{
+                    field: 'state',
+                    radio: true
+                }, {
+                    field: 'id',
+                    title: 'ID',
+                    sortable: true
+                }, {
+                    field: 'teacher',
+                    title: 'Profesor',
+                    sortable: true,
+                }, {
+                    field: 'academic_level',
+                    title: 'Nivel Académico',
+                    sortable: true,
+                }, {
+                    field: 'institute',
+                    title: 'Instituto',
+                    sortable: true,
+                }, {
+                    field: 'title',
+                    title: 'Título',
+                    sortable: true,
+                }, {
+                    field: 'date_award',
+                    title: 'Fecha',
+                    sortable: true,
+                }, {
+                    field: 'country',
+                    title: 'País',
+                    sortable: true,
+                }, {
+                    field: 'senescyt_id',
+                    title: 'No. SENESCYT',
+                    sortable: true,
+                }, {
+                    field: 'created',
+                    title: 'Creado',
+                    sortable: true,
+                    visible: false,
+                }, {
+                    field: 'created_by',
+                    title: 'Creado por',
+                    sortable: true,
+                    visible: false,
+                }, {
+                    field: 'modified',
+                    title: 'Modificado',
+                    sortable: true,
+                    visible: false,
+                }, {
+                    field: 'modified_by',
+                    title: 'Modificado por',
+                    sortable: true,
+                    visible: false,
+                }]
+            });		
+		
+		$('#tbb_edit').click(function(){
+			var studies = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (studies == null){
+				bootbox.alert('Debe seleccionar un período primero.');
+			} else {
+				LoadAjaxContent("/studies/" + studies.id + "/upgrade/");
+			}
+		});
+		
+		$('#tbb_terminate').click(function(){
+			var studies = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (studies == null){
+				bootbox.alert('Debe seleccionar un período primero.');
+			} else {				
+				if (studies.active){
+					var message = "Por favor confirme que desea terminar el período: " + studies.name;
+					bootbox.confirm(message, 
+						function(result) {
+							if(result){
+								$('#du_form')[0].action = "/studies/" + studies.id + "/terminate/";
+								$('#du_form')[0].method = "POST";
+								$('#du_studies_id')[0].value = studies.id;
+								PostAndLoadAjaxContent($('#du_form'));
+							} else {
+								$('.top-right').notify({
+								    message: { text: 'Operación cancelada por el usuario.' },
+								    type: 'warning',
+								  }).show();
+							}
+						});
+				} else {
+					bootbox.alert('El período debe estar activo antes de ser finalizado.');
+				}
+			}
+		});
+		
+		$('#tbb_activate').click(function(){
+			var studies = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (studies == null){
+				bootbox.alert('Debe seleccionar un período primero.');
+			} else {
+				if (studies.active){
+					bootbox.alert('El período ya se encuentra activado.');
+					return;
+				}
+				if (studies.finalized){
+					bootbox.alert('Un período finalizado no puede ser reactivado.');
+					return;
+				}
+				
+				var active = false;
+				var array = $table.bootstrapTable('getData');
+				for (i = 0; i < array.length; i++){
+					if (array[i].active){
+						active = true;
+						break;
+					}
+				}
+				
+				if (active){
+					bootbox.alert('No se puede activar un período si se encuentra otro activo.');
+					return;
+				} else {
+					var message = "Por favor confirme que desea activar el período: " + studies.name;
+					bootbox.confirm(message, 
+						function(result) {
+							if(result){
+								$('#du_form')[0].action= "/studies/" + studies.id + "/activate/";
+								$('#du_form')[0].method = "POST";
+								$('#du_studies_id')[0].value = studies.id;
+								PostAndLoadAjaxContent($('#du_form'));
+							} else {
+								$('.top-right').notify({
+								    message: { text: 'Operación cancelada por el usuario.' },
+								    type: 'warning',
+								  }).show();
+							}
+					}); 
+				}
+			}
+		});
+		
+		$('#tbb_delete').click(function(){
+			var studies = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (studies == null){
+				bootbox.alert('Debe seleccionar un período primero.');
+			} else {
+				bootbox.confirm("Por favor confirme que desea eliminar el período: " + studies.teacher + " - " + 
+				studies.title, function(result) {
+					if(result){
+						$('#du_form')[0].action= "/studies/" + studies.id + "/delete/";
+						$('#du_form')[0].method = "POST";
+						$('#du_studies_id')[0].value = studies.id;
+						PostAndLoadAjaxContent($('#du_form'));
+					} else {
+						$('.top-right').notify({
+						    message: { text: 'Operación cancelada por el usuario.' },
+						    type: 'warning',
+						  }).show();
+					}
+				}); 
+			}
+		});
+	});
+</script>
+{% endblock %}

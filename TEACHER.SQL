@@ -1,0 +1,10 @@
+﻿ALTER TABLE "sigia_teacher" ADD "institutional_email" varchar(75);
+ALTER TABLE "sigia_teacher" ADD "academic_category" varchar(30);
+ALTER TABLE "sigia_teacher" ADD "contract_type" varchar(2);
+ALTER TABLE "sigia_teacher" ADD "academic_unity" varchar(30);
+ALTER TABLE "sigia_teacher" ADD "hours_to_pedagogy" integer;
+ALTER TABLE "sigia_teacher" ADD "hours_to_research" integer;
+ALTER TABLE "sigia_teacher" ADD "hours_to_society" integer;
+ALTER TABLE "sigia_teacher" ADD "hours_to_other" integer;
+ALTER TABLE "sigia_teacher" ADD "other_activities" varchar(50);
+ALTER TABLE "sigia_teacher" ADD "studying" boolean NOT NULL;

@@ -1,0 +1,18 @@
+Estimado/a Estudiante
+
+{{ user_full_name }}
+Del curso:  {{ course_full_name }}
+
+Le recordamos que tiene incumplida la/s siguiente/s cuota/s:
+{% for quota in quotas %}
+	{{ quota }}
+{% endfor %}
+
+Solicito se acerque a realizar la correspondiente cancelación.
+
+Atentamente 
+
+
+Ing. Ricardo Jara Balbin
+Rector
+Tecnológico Almirante Illingworth

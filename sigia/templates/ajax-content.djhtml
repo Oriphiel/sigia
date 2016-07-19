@@ -1,0 +1,32 @@
+{% load sigia_auth_filters %}
+
+{% include 'includes/breadcrumb.djhtml' %}
+
+{% block content %}
+
+{% endblock %}
+
+{% block body_scripts %}
+
+{% endblock %}
+
+<script>
+    $(document).ready(function () {
+        var messages = {% if messages %}[
+                {% for message in messages %}{"type": "{{message.tags}}", "text": "{{message}}"},{% endfor %}];
+            {% else %}null;{% endif %}
+
+        if (messages) {
+            messages.forEach(function (item) {
+                if (item.type == 'script') {
+                    eval(Base64.decode(item.text));
+                } else {
+                    $('.top-right').notify({
+                        message: {html: item.text},
+                        type: item.type
+                    }).show();
+                }
+            });
+        }
+    });
+</script>

@@ -1,0 +1,118 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+
+<h1 class="page-header">{{ title }} </h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+	
+	<blockquote>
+    	Por favor llene los datos del formulario a continuación mostrados para 
+		{% if action == 'CREATE' %}registrar un{% else %}actualizar al{% endif %}  tipo de evento.
+    </blockquote>
+
+	<form class="form-horizontal" id="event_type_form" method="post" enctype="multipart/form-data">{% csrf_token %}
+		<div class="form-group">
+			<div class="control-label col-sm-4">
+				<label for="{{ event_type_form.name.auto_id }}">Nombre</label>			
+				{% if event_type_form.name.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{event_type_form.name.errors}}'>*</label>
+				{% endif %} 
+			</div>
+			<div class="col-sm-8">
+				{{ event_type_form.name }}
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="control-label col-sm-4">
+				<label for="{{ event_type_form.description.auto_id }}">Descripción</label>					
+				{% if event_type_form.description.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{event_type_form.description.errors}}'>*</label>
+				{% endif %} 
+			</div>	
+			<div class="col-sm-8">
+				{{ event_type_form.description }}
+			</div>
+		</div>
+	
+		<div class="form-group">
+			<div class="control-label col-sm-4">
+				<label for="{{ event_type_form.student_type.auto_id }}">Tipo de Estudiante</label>
+				{% if event_type_form.student_type.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{event_type_form.student_type.errors}}'>*</label>
+				{% endif %}
+			</div> 
+			<div class="col-sm-8">
+				{{ event_type_form.student_type }}
+			</div>
+		</div>
+					
+					
+	
+	{% if event_type_form.errors or personal_info_form.errors or event_type_form.errors %}
+	
+	<div class="panel panel-danger">
+	    <div class="panel-heading"><h3 class="panel-title">Errores:</h3></div>
+	    <div class="panel-body">
+	    	{% if event_type_form.errors or personal_info_form.errors %}
+	    		<b>Errores detectados en los datos personales del usuario:</b><br />
+	    		<ul>
+					{% for field in event_type_form %}
+						{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+					{% endfor %}
+					{% for field in personal_info_form %}
+						{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+					{% endfor %}
+				</ul>
+	    	{% endif %}
+	    	{% if event_type_form.errors %}
+	    		<b>Errores detectados en los datos académicos del usuario:</b><br />
+	    		<ul>
+					{% for field in event_type_form %}
+						{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+					{% endfor %}
+				</ul>
+	    	{% endif %}
+	    </div>
+	</div>
+	
+	{% endif %}
+		
+	<div style="width: 100%; text-align: right; vertical-align: middle">
+		{% if action == 'CREATE' %}
+	    	<input class="btn btn-primary" type="button" value="Registrar Tipo de Evento" id="btn_reg_event_type"/>
+	    {% else %}
+	    	<input class="btn btn-primary" type="button" value="Actualizar Tipo de Evento" id="btn_upd_event_type"/>
+	    {% endif %}
+	</div>		
+
+	</form>
+	</div>
+</div>
+	
+
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+	$(function() {
+		{% if action == 'UPGRADE' %}
+			$('#btn_upd_event_type').click(function(){
+				$('#event_type_form')[0].action="/event_type/" + {{id_event_type}} + "/upgrade/";
+				PostAndLoadAjaxContent($('#event_type_form'));
+			});
+		{% else %}
+			$('#btn_reg_event_type').click(function(){
+				$('#event_type_form')[0].action="/event_type/new/";
+				PostAndLoadAjaxContent($('#event_type_form'));
+			});
+		{% endif %}
+		
+		 $('[data-toggle="tooltip"]').tooltip({html:true}); 
+	});
+</script>
+{% endblock %}

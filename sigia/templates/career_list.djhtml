@@ -1,0 +1,99 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+
+<h1 class="page-header">Listado de Carreras</h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+		<div id="custom-toolbar">
+		    <div class="btn-group" role="group">
+		        <button class="btn btn-default" onclick="LoadAjaxContent('/career/new/');">
+					<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Nuevo
+		    	</button>
+		    	<button class="btn btn-default" id="tbb_print">
+					<span class="glyphicon glyphicon-print" aria-hidden="true"></span> Ver/Imprimir
+		    	</button>
+		        <button class="btn btn-default" id="tbb_edit">
+					<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Editar
+		    	</button>
+		        <button class="btn btn-default" id="tbb_delete">
+					<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Eliminar
+		    	</button>      
+		    </div>
+		</div>
+		
+		<table data-toggle="table" id="table-pagination" data-url="/career/api/list/" data-height="600"
+		data-pagination="true" data-search="true" data-click-to-select="true" data-select-item-name="radioName"
+		data-toolbar="#custom-toolbar" data-show-refresh="true" data-show-columns="true"> <!-- data-show-toggle="true" -->
+		    <thead>
+		        <tr>
+		            <th data-field="state" data-radio="true"></th>
+		            <th data-field="id" data-align="center" data-sortable="true">ID</th>
+		            <th data-field="name" data-align="center" data-sortable="true">Nombre</th>
+		            <th data-field="description" data-align="center" data-sortable="true">Descripción</th>
+		        </tr>
+		    </thead>
+		</table>
+		
+		<div id="option-content"></div>
+		
+		<form id="du_form">{% csrf_token %}
+			<input type="hidden" id="du_career_id" name="id" />
+		</form>
+		
+	</div>
+</div>
+
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+	$(document).ready(function() {
+		$.ajax({
+			mimeType: 'application/json; charset=utf-8', // ! Need set mimeType only when run from local file
+			url: '/career/api/list/',
+			type: 'GET',
+			success: function(data) {
+				$('#table-pagination').bootstrapTable({
+			        data: data
+			    });
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				alert(errorThrown);
+			},
+			dataType: "json",
+			async: false
+		});
+	
+		$('#tbb_edit').click(function(){
+			var career = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (career == null){
+				bootbox.alert('Debe seleccionar una carrera primero.');
+			} else {				
+				LoadAjaxContent("/career/" + career.id + "/upgrade/");
+			}
+		});
+		
+		$('#tbb_delete').click(function(){
+			var career = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (career == null){
+				bootbox.alert('Debe seleccionar una carrera primero.');
+			} else {
+				bootbox.confirm("Por favor confirme que desea eliminar la carrera: " + career.name, function(result) {
+					if(result){
+						$('#du_form')[0].action= "/career/" + enrollment.id + "/delete/";
+						$('#du_form')[0].method = "POST";
+						$('#du_career_id')[0].value = enrollment.id;
+						PostAndLoadAjaxContent($('#du_form'));
+					} else {
+						$('.top-right').notify({
+						    message: { text: 'Operación cancelada por el usuario.' },
+						    type: 'warning',
+						  }).show();
+					}
+				}); 
+			}
+		});
+	});
+</script>
+{% endblock %}

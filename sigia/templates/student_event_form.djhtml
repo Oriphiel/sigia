@@ -1,0 +1,290 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+
+<h1 class="page-header">{{ title }} </h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+	
+	<blockquote>
+    	Por favor llene los datos del formulario a continuación mostrados para 
+		{% if action == 'CREATE' %}registrar un{% else %}actualizar al{% endif %} evento de estudiante.
+    </blockquote>
+
+	<form class="form-horizontal" id="student_event_form" method="post" enctype="multipart/form-data">{% csrf_token %}
+
+		<div class="form-group">
+			<div class="control-label col-sm-3">
+				<label for="{{ student_event_form.student.auto_id }}">Estudiante</label>					
+				{% if student_event_form.student.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{student_event_form.student.errors}}'>*</label>
+				{% endif %} 
+			</div>	
+			<div class="col-sm-9">
+				<div class="row">
+					<div class="col-sm-10">
+						{{ student_event_form.student }}
+					</div>
+					<div class="col-sm-2">
+						<button type="button" class="btn btn-default" id="find_user_dialog_button">
+							<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+							Buscar
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="control-label col-sm-3">
+				<label for="{{ student_event_form.type.auto_id }}">Tipo</label>			
+				{% if student_event_form.type.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{student_event_form.type.errors}}'>*</label>
+				{% endif %} 
+			</div>
+			<div class="col-sm-9">
+				{{ student_event_form.type }}
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="control-label col-sm-3">
+				<label for="{{ student_event_form.start_date.auto_id }}">Fecha de Inicio</label>
+				{% if student_event_form.start_date.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{student_event_form.start_date.errors}}'>*</label>
+				{% endif %}
+			</div> 
+			<div class="col-sm-9">
+				<div class="row">
+					<div class="col-sm-10">
+						{{ student_event_form.start_date }}
+					</div>
+					<div class="col-sm-2">
+						<button type="button" class="btn btn-default" id="start_date_btn" data-date-format="dd/mm/yyyy">
+							<span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
+							Seleccionar
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="control-label col-sm-3">
+				<label for="{{ student_event_form.end_date.auto_id }}">Fecha de Finalización</label>			
+				{% if student_event_form.end_date.errors %}
+					<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{student_event_form.end_date.errors}}'>*</label>
+				{% endif %} 
+			</div>
+			<div class="col-sm-9">
+				<div class="row">
+					<div class="col-sm-10">
+						{{ student_event_form.end_date }}
+					</div>
+					<div class="col-sm-2">
+						<button type="button" class="btn btn-default" id="end_date_btn" data-date-format="dd/mm/yyyy">
+							<span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
+							Seleccionar
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="control-label col-sm-3">
+				<label for="{{ student_event_form.tutor.auto_id }}">Tutor/Supervisor</label>
+				{% if student_event_form.tutor.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{student_event_form.tutor.errors}}'>*</label>
+				{% endif %}
+			</div> 
+			<div class="col-sm-9">
+				{{ student_event_form.tutor }}
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<div class="control-label col-sm-3">
+				<label for="{{ student_event_form.manager.auto_id }}">Administrativo</label>
+				{% if student_event_form.manager.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{student_event_form.manager.errors}}'>*</label>
+				{% endif %}
+			</div> 
+			<div class="col-sm-9">
+				{{ student_event_form.manager }}
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="control-label col-sm-3">
+				<label for="{{ student_event_form.ini_obs.auto_id }}">Observaciones Iniciales</label>					
+				{% if student_event_form.ini_obs.errors %}
+				<label class="error" data-toggle="tooltip" data-placement="top" 
+					data-original-title='{{student_event_form.ini_obs.errors}}'>*</label>
+				{% endif %} 
+			</div>	
+			<div class="col-sm-9">
+				{{ student_event_form.ini_obs }}
+			</div>
+		</div>
+	
+	
+	{% if student_event_form.errors or personal_info_form.errors or student_event_form.errors %}
+	
+	<div class="panel panel-danger">
+	    <div class="panel-heading"><h3 class="panel-title">Errores:</h3></div>
+	    <div class="panel-body">
+	    	{% if student_event_form.errors or personal_info_form.errors %}
+	    		<ul>
+					{% for field in student_event_form %}
+						{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+					{% endfor %}
+					{% for field in personal_info_form %}
+						{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+					{% endfor %}
+				</ul>
+	    	{% endif %}
+	    </div>
+	</div>
+	
+	{% endif %}
+		
+	<div style="width: 100%; text-align: right; vertical-align: middle">
+		{% if action == 'CREATE' %}
+	    	<input class="btn btn-primary" type="button" value="Registrar Evento de Estudiante" id="btn_reg_student_event"/>
+	    {% else %}
+	    	<input class="btn btn-primary" type="button" value="Actualizar Evento de Estudiante" id="btn_upd_student_event"/>
+	    {% endif %}
+	</div>		
+
+	</form>
+	
+	<div style="display:none" id="user_dialog_container">
+		<div id="find_user_div" style="padding: 10px">
+			<table id="student-table"></table>
+		</div>
+	</div>
+		
+	</div>
+</div>
+	
+
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+	$(function() {
+		$('#student-table').mutate('height width', function(el,info) {
+	        $('#student-table').bootstrapTable('resetView');
+	    });
+    	
+    	$('#start_date_btn').datepicker().on('changeDate', function(ev){
+		    $('#start_date_btn').datepicker('hide');
+		    $('#id_start_date').val($.datepicker.formatDate("d/m/yy", ev.date));
+		});
+		
+		$('#end_date_btn').datepicker().on('changeDate', function(ev){
+		    $('#end_date_btn').datepicker('hide');
+		    $('#id_end_date').val($.datepicker.formatDate("d/m/yy", ev.date));
+		});
+    	
+    	$('#student-table').bootstrapTable({
+                method: 'get',
+                url: '/students/api/list/',
+                cache: false,
+                striped: true,
+                height: 430,
+                pagination: true,
+                search: true,
+                showColumns: true,
+                showRefresh: true,
+                minimumCountColumns: 2,
+                clickToSelect: true,
+                columns: [{
+                    field: 'state',
+                    radio: true
+                }, {
+                    field: 'id',
+                    title: 'ID',
+                    sortable: true
+                }, {
+                    field: 'last_name',
+                    title: 'Apellidos',
+                    sortable: true,
+                }, {
+                    field: 'first_name',
+                    title: 'Nombre',
+                    sortable: true,
+                }, {
+                    field: 'email',
+                    title: 'Correo',
+                    sortable: true,
+                }]
+            });
+        
+        $('#find_user_dialog_button').click(function(){
+			
+			var toolbar_footer = [{
+		        item: '<button type="button"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>',
+		        event: 'click',
+		        btnclass: 'btn btn-default',
+		        btntext: ' Seleccionar',
+		        callback: function( event ){
+		        	var user = $('#student-table').bootstrapTable('getSelections')[0];
+					if (user == null){
+						bootbox.alert('Debe seleccionar una persona primero.');
+					} else {
+						$('#id_student').val(user.id);
+						event.data.close();
+					}
+		        }
+		    }];
+			
+			$.jsPanel({
+			  id:       "find_user_dialog",
+			  selector: "#e-jspanelclosed",
+			  title: 'Buscar Usuario: ',
+			  bootstrap: true,
+			  position: "center",
+			  resizable: "disabled",
+			  controls: {
+			    maximize:     'disable',
+			    minimize:     'disable',
+			    normalize:    'disable',
+			    smallify:     'disable',
+			    maxtoScreen:  'disable'
+			  },
+			  toolbarFooter: toolbar_footer,
+			  size:     { width:  1000, height: 450 },
+			  content: $('#find_user_div'),
+			});
+			
+			$("#find_user_dialog").on("jspanelbeforeclose", function (event, id) {
+			    if( id === "find_user_dialog" ) {
+			        $('#find_user_div').appendTo('#user_dialog_container');
+			    }
+			});
+		});
+        
+		{% if action == 'UPGRADE' %}
+			$('#btn_upd_student_event').click(function(){
+				$('#student_event_form')[0].action="/student_event/" + {{id_student_event}} + "/upgrade/";
+				PostAndLoadAjaxContent($('#student_event_form'));
+			});
+		{% else %}
+			$('#btn_reg_student_event').click(function(){
+				$('#student_event_form')[0].action="/student_event/new/";
+				PostAndLoadAjaxContent($('#student_event_form'));
+			});
+		{% endif %}
+		
+		 $('[data-toggle="tooltip"]').tooltip({html:true}); 
+	});
+</script>
+{% endblock %}

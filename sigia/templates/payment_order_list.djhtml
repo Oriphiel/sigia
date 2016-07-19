@@ -1,0 +1,290 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% load sigia_auth_filters %}
+
+{% block content %}
+<h1 class="page-header">{{ title }}</h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+	<div id="custom-toolbar">
+	    <div class="btn-group" role="group">
+	    	{% if user|has_group:"secretary" %}
+	        <button class="btn btn-default" onclick="LoadAjaxContent('/payment_order/new/');">
+				<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Nueva
+	    	</button>
+	    	{% endif %}
+	    	<button class="btn btn-default" id="tbb_print">
+				<span class="glyphicon glyphicon-print" aria-hidden="true"></span> Imprimir
+	    	</button>
+	    	{% if user|has_group:"general_secretary" %}
+	        <button class="btn btn-default" id="tbb_edit">
+				<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Editar
+	    	</button>
+	        <button class="btn btn-default" id="tbb_delete">
+				<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Eliminar
+	    	</button>      
+	    	{% endif %}
+	    </div>
+	    
+	    {% if user|has_group:"admin" %}
+	    <div class="btn-group" role="group">
+	        <button class="btn btn-default" id="tbb_pay">
+				<span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Cancelar
+	    	</button>
+	    </div>
+	    {% endif %}
+	</div>
+	
+	<table id="table-pagination"></table>
+	
+	<div id="option-content"></div>
+	
+	<form id="du_form">{% csrf_token %}
+		<input type="hidden" id="du_payment_order_id" name="id" />
+	</form>
+	</div>
+</div>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+	function conceptFormatter(value, row) {
+		if (value == 'MORD') return 'Matrícula Ordinaria';
+		if (value == 'MEXT') return 'Matrícula Extraordinaria';
+		if (value == 'MESP') return 'Matrícula Especial';
+		if (value == 'TASI') return 'Toma de Asignatura';
+		if (value == 'ESUF') return 'Examen de Suficiencia';
+		if (value == 'CNOT') return 'Certificado de Notas';
+		if (value == 'HOMO') return 'Homologación';
+		if (value == 'REVA') return 'Revalidación';
+		if (value == 'CMAT') return 'Certificado de Materias (Plan de Estudios)';
+		if (value == 'SBAC') return 'Curso de Nivelación (Ser Bachiller)';
+		if (value == 'ENES') return 'Curso de Nivelación (ENES)';
+		if (value == 'PRET') return 'Curso de Nivelación (AITEC)';
+		if (value == 'EDCO') return 'Curso de Educación Continua';
+		if (value == 'EPER') return 'Período Académico Extraordinario';
+		if (value == 'UNTE') return 'Unidad de Titulación Especial';
+		if (value == 'QUOT') return 'Cuota';
+		return value;
+    }
+
+	function paymentOrderListRowStyle(row, index) {
+        var classes = ['active-text', 'success-text', 'info-text', 'warning-text', 'danger-text'];
+
+        if (row.payout == false ) return {classes: 'warning-text'};
+        return {classes: 'success-text'};
+    }
+	
+	$(document).ready(function() {
+    	$('#table-pagination').mutate('height width', function(el,info) {
+	        $('#table-pagination').bootstrapTable('resetView');
+	    });
+    	
+    	$('#table-pagination').bootstrapTable({
+                method: 'get',
+                url: '/payment_order/api/list/',
+                cache: false,
+                height: 600,
+                striped: true,
+                pagination: true,
+                search: false,
+                filterControl: true,
+                filterShowClear: true,
+                showColumns: true,
+                showRefresh: true,
+                minimumCountColumns: 2,
+                clickToSelect: true,
+                searchTimeOut: 1500,
+                trimOnSearch: false,
+                rowStyle: paymentOrderListRowStyle,
+                showExport: true,
+                exportDataType: 'all',
+                exportTypes: ['txt', 'csv', 'excel'],
+                toolbar: '#custom-toolbar',
+                columns: [{
+                    field: 'state',
+                    radio: true
+                }, {
+                    field: 'id',
+                    title: 'ID',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'name',
+                    title: 'Estudiante',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'date_issue',
+                    title: 'Fecha de Emisión',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'payment_concept',
+                    title: 'Concepto de Pago',
+                    sortable: true,
+                    formatter: conceptFormatter,
+                    filterControl: 'select',
+                    filterData: "var:PAYMENT_CONCEPT_CHOICES"
+                }, {
+                    field: 'value',
+                    title: 'Valor',
+                    sortable: true,
+                    formatter: moneyFormatter,
+                    filterControl: 'input'
+                }, {
+                    field: 'payout',
+                    title: 'Pagado',
+                    sortable: true,
+                    sorter: booleanSorter,
+                    formatter: boobleanFormatter,
+                    filterControl: 'select',
+                    filterData: "var:YESNO_CHOICES"
+                }, {
+                    field: 'date_payment',
+                    title: 'Fecha',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'level',
+                    title: 'Nivel',
+                    sortable: true,
+                    formatter: levelFormatter,
+                    filterControl: 'select',
+                    filterData: "var:LEVEL_CHOICES"
+                }, {
+                    field: 'period',
+                    title: 'Período',
+                    sortable: true,
+                    filterControl: 'input'
+                }, {
+                    field: 'semester',
+                    title: 'Semestre',
+                    sortable: true,
+                    filterControl: 'select',
+                    filterData: "var:SEMESTER_CHOICES"
+                }, {
+                    field: 'created',
+                    title: 'Creado',
+                    sortable: true,
+                    visible: false,
+                    filterControl: 'input'
+                }, {
+                    field: 'created_by',
+                    title: 'Creado por',
+                    sortable: true,
+                    visible: false,
+                    filterControl: 'input'
+                }, {
+                    field: 'modified',
+                    title: 'Modificado',
+                    sortable: true,
+                    visible: false,
+                    filterControl: 'input'
+                }, {
+                    field: 'modified_by',
+                    title: 'Modificado por',
+                    sortable: true,
+                    visible: false,
+                    filterControl: 'input'
+                }]
+            });
+		
+		$('#tbb_edit').click(function(){
+			var payment_order = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (payment_order == null){
+				bootbox.alert('Debe seleccionar una orden de pago primero.');
+			} else {
+				if (payment_order.payout){
+					bootbox.alert('Una orden de pago que ya fue pagada no puede ser editada.');
+				} else {
+				LoadAjaxContent("/payment_order/" + payment_order.id + "/upgrade/");
+				}
+			}
+		});
+		
+		$('#tbb_pay').click(function(){
+			var payment_order = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (payment_order == null){
+				bootbox.alert('Debe seleccionar una orden de pago primero.');
+			} else {
+				if (payment_order.payout == false){
+					$.jsPanel({
+						  title: 'Cancelar Orden de Pago: ',
+						  id: 'PanelCancelPaymentOrder',
+						  bootstrap: true,
+						  position: "center",
+						  modal: true,
+						  size:     { width:  600, height: 200 },
+						  load: {
+						        url: "/payment_order/" + payment_order.id + "/cancel/"
+						    },
+						});
+				} else {
+					bootbox.alert('La orden de pago ya fue cancelada.');
+				}
+			}
+		});
+		
+		$('#tbb_print').click(function(){
+			var payment_order = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (payment_order == null){
+				var url = "http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Aunpaid_bills.prpt/generatedContent?userid=admin&password=password&output-type=pageable/pdf";
+					
+				$.jsPanel({
+					  title: 'Órdenes de Pago Por Cobrar: ',
+					  bootstrap: true,
+					  position: "center",
+					  size:     { width:  800, height: 600 },
+					  content: '<embed src="' + url + '" width="100%" height="100%">',
+					});
+			} else {
+				var payment_order_id = payment_order.id;
+				var url = "http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Apaymentorder_by_id.prpt/generatedContent?userid=admin&password=password&output-type=pageable/pdf&paymentorder_id=" + payment_order_id;
+				
+				var ShowPaymentOrder = function(){
+					$.jsPanel({
+					  title: 'Orden de Pago: ',
+					  bootstrap: true,
+					  position: "center",
+					  size:     { width:  800, height: 600 },
+					  content: '<embed src="' + url + '" width="100%" height="100%">',
+					});
+				};
+				
+				if (payment_order.payout){
+					bootbox.confirm("Por favor confirme que desea imprimir una orden de pago ya cancelada.", function(result) {
+					if(result){
+						ShowPaymentOrder();
+					}
+					});
+				}else{
+					ShowPaymentOrder();				
+				}
+				
+			}
+		});
+		
+		$('#tbb_delete').click(function(){
+			var payment_order = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (payment_order == null){
+				bootbox.alert('Debe seleccionar una orden de pago primero.');
+			} else {
+				bootbox.confirm("Por favor confirme que desea eliminar la matrícula: " + payment_order.user + " : " + payment_order.payment_concept, function(result) {
+					if(result){
+						$('#du_form')[0].action= "/payment_order/" + payment_order.id + "/delete/";
+						$('#du_form')[0].method = "POST";
+						$('#du_payment_order_id')[0].value = payment_order.id;
+						PostAndLoadAjaxContent($('#du_form'));
+					} else {
+						$('.top-right').notify({
+						    message: { text: 'Operación cancelada por el usuario.' },
+						    type: 'warning',
+						  }).show();
+					}
+				}); 
+			}
+		});
+	});
+</script>
+{% endblock %}

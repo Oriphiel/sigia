@@ -1,0 +1,154 @@
+{% load sigia_auth_filters %}
+
+<div id="sidebar-left" class="col-xs-2 col-sm-2">
+	<ul class="nav main-menu">
+		<li>
+			<a href="/welcome/" class="active ajax-link">
+				<i class="fa fa-rocket"></i>
+				<span class="hidden-xs">Bienvenido</span>
+			</a>
+		</li>
+		{% if user.is_authenticated %}
+		<li class="dropdown">
+			<a href="#" class="dropdown-toggle">
+				<i class="fa fa-street-view"></i>
+				<span class="hidden-xs">Estudiantes</span>
+			</a>
+			<ul class="dropdown-menu">
+				<li><a class="ajax-link" href="/students/">Listado de Estudiantes</a></li>
+				{% if user|has_group:"secretary" %}
+				<li><a class="ajax-link" href="/students/new/">Registrar Estudiante</a></li>
+				<li><a class="ajax-link" href="/reduced_students/new/">Registrar Estudiante Transitorio</a></li>
+				{% endif %}
+				<li><a class="ajax-link" href="/student_event/">Eventos de Estudiantes</a></li>
+				<!-- <li><a class="ajax-link" href="/email/students/">Email a Estudiantes</a></li>-->
+			</ul>
+		</li>
+	
+		{% if user|has_group:"general_secretary" %}
+		<li class="dropdown">
+			<a href="#" class="dropdown-toggle">
+				<i class="fa fa-briefcase"></i>
+				 <span class="hidden-xs">Gestión</span>
+			</a>
+			<ul class="dropdown-menu">
+				<li><a class="ajax-link" href="/country/">Países</a></li>
+				<li><a class="ajax-link" href="/province/">Provincias</a></li>
+				<li><a class="ajax-link" href="/canton/">Cantones</a></li>
+				<li><a class="ajax-link" href="/parish/">Parroquias</a></li>
+				<li><a class="ajax-link" href="/ethnic_group/">Grupos Étnicos</a></li>
+			</ul>
+		</li>
+		{% endif %}
+		
+		{% if user|has_group:"general_secretary" %}
+		<li class="dropdown">
+			<a href="#" class="dropdown-toggle">
+				<i class="fa fa-pencil-square-o"></i>
+				 <span class="hidden-xs">Gestión Académica</span>
+			</a>
+			<ul class="dropdown-menu">
+				<li><a class="ajax-link" href="/period/">Períodos</a></li>
+				<li><a class="ajax-link" href="/career/">Carreras</a></li>
+				<li><a class="ajax-link" href="/course/">Cursos</a></li>
+				<li><a class="ajax-link" href="/under_construction/">Asignaturas</a></li>
+				<li><a class="ajax-link" href="/event_type/">Tipos de Eventos</a></li>
+				<li><a class="ajax-link" href="/event_group/">Grupo de Eventos</a></li>
+			</ul>
+		</li>
+		{% endif %}
+		
+		{% if user|has_group:"admin" %}
+		<li class="dropdown">
+			<a href="#" class="dropdown-toggle">
+				<i class="fa fa-cog"></i>
+				 <span class="hidden-xs">Administración</span>
+			</a>
+			<ul class="dropdown-menu">
+				<li><a class="ajax-link" href="/period/">Períodos</a></li>
+			</ul>
+		</li>
+		{% endif %}
+		
+		<li class="dropdown">
+			<a href="#" class="dropdown-toggle">
+				<i class="fa fa-users"></i>
+				 <span class="hidden-xs">Matriculación</span>
+			</a>
+			<ul class="dropdown-menu">
+				<li><a class="ajax-link" href="/enrollment/">Listado de Matrículas</a></li>
+				{% if user|has_group:"secretary" %}
+				<li><a class="ajax-link" href="/enrollment/new/">Matricular Estudiante</a></li>
+				{% endif %}
+			</ul>
+		</li>
+		<li class="dropdown">
+			<a href="#" class="dropdown-toggle">
+				<i class="fa fa-money"></i>
+				 <span class="hidden-xs">Colecturía</span>
+			</a>
+			<ul class="dropdown-menu">
+				<li><a class="ajax-link" href="/payment_order/">Lista de Órdenes de Pago</a></li>
+				{% if user|has_group:"secretary" %}
+				<li><a class="ajax-link" href="/payment_order/new/">Crear Orden de Pago</a></li>
+				{% endif %}
+			</ul>
+		</li>
+		<li class="dropdown">
+			<a href="#" class="dropdown-toggle">
+				<i class="fa fa-briefcase"></i>
+				 <span class="hidden-xs">Docentes</span>
+			</a>
+			<ul class="dropdown-menu">
+				<li><a class="ajax-link" href="/teacher/">Lista de Docentes</a></li>
+				<li><a class="ajax-link" href="/studies/">Estudios</a></li>
+				{% if user|has_group:"secretary" %}
+				<li><a class="ajax-link" href="/teacher/new/">Agregar Docente</a></li>
+				<li><a class="ajax-link" href="/studies/new/">Agregar Estudios</a></li>
+				{% endif %}
+			</ul>
+		</li>
+		<li class="dropdown">
+			<a href="#" class="dropdown-toggle">
+				<i class="fa fa-calendar"></i>
+				<span class="hidden-xs">Horarios</span>
+			</a>
+			<ul class="dropdown-menu">
+				<li><a class="ajax-link" href="/under_construction/">Lista de Horarios</a></li>
+			</ul>
+		</li>
+		{% else %}
+			<li>
+				<a href="/students/new/" class="ajax-link">
+					<i class="fa fa-users"></i>
+					<span class="hidden-xs">Registro en Línea</span>
+				</a>
+			</li>
+		{% endif %}
+		
+		{% if user.is_authenticated %}
+		
+		<li>
+			<a href="/reports/" class="ajax-link">
+				<i class="fa fa-file-text"></i>
+				<span class="hidden-xs">Reportes</span>
+			</a>
+		</li>
+		
+		 {% endif %}
+		
+		<li class="dropdown">
+			<a href="#" class="dropdown-toggle">
+				<i class="fa fa-life-ring"></i>
+				<span class="hidden-xs">Ayuda</span>
+			</a>
+			<ul class="dropdown-menu">
+				<li><a class="ajax-link" href="/under_construction/">Ayuda</a></li>
+				<li><a class="ajax-link" href="/bug_report/">Informar de un problema</a></li>
+				<li><a class="ajax-link" href="/under_construction/">Solicitar funcionalidad</a></li>
+				<li><a class="ajax-link" href="/under_construction/">Acerca de SIGIA</a></li>
+                <li><a class="ajax-link" href="/hola/">Hola</a></li>
+			</ul>
+		</li>
+	</ul>
+</div>

@@ -1,0 +1,25 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+<h1 class="page-header">Se ha registrado exitosamente.</h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+		<div style="width:100%;text-align: center;">
+			<img src="{{ STATIC_URL }}/img/success.jpg" alt="Imagen Registro Exitoso">
+		</div> 
+		<blockquote>
+            <p style="text-align: justify;">Se ha registrado exitosamente, recibirá un correo del sistema notificando
+            que su usuario ha sido creado correctamente, por esta vía también recibirá notificaciones de eventos 
+            significativos del sistema que requieran su atención, si no recibe el correo por favor informarlo a 
+            dvazquez@reduc.edu.ec.
+            </p>
+            <p style="text-align: justify;">
+            A contnuación debe acercarse a la secretaría docente para ratificar su inscripción y realizar el pago de la
+            matrícula.
+            </p>
+            <div style="text-align: right;">Mensaje del sistema.</div>
+        </blockquote>
+ 	</div>
+ </div>
+ 
+ {% endblock %}

@@ -1,0 +1,115 @@
+{% extends 'ajax-content.djhtml' %}
+
+{% block content %}
+
+<h1 class="page-header">Listado de Provincias</h1>
+<div class="box">
+	<div class="box-content" style="display: block;">
+<div id="custom-toolbar">
+    <div class="btn-group" role="group">
+        <button class="btn btn-default" onclick="LoadAjaxContent('/province/new/');"  title="Registrar Provincia">
+			<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Nuevo
+    	</button>
+    	<button class="btn btn-default" id="tbb_print" title="Imprimir lista de errores">
+			<span class="glyphicon glyphicon-print" aria-hidden="true"></span> Ver/Imprimir
+    	</button>
+        <button class="btn btn-default" id="tbb_edit" title="Editar Provincia">
+			<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Editar
+    	</button>
+        <button class="btn btn-default" id="tbb_delete" title="Eliminar Provincia">
+			<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Eliminar
+    	</button>      
+    </div>
+
+</div>
+
+<table id="table-pagination"></table>
+
+<div id="option-content"></div>
+
+<form id="du_form">{% csrf_token %}
+	<input type="hidden" id="du_province_id" name="id" />
+</form>
+
+</div>
+</div>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+	function rowStyle(row, index) {
+        var classes = ['active-text', 'success-text', 'info-text', 'warning-text', 'danger-text'];
+
+        if (row.approved == false ) return {classes: 'warning-text'};
+        return {classes: 'success-text'};
+    }
+    var $table = null;
+    $(document).ready(function() {
+    	$('#table-pagination').mutate('height width', function(el,info) {
+	        $('#table-pagination').bootstrapTable('resetView');
+	    });
+    	
+    	$('#table-pagination').bootstrapTable({
+                method: 'get',
+                url: '/province/api/list/',
+                cache: false,
+                height: 600,
+                striped: true,
+                pagination: true,
+                search: true,
+                showColumns: true,
+                showRefresh: true,
+                minimumCountColumns: 2,
+                clickToSelect: true,
+                //rowStyle: studentListRowStyle,
+                toolbar: '#custom-toolbar',
+                columns: [{
+                    field: 'state',
+                    radio: true
+                }, {
+                    field: 'id',
+                    title: 'ID',
+                    sortable: true
+                }, {
+                    field: 'name',
+                    title: 'Nombre',
+                    sortable: true,
+                }, {
+                    field: 'country',
+                    title: 'País',
+                    sortable: false,
+                }]
+            });
+		
+		$('#tbb_edit').click(function(){
+			var province = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (province == null){
+				bootbox.alert('Debe seleccionar un Provincia primero.');
+			} else {
+				LoadAjaxContent("/province/" + province.id + "/upgrade/");
+			}
+		});
+		
+		$('#tbb_delete').click(function(){
+			var province = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (province == null){
+				bootbox.alert('Debe seleccionar un Provincia primero.');
+			} else {
+				bootbox.confirm("Por favor confirme que desea eliminar el Provincia: " + province.name, function(result) {
+					if(result){
+						$('#du_form')[0].action= "/province/" + province.id + "/delete/";
+						$('#du_form')[0].method = "POST";
+						$('#du_province_id')[0].value = province.id;
+						PostAndLoadAjaxContent($('#du_form'));
+					} else {
+						$('.top-right').notify({
+						    message: { text: 'Operación cancelada por el usuario.' },
+						    type: 'warning',
+						  }).show();
+					}
+				}); 
+			}
+		});
+	});
+</script>
+{% endblock %}
