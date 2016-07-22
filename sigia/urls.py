@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic.base import RedirectView
@@ -7,7 +7,7 @@ from django.views.generic import TemplateView
 from sigia.settings import BASE_DIR
 import os
 
-from .views import LoginView, WelcomeView, LogoutView, StudentCreateView, StudentDeleteView, StudentsListView, \
+from views import LoginView, WelcomeView, LogoutView, StudentCreateView, StudentDeleteView, StudentsListView, \
     StudentsListData, \
     StudentUpdateView, CareerCreateView, CareerListView, CareerListData, CareerDeleteView, CareerUpdateView, \
     CourseListView, \

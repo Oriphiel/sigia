@@ -1,5 +1,11 @@
 {% extends 'ajax-content.djhtml' %}
-
+{% block styles %}
+    <style type="text/css">
+        select.form-control {
+            -webkit-appearance: menulist;
+        }
+    </style>
+{% endblock %}
 {% block content %}
     <h1 class="page-header">{{ title }} </h1>
     <div class="box">
@@ -152,7 +158,7 @@
                          role="tabpanel" aria-expanded="true" aria-hidden="false">
                         <div class="row">
                             <div class="form-group">
-                                <div class="form-group">
+                                {% comment %}<div class="form-group">
                                     <label for="{{ personal_form.type_background.auto_id }}"
                                            class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ personal_form.type_background.label }}</label>
                                     <div class="col-sm-9 col-md-9 col-lg-9">
@@ -162,20 +168,22 @@
                                         <button type="button" class="btn btn-default"><i
                                                 class="fa fa-plus"></i></button>
                                     </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="control-label col-sm-2 col-md-2 col-lg-2"
-                                           for="{{ personal_form.detail_background.auto_id }}">{{ personal_form.detail_background.label }}</label>
-                                    <div class="col-sm-9 col-md-9 col-lg-9">
-                                        {{ personal_form.detail_background }}
-                                    </div>
-                                </div>
+                                </div>{% endcomment %}
                                 {{ formset.management_form }}
                                 {% for form in formset %}
-                                    {{ form }}
+                                    <div class="form-group esto" id="{{ form.prefix }}-row">
+                                        <label for="{{ form.type_background.auto_id }}"
+                                               class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.type_background.label }}</label>
+                                        <div class="col-sm-9 col-md-9 col-lg-9">
+                                            {{ form.type_background }}
+                                        </div>
+                                        <label class="control-label col-sm-2 col-md-2 col-lg-2"
+                                               for="{{ form.detail_background.auto_id }}">{{ form.detail_background.label }}</label>
+                                        <div class="col-sm-9 col-md-9 col-lg-9">
+                                            {{ form.detail_background }}
+                                        </div>
+                                    </div>
                                 {% endfor %}
-                            Esto
                             </div>
                         </div>
                     </div>
@@ -187,14 +195,12 @@
 
 {% block body_scripts %}
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-select.min.css">
 
     <!-- Latest compiled and minified JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
+    <script src="{{ STATIC_URL }}js/bootstrap-select.min.js"></script>
+    <script src="{{ STATIC_URL }}js/jquery.formset.js"></script>
 
-    <!-- (Optional) Latest compiled and minified JavaScript translation files -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/i18n/defaults-*.min.js"></script>
     <script>
         $(document).ready(function () {
             Date.prototype.toDateInputValue = (function () {
@@ -206,6 +212,9 @@
             var dt = new Date();
             var time = dt.toTimeString().split(' ')[0];
             $('#time1').val(time);
+            $('.selectpicker').selectpicker();
+            $('.selectpicker').selectpicker('render');
+            $('form div .esto').formset();
             $('#id_Medico-id_patient').change(function () {
                         var num = $('#id_Medico-id_patient').children("option").filter(":selected").val();
                         $.ajax({
@@ -265,4 +274,20 @@
             PostAndLoadAjaxContent($('#medicoform'));
         });
     </script>
+    <style>
+
+        .add-row {
+            color: #4cae4c !important;
+            padding-left:18px;
+            background:url({{ STATIC_URL }}img/add.png) no-repeat left center;
+        }
+
+        .delete-row {
+            display: block;
+            margin: 6px 0 0 0;
+            padding-left: 18px;
+            color: #3c3c3c !important;
+            background:url({{ STATIC_URL }}img/delete.png) no-repeat left center;
+        }
+    </style>
 {% endblock %}

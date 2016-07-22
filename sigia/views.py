@@ -3452,7 +3452,9 @@ class MedicRecordCreateView(View):
     def get(self, request, *args, **kwargs):
         medic_form = CreateMedicRecordForm(prefix="Medico")
         personal_antecedent = PersonalMedicBackground(prefix="Personal")
-        example = formset_factory(form=PersonalMedicBackground, max_num=10, can_delete=True, can_order=True)
+        example = formset_factory(form=PersonalMedicBackground, max_num=24, can_delete=True, can_order=True)
+        data = {'form-INITIAL_FORMS': '0'}
+        example(data)
         context = {'action': self.action, 'medic_form': medic_form, 'title': self.title, 'formset': example,
                    'breadCrumbEntries': self.breadCrumbEntries, 'personal_form': personal_antecedent}
         return render_to_response(self.template_name, RequestContext(request, context))

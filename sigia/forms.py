@@ -669,7 +669,8 @@ class CreateMedicRecordForm(forms.ModelForm):
 
 class PersonalMedicBackground(forms.ModelForm):
     type_background = ModelChoiceField(
-        widget=forms.Select(attrs={'class': 'form-control selectpicker', 'data-live-search': "true"}),
+        widget=forms.Select(
+            attrs={'class': 'form-control', 'data-live-search': "true", 'autocomplete': 'off'}),
         queryset=SigiaMedicPersonalBackgroundDetail.objects.filter(id__range=[1, 24]), label="General")
 
     class Meta:

@@ -1,257 +1,365 @@
 {% load sigia_auth_filters %}
 
 <!DOCTYPE html>
-	<head>
-		<meta charset="utf-8">
-		<title>SIGIA</title>
+<head>
+    <meta charset="utf-8">
+    <title>SIGIA</title>
 
-		{% block metadata %}
-		<meta name="keywords" content="estudiantes docentes horarios gestión academica" />
-		<meta name="description" content="Sistema Integrado de Gestión Académica">
-		<meta name="author" content="Dario Jorge Vázquez Arguija">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		{% endblock %}
+    {% block metadata %}
+        <meta name="keywords" content="estudiantes docentes horarios gestión academica"/>
+        <meta name="description" content="Sistema Integrado de Gestión Académica">
+        <meta name="author" content="Dario Jorge Vázquez Arguija">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% endblock %}
 
-		{% block styles %}
+
         <link href="{{ STATIC_URL }}plugins/bootstrap/bootstrap.css" rel="stylesheet">
-		<link href="{{ STATIC_URL }}plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet">
-		<link href="{{ STATIC_URL }}css/font-awesome.css" rel="stylesheet">
-<!--		<link href='http://fonts.googleapis.com/css?family=Righteous' rel='stylesheet' type='text/css'> -->
-		<link href="{{ STATIC_URL }}css/Righteous.css" rel="stylesheet">
-		<link href="{{ STATIC_URL }}plugins/fancybox/jquery.fancybox.css" rel="stylesheet">
-		<link href="{{ STATIC_URL }}plugins/fullcalendar/fullcalendar.css" rel="stylesheet">
-		<link href="{{ STATIC_URL }}plugins/xcharts/xcharts.min.css" rel="stylesheet">
-		<link href="{{ STATIC_URL }}plugins/select2/select2.css" rel="stylesheet">
-		<link href="{{ STATIC_URL }}css/style.css" rel="stylesheet">
-		
-		
+        <link href="{{ STATIC_URL }}plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/font-awesome.css" rel="stylesheet">
+        <!--		<link href='http://fonts.googleapis.com/css?family=Righteous' rel='stylesheet' type='text/css'> -->
+        <link href="{{ STATIC_URL }}css/Righteous.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}plugins/fancybox/jquery.fancybox.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}plugins/fullcalendar/fullcalendar.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}plugins/xcharts/xcharts.min.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}plugins/select2/select2.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/style.css" rel="stylesheet">
+
+
         <link href="{{ STATIC_URL }}css/datepicker.css" rel="stylesheet"/>
         <link href="{{ STATIC_URL }}css/bootstrap-table.css" rel="stylesheet"/>
         <link href="{{ STATIC_URL }}css/bootstrap-notify.css" rel="stylesheet"/>
         <link href="{{ STATIC_URL }}css/jquery.jspanel.css" rel="stylesheet"/>
-        
+
         <!--[if IE]><link rel="shortcut icon" href="/favicon.ico"><![endif]-->
-        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-        
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-		<!--[if lt IE 9]>
+        <!--[if lt IE 9]>
 				<script src="http://getbootstrap.com/docs-assets/js/html5shiv.js"></script>
 				<script src="http://getbootstrap.com/docs-assets/js/respond.min.js"></script>
 		<![endif]-->
-        
-		{% endblock %}
-		
-		<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-		<!--<script src="http://code.jquery.com/jquery.js"></script>-->
-		<script src="{{ STATIC_URL }}plugins/jquery/jquery-2.1.0.min.js"></script>
-		<script src="{{ STATIC_URL }}plugins/jquery-ui/jquery-ui.min.js"></script>
-		<!-- Include all compiled plugins (below), or include individual files as needed -->
-		<script src="{{ STATIC_URL }}plugins/bootstrap/bootstrap.min.js"></script>
-		<script src="{{ STATIC_URL }}plugins/justified-gallery/jquery.justifiedgallery.min.js"></script>
-		
-		<script src="{{ STATIC_URL }}plugins/tinymce/tinymce.min.js"></script>
-		<script src="{{ STATIC_URL }}plugins/tinymce/jquery.tinymce.min.js"></script>
-		<!-- All functions for this theme + document.ready processing -->
-		<script src="{{ STATIC_URL }}js/devoops.js"></script>
+    {% block styles %}
+    {% endblock %}
 
-		<script src="{{ STATIC_URL }}js/modernizr-2.6.2.js"></script>
-        <!-- <script src="{{ STATIC_URL }}js/jquery-2.1.1.js"></script>  -->
-        <!-- <script src="{{ STATIC_URL }}js/jquery-ui.min.js"></script> -->
-        <!-- <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script> -->
-        <script src="{{ STATIC_URL }}js/bootstrap-datepicker.js"></script>
-        <script src="{{ STATIC_URL }}js/bootbox.js"></script>
-        <script src="{{ STATIC_URL }}js/locales/bootstrap-datepicker.es.js"></script>
-        <script src="{{ STATIC_URL }}js/bootstrap-table.js"></script>
-        <script src="{{ STATIC_URL }}js/locale/bootstrap-table-es-NI.js"></script>
-        <script src="{{ STATIC_URL }}js/bootstrap-notify.js"></script>
-        <script src="{{ STATIC_URL }}js/jquery.jspanel.js"></script>
-        <script src="{{ STATIC_URL }}js/mutate.events.js"></script>
-        <script src="{{ STATIC_URL }}js/mutate.min.js"></script>
-        <script src="{{ STATIC_URL }}js/extensions/filter-control/bootstrap-table-filter-control.js"></script>
-        <script type="text/javascript" src="{{ STATIC_URL }}js/tableExport/tableExport.min.js"></script>
-		<script type="text/javascript" src="{{ STATIC_URL }}js/tableExport/libs/FileSaver/FileSaver.min.js"></script>
-        <script src="{{ STATIC_URL }}js/extensions/export/bootstrap-table-export.js"></script>
-        
-	</head>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <!--<script src="http://code.jquery.com/jquery.js"></script>-->
+    <script src="{{ STATIC_URL }}plugins/jquery/jquery-2.1.0.min.js"></script>
+    <script src="{{ STATIC_URL }}plugins/jquery-ui/jquery-ui.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="{{ STATIC_URL }}plugins/bootstrap/bootstrap.min.js"></script>
+    <script src="{{ STATIC_URL }}plugins/justified-gallery/jquery.justifiedgallery.min.js"></script>
 
-	<body>
-		<div class='notifications top-right'></div>
-		{% block body %}
-			{% include 'includes/header.djhtml' %}
-            <div id="main" class="container-fluid">
-				<div class="row">
-					{% include 'includes/sidebar.djhtml' %}
-					<div id="content" class="col-xs-12 col-sm-10">
-						<div class="preloader">
-							<img src="/static/img/devoops_getdata.gif" class="devoops-getdata" alt="preloader"/>
-						</div>
-						<div id="ajax-content"></div>
-					</div>
-            	</div>
-            </div>	
-		{% endblock %}
+    <script src="{{ STATIC_URL }}plugins/tinymce/tinymce.min.js"></script>
+    <script src="{{ STATIC_URL }}plugins/tinymce/jquery.tinymce.min.js"></script>
+    <!-- All functions for this theme + document.ready processing -->
+    <script src="{{ STATIC_URL }}js/devoops.js"></script>
 
-		<!--End Container-->
+    <script src="{{ STATIC_URL }}js/modernizr-2.6.2.js"></script>
+    <!-- <script src="{{ STATIC_URL }}js/jquery-2.1.1.js"></script>  -->
+    <!-- <script src="{{ STATIC_URL }}js/jquery-ui.min.js"></script> -->
+    <!-- <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script> -->
+    <script src="{{ STATIC_URL }}js/bootstrap-datepicker.js"></script>
+    <script src="{{ STATIC_URL }}js/bootbox.js"></script>
+    <script src="{{ STATIC_URL }}js/locales/bootstrap-datepicker.es.js"></script>
+    <script src="{{ STATIC_URL }}js/bootstrap-table.js"></script>
+    <script src="{{ STATIC_URL }}js/locale/bootstrap-table-es-NI.js"></script>
+    <script src="{{ STATIC_URL }}js/bootstrap-notify.js"></script>
+    <script src="{{ STATIC_URL }}js/jquery.jspanel.js"></script>
+    <script src="{{ STATIC_URL }}js/mutate.events.js"></script>
+    <script src="{{ STATIC_URL }}js/mutate.min.js"></script>
+    <script src="{{ STATIC_URL }}js/extensions/filter-control/bootstrap-table-filter-control.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/tableExport/tableExport.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/tableExport/libs/FileSaver/FileSaver.min.js"></script>
+    <script src="{{ STATIC_URL }}js/extensions/export/bootstrap-table-export.js"></script>
 
-		<script type="text/javascript">
-			var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9\+\/\=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/\r\n/g,"\n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}}
-			
-			var jspanel_scholarship= null;
-			
-			function loadlist(selobj,url,nameattr, valattr) {
-			    $(selobj).empty();
-			    $.getJSON(url,{},function(data)
-			    {
-			        $.each(data, function(i,obj)
-			        {
-			            $(selobj).append(
-			                 $('<option></option>')
-			                        .val(obj[valattr])
-			                        .html(obj[nameattr]));
-			        });
-			    });
-			}
-			
-			function booleanSorter(a, b) {
-		    	if (a){
-		    		return -1;
-		    	} else {
-		    		return 1;
-		    	}
-		    };
-					
-			function boobleanFormatter(value, row) {
-				if (value == "true" || value == true)
-		        	return 'Si';
-		        else
-		        	return 'No';
-		    }
-		    
-		    function moneyFormatter(value, row) {
-				return value + ' USD';
-		    }
-		    
-		    function levelFormatter(value, row) {
-				if (value == 0) return 'PRE';
-				if (value == 7) return 'UTE';
-				if (value == 8) return 'ENES';
-				if (value == 9) return 'EDC';
-				if (value == 10) return 'SBA';
-				if (value == 11) return 'CERT';
-				if (value == 12) return 'CLES';
-				if (value == 13) return 'OTR';
-				return value;
-		    }
-		    
-		    function studentTypeFormatter(value, row) {
-				if (value == 'PRE') return 'Pre-Tecnológico';
-				if (value == 'EST') return 'Estudiando';
-				if (value == 'EGR') return 'Egresado';
-				if (value == 'TIT') return 'Titulado';
-				if (value == 'BAJ') return 'Baja';
-				if (value == 'ENE') return 'ENES';
-				if (value == 'SBA') return 'Ser Bachiller';
-				if (value == 'CON') return 'Educación Continua';
-				return value;
-		    }
-		    
-		    window["CAREER_CHOICES"] = {'ADMINISTRACIÓN DE EMPRESAS, MENCIÓN CONTABILIDAD Y AUDITORÍA':'ADMINISTRACIÓN DE EMPRESAS, MENCIÓN CONTABILIDAD Y AUDITORÍA',
-    								'ASISTENTE DE GERENCIA':'ASISTENTE DE GERENCIA',
-    								'INFORMÁTICA':'INFORMÁTICA',
-    								'SECRETARIADO EJECUTIVO':'SECRETARIADO EJECUTIVO', 
-    								};
-    								
-	    	window["YESNO_CHOICES"] = {'Si':'SI','No':'NO',};
-	    							   
-			window["SEMESTER_CHOICES"] = {'A':'A','B':'B',};	    							   
-	    							   
-	 		window["LEVEL_CHOICES"] = {'PRE':'PRE', '1':'1', '2':'2', '3':'3','4':'4','5':'5','6':'6','UTE':'UTE',
-	    							   'ENES':'ENES','EDC':'EDC','SBA':'SBA','CERT':'CERT','CLES':'CLES','PTR':'PTR',
-	    							   'OTR': 'Otros'};
-	    							   
-	 		window["PARALLEL_CHOICES"] = {'A':'A','B':'B','C':'C','D':'D','E':'E','F':'F','G':'G','H':'H',
-				                    'I':'I','J':'J','K':'K','L':'L','M':'M','N':'N','O':'O','P':'P',
-				                    'Q':'Q','R':'R','S':'S','T':'T','U':'U','V':'V','W':'W','X':'X','Y':'Y','Z':'Z'}
-				                    
-			window["FINANCING_SYS_CHOICES"] = {'Crédito Directo':'Crédito Directo', 'Crédito IECE':'Crédito IECE'}	 
-			
-			window["STUDENT_TYPE_CHOICES"]  = {'PRE':'Pre-Tecnológico','EST':'Estudiando','EGR':'Egresado',
-                             'TIT':'Titulado','BAJ':'Baja','ENE':'ENES','SBA':'Ser Bachiller','CON':'Educación Continua'}  
-                             
-           window["EVENT_STATE_CHOICES"] = {'En Espera':'En Espera','En Curso':'En Curso',
-                           'Abortada':'Abortada','Concluida':'Concluida'}
-		    
-		    window["ENROLLMENT_CHOICES"]  = {'Ordinaria':'Ordinaria', 'Extraordinaria':'Extraordinaria','Especial':'Especial',
-		    'Pre-Tecnológico':'Pre-Tecnológico','ENES':'ENES', 'Ser Bachiller':'Ser Bachiller', 'ECO': 'Educación Continua'}
-		    
-		    window["COURSE_TYPE_CHOICES"] = {'Semipresencial':'Semipresencial', 'Presencial':'Presencial', 'Educación Contínua':'Educación Contínua'}
-		    
-		    window["PAYMENT_CONCEPT_CHOICES"] = {'Matrícula Ordinaria':'Matrícula Ordinaria',
-                               'Matrícula Extraordinaria':'Matrícula Extraordinaria',
-                               'Matrícula Especial':'Matrícula Especial',
-                               'Toma de Asignatura':'Toma de Asignatura',
-                               'Examen de Suficiencia':'Examen de Suficiencia',
-                               'Certificado de Notas':'Certificado de Notas',
-                               'Homologación':'Homologación',
-                               'Revalidación':'Revalidación',
-                               'Certificado de Materias (Plan de Estudios)':'Certificado de Materias (Plan de Estudios)',
-                               'Curso de Nivelación (Ser Bachiller)':'Curso de Nivelación (Ser Bachiller)',
-                               'Curso de Nivelación (ENES)':'Curso de Nivelación (ENES)',
-                               'Curso de Nivelación (AITEC)':'Curso de Nivelación (AITEC)',
-                               'Curso de Educación Continua':'Curso de Educación Continua',
-                               'Período Académico Extraordinario':'Período Académico Extraordinario',
-                               'Unidad de Titulación Especial':'Unidad de Titulación Especial',
-                               'Proceso de Graduación':'Proceso de Graduación',
-                               'Cuota':'Cuota'}
-		    
-			$(function() {
-				bootbox.setDefaults({locale: "es"});
-				function getCookie(name) {
-				    var cookieValue = null;
-				    if (document.cookie && document.cookie != '') {
-				        var cookies = document.cookie.split(';');
-				        for (var i = 0; i < cookies.length; i++) {
-				            var cookie = jQuery.trim(cookies[i]);
-				            // Does this cookie string begin with the name we want?
-				            if (cookie.substring(0, name.length + 1) == (name + '=')) {
-				                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-				                break;
-				            }
-				        }
-				    }
-				    return cookieValue;
-				}
-				var csrftoken = getCookie('csrftoken');
-				
-				function csrfSafeMethod(method) {
-				    // these HTTP methods do not require CSRF protection
-				    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-				}
-				$.ajaxSetup({
-				    beforeSend: function(xhr, settings) {
-				        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-				            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-				        }
-				    }
-				});
-								
-				if(typeof(Storage) !== "undefined") {
-				    if(sessionStorage.frozenPanels){
-				    	frozenPanels = sessionStorage.frozenPanels;
-				    	for(var i = 0; i < frozenPanels.length; i++){
-				    		frozenPanels[i].show();
-				    	}
-				    	sessionStorage.frozenPanels = []
-				    }
-				} else {
-				    bootbox.error('Lo sentimos su navegador no es compatible con la aplicación. Por favor actualize su navegador o cambie de navegador por uno que sorte Web Storage.');
-				}
-				
-			});
-		</script>
-		
-		{% block body_scripts %}
-		{% endblock %}
-	</body>
+</head>
+
+<body>
+<div class='notifications top-right'></div>
+{% block body %}
+    {% include 'includes/header.djhtml' %}
+    <div id="main" class="container-fluid">
+        <div class="row">
+            {% include 'includes/sidebar.djhtml' %}
+            <div id="content" class="col-xs-12 col-sm-10">
+                <div class="preloader">
+                    <img src="/static/img/devoops_getdata.gif" class="devoops-getdata" alt="preloader"/>
+                </div>
+                <div id="ajax-content"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+<!--End Container-->
+
+<script type="text/javascript">
+    var Base64 = {
+        _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", encode: function (e) {
+            var t = "";
+            var n, r, i, s, o, u, a;
+            var f = 0;
+            e = Base64._utf8_encode(e);
+            while (f < e.length) {
+                n = e.charCodeAt(f++);
+                r = e.charCodeAt(f++);
+                i = e.charCodeAt(f++);
+                s = n >> 2;
+                o = (n & 3) << 4 | r >> 4;
+                u = (r & 15) << 2 | i >> 6;
+                a = i & 63;
+                if (isNaN(r)) {
+                    u = a = 64
+                } else if (isNaN(i)) {
+                    a = 64
+                }
+                t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a)
+            }
+            return t
+        }, decode: function (e) {
+            var t = "";
+            var n, r, i;
+            var s, o, u, a;
+            var f = 0;
+            e = e.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+            while (f < e.length) {
+                s = this._keyStr.indexOf(e.charAt(f++));
+                o = this._keyStr.indexOf(e.charAt(f++));
+                u = this._keyStr.indexOf(e.charAt(f++));
+                a = this._keyStr.indexOf(e.charAt(f++));
+                n = s << 2 | o >> 4;
+                r = (o & 15) << 4 | u >> 2;
+                i = (u & 3) << 6 | a;
+                t = t + String.fromCharCode(n);
+                if (u != 64) {
+                    t = t + String.fromCharCode(r)
+                }
+                if (a != 64) {
+                    t = t + String.fromCharCode(i)
+                }
+            }
+            t = Base64._utf8_decode(t);
+            return t
+        }, _utf8_encode: function (e) {
+            e = e.replace(/\r\n/g, "\n");
+            var t = "";
+            for (var n = 0; n < e.length; n++) {
+                var r = e.charCodeAt(n);
+                if (r < 128) {
+                    t += String.fromCharCode(r)
+                } else if (r > 127 && r < 2048) {
+                    t += String.fromCharCode(r >> 6 | 192);
+                    t += String.fromCharCode(r & 63 | 128)
+                } else {
+                    t += String.fromCharCode(r >> 12 | 224);
+                    t += String.fromCharCode(r >> 6 & 63 | 128);
+                    t += String.fromCharCode(r & 63 | 128)
+                }
+            }
+            return t
+        }, _utf8_decode: function (e) {
+            var t = "";
+            var n = 0;
+            var r = c1 = c2 = 0;
+            while (n < e.length) {
+                r = e.charCodeAt(n);
+                if (r < 128) {
+                    t += String.fromCharCode(r);
+                    n++
+                } else if (r > 191 && r < 224) {
+                    c2 = e.charCodeAt(n + 1);
+                    t += String.fromCharCode((r & 31) << 6 | c2 & 63);
+                    n += 2
+                } else {
+                    c2 = e.charCodeAt(n + 1);
+                    c3 = e.charCodeAt(n + 2);
+                    t += String.fromCharCode((r & 15) << 12 | (c2 & 63) << 6 | c3 & 63);
+                    n += 3
+                }
+            }
+            return t
+        }
+    }
+
+    var jspanel_scholarship = null;
+
+    function loadlist(selobj, url, nameattr, valattr) {
+        $(selobj).empty();
+        $.getJSON(url, {}, function (data) {
+            $.each(data, function (i, obj) {
+                $(selobj).append(
+                        $('<option></option>')
+                                .val(obj[valattr])
+                                .html(obj[nameattr]));
+            });
+        });
+    }
+
+    function booleanSorter(a, b) {
+        if (a) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
+    ;
+
+    function boobleanFormatter(value, row) {
+        if (value == "true" || value == true)
+            return 'Si';
+        else
+            return 'No';
+    }
+
+    function moneyFormatter(value, row) {
+        return value + ' USD';
+    }
+
+    function levelFormatter(value, row) {
+        if (value == 0) return 'PRE';
+        if (value == 7) return 'UTE';
+        if (value == 8) return 'ENES';
+        if (value == 9) return 'EDC';
+        if (value == 10) return 'SBA';
+        if (value == 11) return 'CERT';
+        if (value == 12) return 'CLES';
+        if (value == 13) return 'OTR';
+        return value;
+    }
+
+    function studentTypeFormatter(value, row) {
+        if (value == 'PRE') return 'Pre-Tecnológico';
+        if (value == 'EST') return 'Estudiando';
+        if (value == 'EGR') return 'Egresado';
+        if (value == 'TIT') return 'Titulado';
+        if (value == 'BAJ') return 'Baja';
+        if (value == 'ENE') return 'ENES';
+        if (value == 'SBA') return 'Ser Bachiller';
+        if (value == 'CON') return 'Educación Continua';
+        return value;
+    }
+
+    window["CAREER_CHOICES"] = {
+        'ADMINISTRACIÓN DE EMPRESAS, MENCIÓN CONTABILIDAD Y AUDITORÍA': 'ADMINISTRACIÓN DE EMPRESAS, MENCIÓN CONTABILIDAD Y AUDITORÍA',
+        'ASISTENTE DE GERENCIA': 'ASISTENTE DE GERENCIA',
+        'INFORMÁTICA': 'INFORMÁTICA',
+        'SECRETARIADO EJECUTIVO': 'SECRETARIADO EJECUTIVO',
+    };
+
+    window["YESNO_CHOICES"] = {'Si': 'SI', 'No': 'NO',};
+
+    window["SEMESTER_CHOICES"] = {'A': 'A', 'B': 'B',};
+
+    window["LEVEL_CHOICES"] = {
+        'PRE': 'PRE', '1': '1', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', 'UTE': 'UTE',
+        'ENES': 'ENES', 'EDC': 'EDC', 'SBA': 'SBA', 'CERT': 'CERT', 'CLES': 'CLES', 'PTR': 'PTR',
+        'OTR': 'Otros'
+    };
+
+    window["PARALLEL_CHOICES"] = {
+        'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E', 'F': 'F', 'G': 'G', 'H': 'H',
+        'I': 'I', 'J': 'J', 'K': 'K', 'L': 'L', 'M': 'M', 'N': 'N', 'O': 'O', 'P': 'P',
+        'Q': 'Q', 'R': 'R', 'S': 'S', 'T': 'T', 'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 'Y': 'Y', 'Z': 'Z'
+    }
+
+    window["FINANCING_SYS_CHOICES"] = {'Crédito Directo': 'Crédito Directo', 'Crédito IECE': 'Crédito IECE'}
+
+    window["STUDENT_TYPE_CHOICES"] = {
+        'PRE': 'Pre-Tecnológico', 'EST': 'Estudiando', 'EGR': 'Egresado',
+        'TIT': 'Titulado', 'BAJ': 'Baja', 'ENE': 'ENES', 'SBA': 'Ser Bachiller', 'CON': 'Educación Continua'
+    }
+
+    window["EVENT_STATE_CHOICES"] = {
+        'En Espera': 'En Espera', 'En Curso': 'En Curso',
+        'Abortada': 'Abortada', 'Concluida': 'Concluida'
+    }
+
+    window["ENROLLMENT_CHOICES"] = {
+        'Ordinaria': 'Ordinaria',
+        'Extraordinaria': 'Extraordinaria',
+        'Especial': 'Especial',
+        'Pre-Tecnológico': 'Pre-Tecnológico',
+        'ENES': 'ENES',
+        'Ser Bachiller': 'Ser Bachiller',
+        'ECO': 'Educación Continua'
+    }
+
+    window["COURSE_TYPE_CHOICES"] = {
+        'Semipresencial': 'Semipresencial',
+        'Presencial': 'Presencial',
+        'Educación Contínua': 'Educación Contínua'
+    }
+
+    window["PAYMENT_CONCEPT_CHOICES"] = {
+        'Matrícula Ordinaria': 'Matrícula Ordinaria',
+        'Matrícula Extraordinaria': 'Matrícula Extraordinaria',
+        'Matrícula Especial': 'Matrícula Especial',
+        'Toma de Asignatura': 'Toma de Asignatura',
+        'Examen de Suficiencia': 'Examen de Suficiencia',
+        'Certificado de Notas': 'Certificado de Notas',
+        'Homologación': 'Homologación',
+        'Revalidación': 'Revalidación',
+        'Certificado de Materias (Plan de Estudios)': 'Certificado de Materias (Plan de Estudios)',
+        'Curso de Nivelación (Ser Bachiller)': 'Curso de Nivelación (Ser Bachiller)',
+        'Curso de Nivelación (ENES)': 'Curso de Nivelación (ENES)',
+        'Curso de Nivelación (AITEC)': 'Curso de Nivelación (AITEC)',
+        'Curso de Educación Continua': 'Curso de Educación Continua',
+        'Período Académico Extraordinario': 'Período Académico Extraordinario',
+        'Unidad de Titulación Especial': 'Unidad de Titulación Especial',
+        'Proceso de Graduación': 'Proceso de Graduación',
+        'Cuota': 'Cuota'
+    }
+
+    $(function () {
+        bootbox.setDefaults({locale: "es"});
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        var csrftoken = getCookie('csrftoken');
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        if (typeof(Storage) !== "undefined") {
+            if (sessionStorage.frozenPanels) {
+                frozenPanels = sessionStorage.frozenPanels;
+                for (var i = 0; i < frozenPanels.length; i++) {
+                    frozenPanels[i].show();
+                }
+                sessionStorage.frozenPanels = []
+            }
+        } else {
+            bootbox.error('Lo sentimos su navegador no es compatible con la aplicación. Por favor actualize su navegador o cambie de navegador por uno que sorte Web Storage.');
+        }
+
+    });
+</script>
+
+{% block body_scripts %}
+{% endblock %}
+</body>
 
 </html>

@@ -16,6 +16,7 @@
     <orderEntry type="jdk" jdkName="Python 2.7.12 virtualenv at C:\Users\tony_\Sigia" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="bootstrap-select" level="application" />
+    <orderEntry type="library" name="bootstrap-select" level="application" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
