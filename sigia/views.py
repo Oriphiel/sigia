@@ -22,12 +22,13 @@ from sigia.forms import LoginForm, UserForm, UserPersonalInfoForm, \
     EthnicGroupForm, BugReportForm, CountryForm, ProvinceForm, CantonForm, \
     ParishForm, ReducedStudentForm, ContactForm, TeacherForm, EventTypeForm, \
     StudentEventForm, StudiesForm, EventGroupForm, EmailForm, InstitutionForm, CreateMedicRecordForm, \
-    PersonalMedicBackground
+    PersonalMedicBackground, PersonalFemMedicBackground, FamilyMedicBackground, MedicContact, PhysicalExam, \
+    DiagnosticPlan, DiagnosticPresumptive
 from django.views.generic.base import TemplateView
 from sigia.models import Student, UserProfile, Career, Course, Enrollment, \
     Period, PaymentOrder, Province, Canton, Parish, EthnicGroup, BugReport, \
     Country, Teacher, EventType, StudentEvent, Studies, EventsGroup, \
-    EventsGroupRelation, StudentEventsGroupRelation, EmailLog, Institution
+    EventsGroupRelation, StudentEventsGroupRelation, EmailLog, Institution, SigiaMedicCie10
 from django.http.response import JsonResponse, HttpResponse, \
     HttpResponseRedirect
 from django.contrib import messages
@@ -3440,8 +3441,8 @@ class InstitutionDeleteView(View):
 
 class MedicRecordCreateView(View):
     title = 'Historia Clinica'
-    template_name = 'holaMundo.html'
-    action = 'GET'
+    template_name = 'medic_form.html'
+    action = 'CREATE'
     breadCrumbEntries = (BreadCrumb("Bienvenido", "/welcome/"), BreadCrumb("Hola Mundo", "/hola/"),)
 
     @classmethod
@@ -3450,18 +3451,35 @@ class MedicRecordCreateView(View):
         return login_required(view, "/")
 
     def get(self, request, *args, **kwargs):
-        medic_form = CreateMedicRecordForm(prefix="Medico")
-        personal_antecedent = PersonalMedicBackground(prefix="Personal")
-        example = formset_factory(form=PersonalMedicBackground, max_num=24, can_delete=True, can_order=True)
-        data = {'form-INITIAL_FORMS': '0'}
-        example(data)
-        context = {'action': self.action, 'medic_form': medic_form, 'title': self.title, 'formset': example,
-                   'breadCrumbEntries': self.breadCrumbEntries, 'personal_form': personal_antecedent}
+        medic_form = CreateMedicRecordForm(prefix="medico")
+        personal = formset_factory(form=PersonalMedicBackground, max_num=24, can_delete=True, can_order=True)
+        personal_form = personal(prefix='personal_form')
+        personal_fem = formset_factory(form=PersonalFemMedicBackground, max_num=24, can_delete=True, can_order=True)
+        personal_fem_form = personal_fem(prefix='persona_fem_form')
+        family = formset_factory(form=FamilyMedicBackground, max_num=11, can_delete=True, can_order=True)
+        family_form = family(prefix='family_form')
+        contacto = formset_factory(form=MedicContact, max_num=5, can_delete=True, can_order=True)
+        contacto_form = contacto(prefix='contacto_form')
+        fisico = formset_factory(form=PhysicalExam, max_num=20, can_delete=True, can_order=True)
+        fisico_form = fisico(prefix='physical_form')
+        diagnostic = formset_factory(form=DiagnosticPlan, max_num=20, can_delete=True, can_order=True)
+        diagnostic_form = diagnostic(prefix='diagnostic_form')
+        presumptive = formset_factory(form=DiagnosticPresumptive, max_num=20, can_delete=True, can_order=True)
+        presumptive_form = presumptive(prefix='presumptive_form')
+        context = {'action': self.action, 'medic_form': medic_form, 'title': self.title, 'formset': personal_form,
+                   'breadCrumbEntries': self.breadCrumbEntries, 'personalFemForm': personal_fem_form,
+                   'familyform': family_form, 'contacto_form': contacto_form, 'fisico_form': fisico_form,
+                   'diagnostic_form': diagnostic_form, 'presumptive_form': presumptive_form}
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
         print request.POST
-        course_form = InstitutionForm(request.POST)
+        personal_detail_form = formset_factory(form=PersonalMedicBackground)
+        personal = personal_detail_form(request.POST, prefix='personal_form')
+        for formulario in personal.forms:
+            if formulario.is_valid():
+                print formulario.cleaned_data
+        sleep(5)
         return
         if course_form.is_valid():
             course = course_form.save(commit=False)
@@ -3488,3 +3506,21 @@ class UserLista(View):
         return JsonResponse(serializers.serialize('json', [pacientes, pacientes.user, pacientes.nationality,
                                                            pacientes.address_province, pacientes.address_canton]),
                             safe=False)
+
+
+class Cie10Lista(View):
+    @staticmethod
+    def get(request, *args, **kwargs):
+        q = request.GET.get('term', '')
+        query = Q(id__contains=q) | Q(detail__contains=q)
+        cie10 = SigiaMedicCie10.objects.filter(query)[:20]
+        results = []
+        for cie in cie10:
+            cie_json = {}
+            cie_json['id'] = cie.id
+            cie_json['label'] = cie.detail
+            cie_json['value'] = cie.detail
+            results.append(cie_json)
+        data = json.dumps(results)
+        mimetype = 'application/json'
+        return HttpResponse(data, mimetype)

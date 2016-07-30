@@ -13,28 +13,28 @@
     {% endblock %}
 
 
-        <link href="{{ STATIC_URL }}plugins/bootstrap/bootstrap.css" rel="stylesheet">
-        <link href="{{ STATIC_URL }}plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet">
-        <link href="{{ STATIC_URL }}css/font-awesome.css" rel="stylesheet">
-        <!--		<link href='http://fonts.googleapis.com/css?family=Righteous' rel='stylesheet' type='text/css'> -->
-        <link href="{{ STATIC_URL }}css/Righteous.css" rel="stylesheet">
-        <link href="{{ STATIC_URL }}plugins/fancybox/jquery.fancybox.css" rel="stylesheet">
-        <link href="{{ STATIC_URL }}plugins/fullcalendar/fullcalendar.css" rel="stylesheet">
-        <link href="{{ STATIC_URL }}plugins/xcharts/xcharts.min.css" rel="stylesheet">
-        <link href="{{ STATIC_URL }}plugins/select2/select2.css" rel="stylesheet">
-        <link href="{{ STATIC_URL }}css/style.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}plugins/bootstrap/bootstrap.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}css/font-awesome.css" rel="stylesheet">
+    <!--		<link href='http://fonts.googleapis.com/css?family=Righteous' rel='stylesheet' type='text/css'> -->
+    <link href="{{ STATIC_URL }}css/Righteous.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}plugins/fancybox/jquery.fancybox.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}plugins/fullcalendar/fullcalendar.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}plugins/xcharts/xcharts.min.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}plugins/select2/select2.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}css/style.css" rel="stylesheet">
 
 
-        <link href="{{ STATIC_URL }}css/datepicker.css" rel="stylesheet"/>
-        <link href="{{ STATIC_URL }}css/bootstrap-table.css" rel="stylesheet"/>
-        <link href="{{ STATIC_URL }}css/bootstrap-notify.css" rel="stylesheet"/>
-        <link href="{{ STATIC_URL }}css/jquery.jspanel.css" rel="stylesheet"/>
+    <link href="{{ STATIC_URL }}css/datepicker.css" rel="stylesheet"/>
+    <link href="{{ STATIC_URL }}css/bootstrap-table.css" rel="stylesheet"/>
+    <link href="{{ STATIC_URL }}css/bootstrap-notify.css" rel="stylesheet"/>
+    <link href="{{ STATIC_URL }}css/jquery.jspanel.css" rel="stylesheet"/>
 
-        <!--[if IE]><link rel="shortcut icon" href="/favicon.ico"><![endif]-->
-        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <!--[if IE]><link rel="shortcut icon" href="/favicon.ico"><![endif]-->
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
 
-        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
 				<script src="http://getbootstrap.com/docs-assets/js/html5shiv.js"></script>
 				<script src="http://getbootstrap.com/docs-assets/js/respond.min.js"></script>
 		<![endif]-->
@@ -179,7 +179,7 @@
             }
             return t
         }
-    }
+    };
 
     var jspanel_scholarship = null;
 
@@ -260,19 +260,19 @@
         'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E', 'F': 'F', 'G': 'G', 'H': 'H',
         'I': 'I', 'J': 'J', 'K': 'K', 'L': 'L', 'M': 'M', 'N': 'N', 'O': 'O', 'P': 'P',
         'Q': 'Q', 'R': 'R', 'S': 'S', 'T': 'T', 'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 'Y': 'Y', 'Z': 'Z'
-    }
+    };
 
     window["FINANCING_SYS_CHOICES"] = {'Crédito Directo': 'Crédito Directo', 'Crédito IECE': 'Crédito IECE'}
 
     window["STUDENT_TYPE_CHOICES"] = {
         'PRE': 'Pre-Tecnológico', 'EST': 'Estudiando', 'EGR': 'Egresado',
         'TIT': 'Titulado', 'BAJ': 'Baja', 'ENE': 'ENES', 'SBA': 'Ser Bachiller', 'CON': 'Educación Continua'
-    }
+    };
 
     window["EVENT_STATE_CHOICES"] = {
         'En Espera': 'En Espera', 'En Curso': 'En Curso',
         'Abortada': 'Abortada', 'Concluida': 'Concluida'
-    }
+    };
 
     window["ENROLLMENT_CHOICES"] = {
         'Ordinaria': 'Ordinaria',
@@ -282,13 +282,13 @@
         'ENES': 'ENES',
         'Ser Bachiller': 'Ser Bachiller',
         'ECO': 'Educación Continua'
-    }
+    };
 
     window["COURSE_TYPE_CHOICES"] = {
         'Semipresencial': 'Semipresencial',
         'Presencial': 'Presencial',
         'Educación Contínua': 'Educación Contínua'
-    }
+    };
 
     window["PAYMENT_CONCEPT_CHOICES"] = {
         'Matrícula Ordinaria': 'Matrícula Ordinaria',
@@ -308,7 +308,7 @@
         'Unidad de Titulación Especial': 'Unidad de Titulación Especial',
         'Proceso de Graduación': 'Proceso de Graduación',
         'Cuota': 'Cuota'
-    }
+    };
 
     $(function () {
         bootbox.setDefaults({locale: "es"});
@@ -362,4 +362,3 @@
 {% endblock %}
 </body>
 
-</html>

@@ -4,21 +4,25 @@
 Created on: 13/12/2014
 @autor: Dario
 """
+import os
 
 from django import forms
 from sigia.models import UserProfile, Teacher, Career, Course, Matter, Studies, \
     Student, Enrollment, Period, PaymentOrder, SEMESTER_CHOICES, Country, \
     EthnicGroup, BugReport, Province, Canton, Parish, Contact, EventType, \
-    StudentEvent, EventsGroup, Institution, SigiaMedicContac, SigiaMedicFamilyBackground, \
-    SigiaMedicFamilyBackgroundDetail, SigiaMedicPersonalBackground, SigiaMedicPersonalBackgroundDetail, SigiaMedicrecord
+    StudentEvent, EventsGroup, Institution, SigiaMedicContact, SigiaMedicFamilyBackground, \
+    SigiaMedicFamilyBackgroundDetail, SigiaMedicPersonalBackground, SigiaMedicPersonalBackgroundDetail, \
+    SigiaMedicrecord, \
+    SigiaMedicPhysicalExam, SigiaMedicPhysicalExamDetail, SigiaMedicDiagnosticPlan, SigiaMedicDiagnosticPlanDetail, \
+    SigiaMedicDiagnosticPresumptive, SigiaMedicCie10
 from django.contrib.auth.models import User, Group
 from captcha.fields import CaptchaField
 from django.forms.widgets import TextInput, EmailInput, \
-    Select, CheckboxInput, Textarea, NumberInput, DateInput, SelectMultiple
+    Select, CheckboxInput, Textarea, NumberInput, DateInput, SelectMultiple, RadioSelect
 from django.forms.models import ModelChoiceField
 from floppyforms import ClearableFileInput
 from sigia.utils import cedula_valida
-from fileinput import FileInput
+import json
 
 
 class ImageThumbnailFileInput(ClearableFileInput):
@@ -633,37 +637,50 @@ class UpdateEnrollmentForm(forms.ModelForm):
 #
 class CreateMedicRecordForm(forms.ModelForm):
     id_patient = UserModelChoiceField(
-        widget=forms.Select(attrs={'class': 'form-control selectpicker', 'data-live-search': "true"}),
+        widget=forms.Select(attrs={'class': 'form-control selectpicker id_paciente', 'data-live-search': "true"}),
         queryset=User.objects.all().order_by("last_name", "first_name"), label="Paciente")
 
     class Meta:
         model = SigiaMedicrecord
-        blood_type = (('ENE', 'Hola'),
-                      ('SBA', 'Ser Bachiller'),
-                      ('CON', 'Educación Continua'))
+        blood_type_by = (('1', 'IESS'),
+                         ('2', 'OTRO'),)
+        blood_type = (('A+', 'A+'),
+                      ('A-', 'A-'),
+                      ('B+', 'B+'),
+                      ('B-', 'B-'),
+                      ('AB+', 'AB+'),
+                      ('AB-', 'AB-'),
+                      ('O+', 'O+'),
+                      ('O-', 'O-'),)
         form_arrival_choice = (('Ambulatorio', 'Ambulatorio'),
                                ('Silla de ruedas', 'Silla de ruedas'),
                                ('Camilla', 'Camilla'))
         exclude = []
         widgets = {
-            'id_patient': Select(attrs={'class': 'form-control',}),
-            'blood_type_by': Select(attrs={'class': 'form-control',}, choices=blood_type),
-            'blood_type': Select(attrs={'class': 'form-control',}),
-            'form_arrival': Select(attrs={'class': 'form-control',}, choices=form_arrival_choice),
+            'id_patient': Select(attrs={'class': 'form-control'}),
+            'blood_type_by': Select(attrs={'class': 'form-control'}, choices=blood_type_by),
+            'blood_type': Select(attrs={'class': 'form-control'}, choices=blood_type),
+            'form_arrival': Select(attrs={'class': 'form-control'}, choices=form_arrival_choice),
             'source_information': TextInput(attrs={'class': 'form-control', 'placeholder': 'Fuente de información'}),
             'delivery_patient': TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Institución o persona que entrega al paciente'}),
             'phone_delivery': TextInput(attrs={'class': 'form-control', 'placeholder': 'Teléfono'}),
-            'actual_problem': Select(attrs={'class': 'form-control',}),
-            'blood_pressure': Select(attrs={'class': 'form-control',}),
-            'heart_rate': Select(attrs={'class': 'form-control',}),
-            'breathing_frequency': Select(attrs={'class': 'form-control',}),
-            'oral_temperature': Select(attrs={'class': 'form-control',}),
-            'asolar_temperature': Select(attrs={'class': 'form-control',}),
-            'weight': Select(attrs={'class': 'form-control',}),
-            'height': Select(attrs={'class': 'form-control',}),
-            'imc': Select(attrs={'class': 'form-control',}),
-            'p_cephalico': Select(attrs={'class': 'form-control',}),
+            'actual_problem': Textarea(attrs={'class': 'form-control', 'rows': '6',
+                                              'placeholder': 'Cronología, Localización, Características, Intensidad, '
+                                                             'Causas Aparentes, Factores que agravan o mejoran,'
+                                                             'Síntomas asociados, Evolución, Medicamentos que reciben, '
+                                                             'Resultados de Exámenes Anteriores, Condición actual'}),
+            'blood_pressure': TextInput(attrs={'class': 'form-control', 'type': 'number'}),
+            'heart_rate': TextInput(attrs={'class': 'form-control', 'type': 'number', 'placeholder': 'min'}),
+            'breathing_frequency': TextInput(attrs={'class': 'form-control', 'type': 'number', 'placeholder': 'min'}),
+            'oral_temperature': TextInput(attrs={'class': 'form-control', 'type': 'number', 'placeholder': 'C'}),
+            'asolar_temperature': TextInput(attrs={'class': 'form-control', 'type': 'number', 'placeholder': 'C'}),
+            'weight': TextInput(
+                attrs={'class': 'form-control', 'type': 'number', 'placeholder': 'KG', 'step': "0.01", 'min': '0'}),
+            'height': TextInput(
+                attrs={'class': 'form-control', 'type': 'number', 'placeholder': 'm', 'step': "0.01", 'min': '0'}),
+            'imc': TextInput(attrs={'class': 'form-control', 'type': 'number'}),
+            'p_cephalico': TextInput(attrs={'class': 'form-control', 'type': 'number'}),
         }
 
 
@@ -675,8 +692,109 @@ class PersonalMedicBackground(forms.ModelForm):
 
     class Meta:
         model = SigiaMedicPersonalBackground
-        exclude = ['id_sigiamedicrecord', 'live']
+        exclude = ["id_sigia_medic_record", 'live']
         widgets = {
             'detail_background': Textarea(
-                attrs={'class': 'form-control', 'rows': '3', 'style': "resize: none", 'cols': '50'})
+                attrs={'class': 'form-control', 'rows': '3', 'style': "resize: none", 'cols': '50',
+                       'placeholder': 'Escriba el detalle...'}),
+            'type_background': Select(attrs={'class': 'form-control'})
+        }
+
+
+class PersonalFemMedicBackground(forms.ModelForm):
+    type_background = ModelChoiceField(
+        widget=forms.Select(
+            attrs={'class': 'form-control', 'data-live-search': "true", 'autocomplete': 'off'}),
+        queryset=SigiaMedicPersonalBackgroundDetail.objects.filter(id__range=[25, 41]), label="General Femenino")
+
+    class Meta:
+        model = SigiaMedicPersonalBackground
+        exclude = ["id_sigia_medic_record", 'live']
+        widgets = {
+            'detail_background': Textarea(
+                attrs={'class': 'form-control', 'rows': '3', 'style': "resize: none", 'cols': '50',
+                       'placeholder': 'Escriba el detalle...'}),
+            'type_background': Select(attrs={'class': 'form-control'})
+        }
+
+
+class FamilyMedicBackground(forms.ModelForm):
+    type_background = ModelChoiceField(
+        widget=forms.Select(
+            attrs={'class': 'form-control', 'data-live-search': "true", 'autocomplete': 'off'}),
+        queryset=SigiaMedicFamilyBackgroundDetail.objects.filter(id__range=[1, 11]), label="General")
+
+    class Meta:
+        model = SigiaMedicFamilyBackground
+        exclude = ["id_sigia_medic_record", 'live']
+        widgets = {
+            'detail_background': Textarea(
+                attrs={'class': 'form-control', 'rows': '3', 'style': "resize: none", 'cols': '50',
+                       'placeholder': 'Escriba el detalle...'}),
+            'type_background': Select(attrs={'class': 'form-control'})
+        }
+
+
+class MedicContact(forms.ModelForm):
+    class Meta:
+        model = SigiaMedicContact
+        exclude = ["id_sigia_medic_record", 'live']
+        widgets = {
+            'relationship_type': TextInput(attrs={'class': 'form-control', 'placeholder': 'Tipo de relación'}),
+            'name': TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre persona'}),
+            'phone_number': TextInput(attrs={'class': 'form-control', 'placeholder': 'Teléfono'})
+        }
+
+
+class PhysicalExam(forms.ModelForm):
+    type_background = ModelChoiceField(
+        widget=forms.Select(
+            attrs={'class': 'form-control', 'data-live-search': "true", 'autocomplete': 'off'}),
+        queryset=SigiaMedicPhysicalExamDetail.objects.filter(id__range=[1, 25]), label="General")
+    cp = forms.BooleanField(widget=RadioSelect(choices=[(True, 'Si'),
+                                                        (False, 'No')]), label="Con evidencia de patología")
+    sp = forms.BooleanField(widget=RadioSelect(choices=[(True, 'Si'),
+                                                        (False, 'No')]), label="Sin evidencia de patología")
+
+    class Meta:
+        model = SigiaMedicPhysicalExam
+        tipos = (('R', 'REGIONAL'),
+                 ('S', 'SISTÉMICO'),)
+        exclude = ["id_sigia_medic_record", 'live']
+        widgets = {
+            'detail_background': Textarea(
+                attrs={'class': 'form-control', 'rows': '3', 'style': "resize: none", 'cols': '50',
+                       'placeholder': 'Escriba el detalle...'}),
+            'typed': Select(attrs={'class': 'form-control'}, choices=tipos),
+            'cp': Select(attrs={'class': 'form-control'}),
+            'sp': Select(attrs={'class': 'form-control'}),
+            'type_background': Select(attrs={'class': 'form-control'})
+        }
+
+
+class DiagnosticPlan(forms.ModelForm):
+    type_background = ModelChoiceField(
+        widget=forms.Select(
+            attrs={'class': 'form-control', 'data-live-search': "true", 'autocomplete': 'off'}),
+        queryset=SigiaMedicDiagnosticPlanDetail.objects.filter(id__range=[1, 16]), label="General")
+
+    class Meta:
+        model = SigiaMedicDiagnosticPlan
+        exclude = ["id_sigia_medic_record", 'live']
+        widgets = {
+            'detail_background': Textarea(
+                attrs={'class': 'form-control', 'rows': '3', 'style': "resize: none", 'cols': '50',
+                       'placeholder': 'Escriba el detalle...'}),
+            'type_background': Select(attrs={'class': 'form-control'})
+        }
+
+
+class DiagnosticPresumptive(forms.ModelForm):
+    class Meta:
+        model = SigiaMedicDiagnosticPresumptive
+        exclude = ["id_sigia_medic_record", 'live']
+        widgets = {
+            'detail_background': TextInput(attrs={'class': 'form-control llenar', 'placeholder': 'Enfermedad'}),
+            'cie': TextInput(
+                attrs={'class': 'form-control autocomplete-me', 'placeholder': 'Escriba el CIE-10 o la enfermedad...'})
         }

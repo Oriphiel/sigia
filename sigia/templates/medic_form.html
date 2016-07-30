@@ -1,0 +1,626 @@
+{% extends 'ajax-content.djhtml' %}
+{% block styles %}
+    <style type="text/css">
+        select.form-control {
+            -webkit-appearance: menulist;
+        }
+
+    </style>
+{% endblock %}
+{% block content %}
+    <h1 class="page-header">{{ title }} </h1>
+    <div class="box">
+        <div class="box-content" style="display: block;">
+
+            <blockquote>
+                Por favor llene los datos del paciente
+            </blockquote>
+
+            <form id="medicoform" class="form-horizontal" method="post" enctype="multipart/form-data">{% csrf_token %}
+                <div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+                    <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all"
+                        role="tablist">
+                        <li class="ui-state-default ui-corner-top ui-tabs-active ui-state-active" role="tab"
+                            tabindex="0" aria-controls="tabs-1" aria-labelledby="ui-id-4" aria-selected="true"><a
+                                href="#tabs-1" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-4">REGISTRO
+                            DE ADMISION</a></li>
+                        <li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-2"
+                            aria-labelledby="ui-id-5" aria-selected="false"><a href="#tabs-2" class="ui-tabs-anchor"
+                                                                               role="presentation" tabindex="-1"
+                                                                               id="ui-id-5">ANTECEDENTES PERSONALES</a>
+                        </li>
+                        <li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-3"
+                            aria-labelledby="ui-id-5" aria-selected="false"><a href="#tabs-3" class="ui-tabs-anchor"
+                                                                               role="presentation" tabindex="-1"
+                                                                               id="ui-id-5">ANTECEDENTES FAMILIARES</a>
+                        </li>
+                        <li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-4"
+                            aria-labelledby="ui-id-5" aria-selected="false"><a href="#tabs-4" class="ui-tabs-anchor"
+                                                                               role="presentation" tabindex="-1"
+                                                                               id="ui-id-5">DATOS</a>
+                        </li>
+                    </ul>
+                    <div id="tabs-1" aria-labelledby="ui-id-4" class="ui-tabs-panel ui-widget-content ui-corner-bottom"
+                         role="tabpanel" aria-expanded="true" aria-hidden="false">
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <label for="{{ medic_form.id_patient.auto_id }}"
+                                           class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ medic_form.id_patient.label }}</label>
+                                    <div class="col-sm-9 col-md-9 col-lg-9">
+                                        {{ medic_form.id_patient }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="apellido"
+                                           class="control-label col-sm-2 col-md-2 col-lg-2">Apellidos</label>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                        <input type="text" id="apellido" disabled class="form-control">
+                                    </div>
+                                    <label for="nombre" class="control-label col-sm-1 col-md-1 col-lg-1">Nombres</label>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                        <input type="text" id="nombre" disabled class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="nacionalidad" class="control-label col-sm-2 col-md-2 col-lg-2">Nacionalidad</label>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                        <input type="text" id="nacionalidad" disabled class="form-control">
+                                    </div>
+                                    <label for="cedula"
+                                           class="control-label col-sm-1 col-md-1 col-lg-1">N° Cedula</label>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                        <input type="text" id="cedula" disabled class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="direccion"
+                                           class="control-label col-sm-2 col-md-2 col-lg-2">Direccion</label>
+                                    <div class="col-sm-5 col-md-5 col-lg-5">
+                                        <input type="text" id="direccion" disabled class="form-control">
+                                    </div>
+                                    <label for="telefono"
+                                           class="control-label col-sm-2 col-md-2 col-lg-2">Telefono</label>
+                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                        <input type="text" id="telefono" disabled class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="canton" class="control-label col-sm-2 col-md-2 col-lg-2">Canton</label>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                        <input type="text" id="canton" disabled class="form-control">
+                                    </div>
+                                    <label for="provincia"
+                                           class="control-label col-sm-1 col-md-1 col-lg-1">Provincia</label>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                        <input type="text" id="provincia" disabled class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="marital"
+                                           class="control-label col-sm-2 col-md-2 col-lg-2">Estado
+                                        Civil</label>
+                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                        <select class="form-control" id="marital" disabled>
+                                            <option value="S">Soltero</option>
+                                            <option value="C">Casado</option>
+                                            <option value="D">Divorciado</option>
+                                            <option value="U">Union Libre</option>
+                                        </select>
+                                    </div>
+                                    <label for="{{ medic_form.blood_type_by.auto_id }}"
+                                           class="control-label col-sm-2 col-md-2 col-lg-2">{{ medic_form.blood_type_by.label }}</label>
+                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                        {{ medic_form.blood_type_by }}
+                                    </div>
+                                    <label for="{{ medic_form.blood_type.auto_id }}"
+                                           class="control-label col-sm-1 col-md-1 col-lg-1">{{ medic_form.blood_type.label }}</label>
+                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                        {{ medic_form.blood_type }}
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="date1" class="control-label co2-sm-2 col-md-2 col-lg-2">Fecha</label>
+                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                        <input type="date" class="form-control" id="date1" required name="fecha">
+                                    </div>
+                                    <label for="time1" class="control-label col-sm-2 col-md-2 col-lg-2">Hora</label>
+                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                        <input type="time" class="form-control" id="time1" required name="hora">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    {{ contacto_form.management_form }}
+                                    {% for forma in contacto_form %}
+                                        <div class="form-group contactos" id="{{ forma.prefix }}-row">
+                                            <label class="control-label col-sm-2 col-md-2 col-lg-2">Contacto</label>
+                                            <div class="col-sm-3 col-md-3 col-lg-3">
+                                                {{ forma.name }}
+                                            </div>
+                                            <div class="col-sm-3 col-md-3 col-lg-3">
+                                                {{ forma.relationship_type }}
+                                            </div>
+                                            <div class="col-sm-2 col-md-2 col-lg-2">
+                                                {{ forma.phone_number }}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label for="{{ medic_form.form_arrival.auto_id }}"
+                                           class="control-label col-sm-2 col-md-2 col-lg-2">{{ medic_form.form_arrival.label }}</label>
+                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                        {{ medic_form.form_arrival }}
+                                    </div>
+                                    <div class="col-sm-3 col-md-3 col-lg-3">
+                                        {{ medic_form.source_information }}
+                                    </div>
+                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                        {{ medic_form.delivery_patient }}
+                                    </div>
+                                    <label class="control-label col-sm-2 col-md-2 col-lg-2"></label>
+                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                        {{ medic_form.phone_delivery }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-lg-11 col-xs-11 col-md-11 col-sm-11">
+                                        <input class="btn btn-primary pull-right" type="button"
+                                               value="Registrar Paciente"
+                                               id="formulario"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div id="tabs-2" aria-labelledby="ui-id-4" class="ui-tabs-panel ui-widget-content ui-corner-bottom"
+                         role="tabpanel" aria-expanded="true" aria-hidden="false">
+                        <div class="row">
+                            <div class="form-group">
+                                {{ formset.management_form }}
+                                {% for form in formset %}
+                                    <div class="form-group esto" id="{{ form.prefix }}-row">
+                                        <label for="{{ form.type_background.auto_id }}"
+                                               class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.type_background.label }}</label>
+                                        <div class="col-sm-9 col-md-9 col-lg-9">
+                                            {{ form.type_background }}
+                                        </div>
+                                        <label class="control-label col-sm-2 col-md-2 col-lg-2"
+                                               for="{{ form.detail_background.auto_id }}">{{ form.detail_background.label }}</label>
+                                        <div class="col-sm-9 col-md-9 col-lg-9">
+                                            {{ form.detail_background }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group">
+                                {{ personalFemForm.management_form }}
+                                {% for form in personalFemForm %}
+                                    <div class="form-group esta" id="{{ form.prefix }}-row">
+                                        <label for="{{ form.type_background.auto_id }}"
+                                               class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.type_background.label }}</label>
+                                        <div class="col-sm-9 col-md-9 col-lg-9">
+                                            {{ form.type_background }}
+                                        </div>
+                                        <label class="control-label col-sm-2 col-md-2 col-lg-2"
+                                               for="{{ form.detail_background.auto_id }}">{{ form.detail_background.label }}</label>
+                                        <div class="col-sm-9 col-md-9 col-lg-9">
+                                            {{ form.detail_background }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tabs-3" aria-labelledby="ui-id-4" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
+                        <div class="row">
+                            <div class="form-group">
+                                {{ familyform.management_form }}
+                                {% for form in familyform %}
+                                    <div class="form-group familia" id="{{ form.prefix }}-row">
+                                        <label for="{{ form.type_background.auto_id }}"
+                                               class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.type_background.label }}</label>
+                                        <div class="col-sm-9 col-md-9 col-lg-9">
+                                            {{ form.type_background }}
+                                        </div>
+                                        <label class="control-label col-sm-2 col-md-2 col-lg-2"
+                                               for="{{ form.detail_background.auto_id }}">{{ form.detail_background.label }}</label>
+                                        <div class="col-sm-9 col-md-9 col-lg-9">
+                                            {{ form.detail_background }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tabs-4" aria-labelledby="ui-id-4" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
+
+                        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab" id="headingOne">
+                                    <h4 class="panel-title">
+                                        <a role="button" data-toggle="collapse" data-parent="#accordion"
+                                           href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                            ENFERMEDAD O PROBLEMA ACTUAL
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div id="collapseOne" class="panel-collapse collapse" role="tabpanel"
+                                     aria-labelledby="headingOne">
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <label for="{{ medic_form.actual_problem.auto_id }}"
+                                                   class="control-label col-sm-2 col-md-2 col-lg-2">{{ medic_form.actual_problem.label }}</label>
+                                            <div class="col-sm-9 col-md-9 col-lg-9">
+                                                {{ medic_form.actual_problem }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab" id="headingTwo">
+                                    <h4 class="panel-title">
+                                        <a role="button" data-toggle="collapse" data-parent="#accordion"
+                                           href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                                            SIGNOS VITALES Y MEDICIONES
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel"
+                                     aria-labelledby="collapseTwo">
+                                    <div class="row">
+                                        <div class="form-group">
+
+                                            <label for="{{ medic_form.blood_pressure.auto_id }}"
+                                                   class="control-label col-sm-2 col-md-2 col-lg-2">{{ medic_form.blood_pressure.label }}</label>
+                                            <div class="col-sm-1 col-md-1 col-lg-1">
+                                                {{ medic_form.blood_pressure }}
+                                            </div>
+
+                                            <label for="{{ medic_form.heart_rate.auto_id }}"
+                                                   class="control-label col-sm-1 col-md-1 col-lg-1">{{ medic_form.heart_rate.label }}</label>
+                                            <div class="col-sm-1 col-md-1 col-lg-1">
+                                                {{ medic_form.heart_rate }}
+                                            </div>
+
+                                            <label for="{{ medic_form.breathing_frequency.auto_id }}"
+                                                   class="control-label col-sm-1 col-md-1 col-lg-1">{{ medic_form.breathing_frequency.label }}</label>
+                                            <div class="col-sm-1 col-md-1 col-lg-1">
+                                                {{ medic_form.breathing_frequency }}
+                                            </div>
+
+                                            <label for="{{ medic_form.oral_temperature.auto_id }}"
+                                                   class="control-label col-sm-1 col-md-1 col-lg-1">{{ medic_form.oral_temperature.label }}</label>
+                                            <div class="col-sm-1 col-md-1 col-lg-1">
+                                                {{ medic_form.oral_temperature }}
+                                            </div>
+
+                                            <label for="{{ medic_form.asolar_temperature.auto_id }}"
+                                                   class="control-label col-sm-1 col-md-1 col-lg-1">{{ medic_form.asolar_temperature.label }}</label>
+                                            <div class="col-sm-1 col-md-1 col-lg-1">
+                                                {{ medic_form.asolar_temperature }}
+                                            </div>
+
+                                        </div>
+
+                                        <div class="form-group">
+
+                                            <label for="{{ medic_form.weight.auto_id }}"
+                                                   class="control-label col-sm-2 col-md-2 col-lg-2">{{ medic_form.weight.label }}</label>
+                                            <div class="col-sm-1 col-md-1 col-lg-1">
+                                                {{ medic_form.weight }}
+                                            </div>
+
+                                            <label for="{{ medic_form.height.auto_id }}"
+                                                   class="control-label col-sm-1 col-md-1 col-lg-1">{{ medic_form.height.label }}</label>
+                                            <div class="col-sm-1 col-md-1 col-lg-1">
+                                                {{ medic_form.height }}
+                                            </div>
+
+                                            <label for="{{ medic_form.imc.auto_id }}"
+                                                   class="control-label col-sm-1 col-md-1 col-lg-1">{{ medic_form.imc.label }}</label>
+                                            <div class="col-sm-1 col-md-1 col-lg-1">
+                                                {{ medic_form.imc }}
+                                            </div>
+
+                                            <label for="{{ medic_form.p_cephalico.auto_id }}"
+                                                   class="control-label col-sm-1 col-md-1 col-lg-1">{{ medic_form.p_cephalico.label }}</label>
+                                            <div class="col-sm-1 col-md-1 col-lg-1">
+                                                {{ medic_form.p_cephalico }}
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab" id="headingThree">
+                                    <h4 class="panel-title">
+                                        <a role="button" data-toggle="collapse" data-parent="#accordion"
+                                           href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                            EXAMEN FÍSICO
+                                        </a>
+                                    </h4>
+                                </div>
+
+                                <div id="collapseThree" class="panel-collapse collapse in" role="tabpanel"
+                                     aria-labelledby="headingThree">
+                                    <div class="row">
+                                        <div class="form-group">
+                                            {{ fisico_form.management_form }}
+                                            {% for form in fisico_form %}
+                                                <div class="form-group fisico" id="{{ form.prefix }}-row">
+                                                    <label for="{{ form.type_background.auto_id }}"
+                                                           class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.type_background.label }}</label>
+                                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                                        {{ form.type_background }}
+                                                    </div>
+                                                    <label class="control-label col-sm-1 col-md-1 col-lg-1"
+                                                           for="{{ form.typed.auto_id }}">{{ form.typed.label }}</label>
+                                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                                        {{ form.typed }}
+                                                    </div>
+                                                    <label class="control-label col-sm-2 col-md-2 col-lg-2"
+                                                           for="{{ form.cp.auto_id }}">{{ form.cp.label }}</label>
+                                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                                        {{ form.cp }}
+                                                    </div>
+                                                    <label class="control-label col-sm-4 col-md-4 col-lg-4"
+                                                           for="{{ form.sp.auto_id }}">{{ form.sp.label }}</label>
+                                                    <div class="col-sm-3 col-md-3 col-lg-3">
+                                                        {{ form.sp }}
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab" id="headingFour">
+                                    <h4 class="panel-title">
+                                        <a role="button" data-toggle="collapse" data-parent="#accordion"
+                                           href="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                            PLAN DIAGNÓSTICO
+                                        </a>
+                                    </h4>
+                                </div>
+
+                                <div id="collapseFour" class="panel-collapse collapse in" role="tabpanel"
+                                     aria-labelledby="headingFour">
+                                    <div class="row">
+                                        <div class="form-group">
+                                            {{ diagnostic_form.management_form }}
+                                            {% for form in diagnostic_form %}
+                                                <div class="form-group diagnostico" id="{{ form.prefix }}-row">
+                                                    <label for="{{ form.type_background.auto_id }}"
+                                                           class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.type_background.label }}</label>
+                                                    <div class="col-sm-9 col-md-9 col-lg-9">
+                                                        {{ form.type_background }}
+                                                    </div>
+                                                    <label class="control-label col-sm-2 col-md-2 col-lg-2"
+                                                           for="{{ form.detail_background.auto_id }}">{{ form.detail_background.label }}</label>
+                                                    <div class="col-sm-9 col-md-9 col-lg-9">
+                                                        {{ form.detail_background }}
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab" id="headingFive">
+                                    <h4 class="panel-title">
+                                        <a role="button" data-toggle="collapse" data-parent="#accordion"
+                                           href="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                                            PLAN DIAGNÓSTICO
+                                        </a>
+                                    </h4>
+                                </div>
+
+                                <div id="collapseFive" class="panel-collapse collapse in" role="tabpanel"
+                                     aria-labelledby="headingFive">
+                                    <div class="row">
+                                        <div class="form-group">
+                                            {{ presumptive_form.management_form }}
+                                            {% for form in presumptive_form %}
+                                                <div class="form-group presumptive" id="{{ form.prefix }}-row">
+                                                        <label for="{{ form.cie.auto_id }}"
+                                                               class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.cie.label }}</label>
+                                                        <div class="col-sm-9 col-md-9 col-lg-9">
+                                                            {{ form.cie }}
+                                                        </div>
+
+                                                    <label class="control-label col-sm-2 col-md-2 col-lg-2"
+                                                           for="{{ form.detail_background.auto_id }}">{{ form.detail_background.label }}</label>
+                                                    <div class="col-sm-9 col-md-9 col-lg-9">
+                                                        {{ form.detail_background }}
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_scripts %}
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-select.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="{{ STATIC_URL }}js/bootstrap-select.min.js"></script>
+    <script src="{{ STATIC_URL }}js/jquery.formset.js"></script>
+
+    <script>
+        function log(message, context, id) {
+            $('input[class$=llenar]', context || null).val(message);
+            $('input[class$=autocomplete-me]', context || null).val(id);
+            $('input[class$=autocomplete-me]', context || null).text(id);
+            console.log(id)
+        }
+
+        function enableAutocomplete(context) {
+            $('input[class$=autocomplete-me]', context || null).autocomplete({
+                source: "/api/medic/cie10/",
+                minLength: 2,
+                response: function (event, ui ){
+                    console.log(event);
+                    console.log(ui);
+                },
+                select: function (event, ui) {
+                    log(ui.item ?
+                    "" + ui.item.value + "    CIE-10: " + ui.item.id :
+                    "Nothing selected, input was " + this.value, context, ui.item.id);
+                }
+            });
+        }
+        $(document).ready(function () {
+            Date.prototype.toDateInputValue = (function () {
+                var local = new Date(this);
+                local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+                return local.toJSON().slice(0, 10);
+            });
+            $('#date1').val(new Date().toDateInputValue());
+            var dt = new Date();
+            var time = dt.toTimeString().split(' ')[0];
+            $('#time1').val(time);
+            $('.id_paciente').selectpicker();
+            $('.id_paciente').selectpicker('render');
+            $('form div .contactos').formset({
+                prefix: "{{ contacto_form.prefix }}",
+                addText: "Agregar Contacto",
+                deleteText: "Borrar"
+            });
+            $('form div .esto').formset({
+                prefix: '{{ formset.prefix }}'
+            });
+            $('form div .esta').formset({
+                prefix: "{{ personalFemForm.prefix }}"
+            });
+            $('form div .familia').formset({
+                prefix: "{{ familyform.prefix }}"
+            });
+            $('form div .fisico').formset({
+                prefix: "{{ fisico_form.prefix }}",
+                deleteText: "Borrar"
+            });
+            $('form div .diagnostico').formset({
+                prefix: "{{ fisico_form.prefix }}",
+                deleteText: "Borrar"
+            });
+            $('form div .presumptive').formset({
+                prefix: "{{ presumptive_form.prefix }}",
+                deleteText: "Borrar",
+                added: function (row) {
+                    enableAutocomplete(row);
+                    console.log("Funciona")
+                }
+            });
+            enableAutocomplete();
+            $('#id_medico-id_patient').change(function () {
+                        var num = $('#id_medico-id_patient').children("option").filter(":selected").val();
+                        $.ajax({
+                            type: 'GET',
+                            url: '/user/api/lista/',
+                            data: {
+                                ids: num
+                            },
+                            contentType: 'json',
+                            success: function (data) {
+                                var nuevo = JSON.parse(data);
+                                $('#apellido').val(nuevo[1].fields.last_name);
+                                $('#nombre').val(nuevo[1].fields.first_name);
+                                $('#direccion').val(nuevo[0].fields.address);
+                                $('#telefono').val(nuevo[0].fields.cellphone);
+                                $('#cedula').val(nuevo[0].fields.id_doc_num);
+                                $("#marital").val(nuevo[0].fields.marital_status);
+                                if (Object.keys(nuevo).length > 2) {
+                                    $('#nacionalidad').val(nuevo[2].fields.name);
+                                    $('#canton').val(nuevo[4].fields.name);
+                                    $('#provincia').val(nuevo[3].fields.name);
+                                } else {
+                                    $('#nacionalidad').val("Sin datos");
+                                    $('#canton').val("Sin datos");
+                                    $('#provincia').val("Sin datos");
+                                }
+                            }
+                        });
+                    }
+            );
+
+            var max_fields = 2; //maximum input boxes allowed
+            var wrapper = $(".contactos"); //Fields wrapper
+            var add_button = $(".addButton"); //Add button ID
+
+            var x = 1; //initlal text box count
+            $(add_button).click(function (e) { //on add input button click
+                e.preventDefault();
+                if (x < max_fields) { //max input box allowed
+                    x++; //text box increment
+                    $(wrapper).append('<div><label class="control-label col-sm-2 col-md-2 col-lg-2"></label><div class="col-sm-3 col-md-3 col-lg-3"><input type="text" class="form-control" name="contacto.name" placeholder="Nombre"/></div><div class="col-sm-3 col-md-3 col-lg-3"><input type="text" class="form-control" name="contacto.relation" placeholder="Tipo de relacion"/></div><div class="col-sm-3 col-md-3 col-lg-3"><input type="text" class="form-control" name="contacto.phone" placeholder="Telefono"/></div><a class="col-xs-1 remove_field"><button class="btn btn-default"><i class="fa fa-minus "></i></button></a></div>'); //add input box
+                }
+            });
+
+            $(wrapper).on("click", ".remove_field", function (e) { //user click on remove text
+                e.preventDefault();
+                $(this).parent('div').remove();
+                x--;
+            })
+        });
+        $(function () {
+            $("#tabs").tabs();
+        });
+
+        $('#formulario').click(function () {
+            $('#medicoform')[0].action = "/hola/";
+            PostAndLoadAjaxContent($('#medicoform'));
+        });
+
+
+    </script>
+    <style>
+
+        .add-row {
+            color: #4cae4c !important;
+            padding-left: 18px;
+            background: url({{ STATIC_URL }}img/add.png) no-repeat left center;
+        }
+
+        .delete-row {
+            display: block;
+            margin: 6px 0 0 0;
+            padding-left: 18px;
+            color: #3c3c3c !important;
+            background: url({{ STATIC_URL }}img/delete.png) no-repeat left center;
+        }
+    </style>
+{% endblock %}

@@ -698,33 +698,36 @@ class SigiaMedicPersonalBackgroundDetail(LiveModel, TimeStampedModel, AuthStampe
 
 class SigiaMedicrecord(LiveModel, TimeStampedModel, AuthStampedModel):
     id_patient = models.ForeignKey(UserProfile, models.DO_NOTHING, db_column='id_patient', blank=True, null=True)
-    blood_type_by = models.IntegerField(blank=True, null=True)
-    blood_type = models.CharField(max_length=4, blank=True, null=True)
+    blood_type_by = models.IntegerField(blank=True, null=True, verbose_name="Tipo de sangre")
+    blood_type = models.CharField(max_length=4, blank=True, null=True, verbose_name="Grupo sanguíneo")
     form_arrival = models.CharField(max_length=40, blank=True, null=True, verbose_name="Forma de llegada")
     source_information = models.CharField(max_length=40, blank=True, null=True)
     delivery_patient = models.CharField(max_length=40, blank=True, null=True)
     phone_delivery = models.CharField(max_length=12, blank=True, null=True)
-    actual_problem = models.CharField(max_length=40, blank=True, null=True)
-    blood_pressure = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    heart_rate = models.IntegerField(blank=True, null=True)
-    breathing_frequency = models.IntegerField(blank=True, null=True)
-    oral_temperature = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    asolar_temperature = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    weight = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    height = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    imc = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    p_cephalico = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    actual_problem = models.CharField(max_length=1000, blank=True, null=True, verbose_name="Detalle")
+    blood_pressure = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True,
+                                         verbose_name="Presión arterial")
+    heart_rate = models.IntegerField(blank=True, null=True, verbose_name="Frecuencia cardiaca")
+    breathing_frequency = models.IntegerField(blank=True, null=True, verbose_name="Frecuencia respiratoria")
+    oral_temperature = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True,
+                                           verbose_name="Temperatural Bucal")
+    asolar_temperature = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True,
+                                             verbose_name="Temperatura Asolar")
+    weight = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True, verbose_name="Peso")
+    height = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True, verbose_name="Talla")
+    imc = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True, verbose_name="I.M.C.")
+    p_cephalico = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True, verbose_name="P. Cefalico")
 
     class Meta:
         managed = True
-        db_table = 'sigia_medicrecord'
+        db_table = 'sigia_medic_record'
 
 
 class SigiaMedicPersonalBackground(LiveModel, TimeStampedModel, AuthStampedModel):
-    id_sigiamedicrecord = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord')
+    id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord')
     type_background = models.ForeignKey(SigiaMedicPersonalBackgroundDetail, models.DO_NOTHING,
                                         db_column='type_background', blank=True, null=True)
-    detail_background = models.CharField(max_length=200, blank=True, null=True, verbose_name="Detalle")
+    detail_background = models.CharField(max_length=200, blank=False, null=False, verbose_name="Detalle")
 
     class Meta:
         managed = True
@@ -735,7 +738,7 @@ class SigiaMedicPersonalBackground(LiveModel, TimeStampedModel, AuthStampedModel
 
 
 class SigiaMedicFamilyBackground(LiveModel, TimeStampedModel, AuthStampedModel):
-    id_sigiamedicrecord = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord')
+    id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord')
     type_background = models.ForeignKey(SigiaMedicFamilyBackgroundDetail, models.DO_NOTHING,
                                         db_column='type_background', blank=True, null=True)
     detail_background = models.CharField(max_length=200, blank=True, null=True, verbose_name="Detalle")
@@ -745,12 +748,80 @@ class SigiaMedicFamilyBackground(LiveModel, TimeStampedModel, AuthStampedModel):
         db_table = 'sigia_medic_family_background'
 
 
-class SigiaMedicContac(LiveModel, TimeStampedModel, AuthStampedModel):
-    id_sigiamedicrecord = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord')
+class SigiaMedicContact(LiveModel, TimeStampedModel, AuthStampedModel):
+    id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord')
     relationship_type = models.CharField(max_length=40, blank=True, null=True)
     name = models.CharField(max_length=100, blank=True, null=True)
     phone_number = models.CharField(max_length=12, blank=True, null=True)
 
     class Meta:
         managed = True
-        db_table = 'sigia_medic_contac'
+        db_table = 'sigia_medic_contact'
+
+
+class SigiaMedicPhysicalExamDetail(LiveModel, TimeStampedModel, AuthStampedModel):
+    detail = models.CharField(max_length=100, blank=True, null=True)
+    status = models.CharField(max_length=1, blank=True, null=True, default='0')
+
+    class Meta:
+        managed = True
+        db_table = 'sigia_medic_physical_detail'
+
+    def __unicode__(self):
+        return "%s" % self.detail
+
+
+class SigiaMedicPhysicalExam(LiveModel, TimeStampedModel, AuthStampedModel):
+    id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord')
+    type_background = models.ForeignKey(SigiaMedicPhysicalExamDetail, models.DO_NOTHING,
+                                        db_column='type_background', blank=True, null=True)
+    detail_background = models.CharField(max_length=200, blank=True, null=True, verbose_name="Detalle")
+    typed = models.CharField(max_length=10, blank=True, null=True, verbose_name="Tipo", db_column='type')
+    cp = models.BooleanField(default=False, verbose_name="Con evidencia de patología")
+    sp = models.BooleanField(default=False, verbose_name="Sin evidencia de patología")
+
+    class Meta:
+        managed = True
+        db_table = 'sigia_medic_physical'
+
+
+class SigiaMedicDiagnosticPlanDetail(LiveModel, TimeStampedModel, AuthStampedModel):
+    detail = models.CharField(max_length=100, blank=True, null=True)
+    status = models.CharField(max_length=1, blank=True, null=True, default='0')
+
+    class Meta:
+        managed = True
+        db_table = 'sigia_medic_diagnostic_plan_detail'
+
+    def __unicode__(self):
+        return "%s" % self.detail
+
+
+class SigiaMedicDiagnosticPlan(LiveModel, TimeStampedModel, AuthStampedModel):
+    id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord')
+    type_background = models.ForeignKey(SigiaMedicDiagnosticPlanDetail, models.DO_NOTHING,
+                                        db_column='type_background', blank=True, null=True)
+    detail_background = models.CharField(max_length=200, blank=True, null=True, verbose_name="Detalle")
+
+    class Meta:
+        managed = True
+        db_table = 'sigia_medic_diagnostic_plan'
+
+
+class SigiaMedicCie10(LiveModel, TimeStampedModel, AuthStampedModel):
+    id = models.CharField(max_length=10,primary_key=True)
+    detail = models.CharField(max_length=300, blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'sigia_medic_cie10'
+
+
+class SigiaMedicDiagnosticPresumptive(LiveModel, TimeStampedModel, AuthStampedModel):
+    id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord')
+    detail_background = models.CharField(max_length=200, blank=True, null=True, verbose_name="Detalle")
+    cie = models.ForeignKey(SigiaMedicCie10, models.DO_NOTHING, db_column="cie", verbose_name="CIE-10")
+
+    class Meta:
+        managed = True
+        db_table = 'sigia_medic_diagnostic_presumptive'
