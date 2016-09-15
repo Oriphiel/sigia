@@ -7,6 +7,8 @@ Created on: 13/12/2014
 import os
 
 from django import forms
+from django.forms import formset_factory, modelformset_factory, inlineformset_factory
+
 from sigia.models import UserProfile, Teacher, Career, Course, Matter, Studies, \
     Student, Enrollment, Period, PaymentOrder, SEMESTER_CHOICES, Country, \
     EthnicGroup, BugReport, Province, Canton, Parish, Contact, EventType, \
@@ -14,11 +16,11 @@ from sigia.models import UserProfile, Teacher, Career, Course, Matter, Studies, 
     SigiaMedicFamilyBackgroundDetail, SigiaMedicPersonalBackground, SigiaMedicPersonalBackgroundDetail, \
     SigiaMedicrecord, \
     SigiaMedicPhysicalExam, SigiaMedicPhysicalExamDetail, SigiaMedicDiagnosticPlan, SigiaMedicDiagnosticPlanDetail, \
-    SigiaMedicDiagnosticPresumptive, SigiaMedicCie10
+    SigiaMedicDiagnosticPresumptive, SigiaMedicCie10, SigiaMedicalCenter
 from django.contrib.auth.models import User, Group
 from captcha.fields import CaptchaField
 from django.forms.widgets import TextInput, EmailInput, \
-    Select, CheckboxInput, Textarea, NumberInput, DateInput, SelectMultiple, RadioSelect
+    Select, CheckboxInput, Textarea, NumberInput, DateInput, SelectMultiple, RadioSelect, DateTimeInput
 from django.forms.models import ModelChoiceField
 from floppyforms import ClearableFileInput
 from sigia.utils import cedula_valida
@@ -46,9 +48,9 @@ class EmailForm(forms.Form):
 
 
 class LoginForm(forms.Form):
-    user = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control',}), max_length=30, label='Usuario')
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control',}), label='Contraseña')
-    not_expire = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'form-control',}), required=False,
+    user = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', }), max_length=30, label='Usuario')
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', }), label='Contraseña')
+    not_expire = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'form-control', }), required=False,
                                     label='No caduca la sesión')
 
 
@@ -60,21 +62,21 @@ class ReducedStudentForm(forms.Form):
                             ('SBA', 'Ser Bachiller'),
                             ('CON', 'Educación Continua'))
 
-    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control',}), label='Usuario')
-    first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control',}), label='Nombres')
-    last_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control',}), label='Apellidos')
-    email = forms.CharField(widget=forms.EmailInput(attrs={'class': 'form-control',}), required=False, label='Email')
+    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', }), label='Usuario')
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', }), label='Nombres')
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', }), label='Apellidos')
+    email = forms.CharField(widget=forms.EmailInput(attrs={'class': 'form-control', }), required=False, label='Email')
     address = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4}), label='Dirección')
-    gender = forms.ChoiceField(choices=GENDER_CHOICES, widget=forms.Select(attrs={'class': 'form-control',}),
+    gender = forms.ChoiceField(choices=GENDER_CHOICES, widget=forms.Select(attrs={'class': 'form-control', }),
                                label='Género')
-    campus_orig = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control',}),
+    campus_orig = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', }),
                                   label='Plantel de procedencia')
-    specialization = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control',}), label='Especialización')
-    cellphone = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control',}), required=False,
+    specialization = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', }), label='Especialización')
+    cellphone = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', }), required=False,
                                 label='Celular')
-    telephone = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control',}), required=False,
+    telephone = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', }), required=False,
                                 label='Teléfono')
-    type = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control',}), choices=STUDENT_TYPE_CHOICES,
+    type = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control', }), choices=STUDENT_TYPE_CHOICES,
                              required=True, label="Tipo")
 
     def clean_username(self):
@@ -87,9 +89,9 @@ class ReducedStudentForm(forms.Form):
 
 
 class GenEnrollmentBookForm(forms.Form):
-    period = forms.ModelChoiceField(widget=forms.Select(attrs={'class': 'form-control',}),
+    period = forms.ModelChoiceField(widget=forms.Select(attrs={'class': 'form-control', }),
                                     queryset=Period.objects.all(), label='Período')
-    semester = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control',}),
+    semester = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control', }),
                                  choices=SEMESTER_CHOICES, required=True, label="Semestre")
 
 
@@ -109,13 +111,13 @@ class ContactForm(forms.ModelForm):
         fields = ['first_name', 'last_name', 'id_doc_num', 'email', 'address', 'telephone', 'cellphone']
 
         widgets = {
-            'first_name': TextInput(attrs={'class': 'form-control',}),
-            'last_name': TextInput(attrs={'class': 'form-control',}),
-            'id_doc_num': TextInput(attrs={'class': 'form-control',}),
-            'email': EmailInput(attrs={'class': 'form-control',}),
+            'first_name': TextInput(attrs={'class': 'form-control', }),
+            'last_name': TextInput(attrs={'class': 'form-control', }),
+            'id_doc_num': TextInput(attrs={'class': 'form-control', }),
+            'email': EmailInput(attrs={'class': 'form-control', }),
             'address': Textarea(attrs={'class': 'form-control', 'rows': 4}),
-            'telephone': TextInput(attrs={'class': 'form-control',}),
-            'cellphone': TextInput(attrs={'class': 'form-control',})
+            'telephone': TextInput(attrs={'class': 'form-control', }),
+            'cellphone': TextInput(attrs={'class': 'form-control', })
         }
 
 
@@ -125,15 +127,15 @@ class EventGroupForm(forms.ModelForm):
         fields = ['name', 'description', 'student_type', 'events']
 
         widgets = {
-            'name': TextInput(attrs={'class': 'form-control',}),
+            'name': TextInput(attrs={'class': 'form-control', }),
             'description': Textarea(attrs={'class': 'form-control', 'rows': 2}),
-            'student_type': Select(attrs={'class': 'form-control',}),
+            'student_type': Select(attrs={'class': 'form-control', }),
         }
 
 
 class UserPersonalInfoForm(forms.ModelForm):
-    nationality = NationalityModelChoiceField(widget=forms.Select(attrs={'class': 'form-control',}),
-                                              queryset=Country.objects.all())
+    nationality = NationalityModelChoiceField(widget=forms.Select(attrs={'class': 'form-control', }),
+                                              queryset=Country.objects.all(), label="Nacionalidad")
 
     class Meta:
         model = UserProfile
@@ -147,40 +149,40 @@ class UserPersonalInfoForm(forms.ModelForm):
                   'handed_birth_cert']
 
         widgets = {
-            'photo': ImageThumbnailFileInput(attrs={'style': 'width:100%',}),
-            'id_doc_type': Select(attrs={'class': 'form-control',}),
-            'id_doc_num': TextInput(attrs={'class': 'form-control',}),
-            'gender': Select(attrs={'class': 'form-control',}),
-            'birthday': DateInput(attrs={'class': 'form-control',}),
-            'nationality': Select(attrs={'class': 'form-control',}),
-            'birthplace_country': Select(attrs={'class': 'form-control',}),
-            'birthplace_province': Select(attrs={'class': 'form-control',}),
-            'birthplace_canton': Select(attrs={'class': 'form-control',}),
-            'birthplace_parish': Select(attrs={'class': 'form-control',}),
-            'address_province': Select(attrs={'class': 'form-control',}),
-            'address_canton': Select(attrs={'class': 'form-control',}),
-            'address_parish': Select(attrs={'class': 'form-control',}),
-            'marital_status': Select(attrs={'class': 'form-control',}),
+            'photo': ImageThumbnailFileInput(attrs={'style': 'width:100%', }),
+            'id_doc_type': Select(attrs={'class': 'form-control', }),
+            'id_doc_num': TextInput(attrs={'class': 'form-control', }),
+            'gender': Select(attrs={'class': 'form-control', }),
+            'birthday': DateInput(attrs={'class': 'form-control', }),
+            'nationality': Select(attrs={'class': 'form-control', }),
+            'birthplace_country': Select(attrs={'class': 'form-control', }),
+            'birthplace_province': Select(attrs={'class': 'form-control', }),
+            'birthplace_canton': Select(attrs={'class': 'form-control', }),
+            'birthplace_parish': Select(attrs={'class': 'form-control', }),
+            'address_province': Select(attrs={'class': 'form-control', }),
+            'address_canton': Select(attrs={'class': 'form-control', }),
+            'address_parish': Select(attrs={'class': 'form-control', }),
+            'marital_status': Select(attrs={'class': 'form-control', }),
             'address': Textarea(attrs={'class': 'form-control', 'rows': 4}),
-            'telephone': TextInput(attrs={'class': 'form-control',}),
-            'cellphone': TextInput(attrs={'class': 'form-control',}),
+            'telephone': TextInput(attrs={'class': 'form-control', }),
+            'cellphone': TextInput(attrs={'class': 'form-control', }),
 
-            'ethnic_group': Select(attrs={'class': 'form-control',}),
+            'ethnic_group': Select(attrs={'class': 'form-control', }),
 
-            'disability': CheckboxInput(attrs={'class': 'form-control',}),
-            'disability_percent': NumberInput(attrs={'class': 'form-control',}),
-            'disability_id': TextInput(attrs={'class': 'form-control',}),
+            'disability': CheckboxInput(attrs={'class': 'form-control', }),
+            'disability_percent': NumberInput(attrs={'class': 'form-control', }),
+            'disability_id': TextInput(attrs={'class': 'form-control', }),
 
-            'handed_id_doc': CheckboxInput(attrs={'class': 'form-control',}),
-            'id_doc_img': ImageThumbnailFileInput(attrs={'style': 'width:100%',}),
-            'handed_voting_cert': CheckboxInput(attrs={'class': 'form-control',}),
-            'voting_cert_img': ImageThumbnailFileInput(attrs={'style': 'width:100%',}),
-            'handed_degree': CheckboxInput(attrs={'class': 'form-control',}),
-            'handed_degree_img': ImageThumbnailFileInput(attrs={'style': 'width:100%',}),
-            'handed_medical_cert': CheckboxInput(attrs={'class': 'form-control',}),
-            'medical_cert_img': ImageThumbnailFileInput(attrs={'style': 'width:100%',}),
-            'handed_birth_cert': CheckboxInput(attrs={'class': 'form-control',}),
-            'birth_cert_img': ImageThumbnailFileInput(attrs={'style': 'width:100%',}),
+            'handed_id_doc': CheckboxInput(attrs={'class': 'form-control', }),
+            'id_doc_img': ImageThumbnailFileInput(attrs={'style': 'width:100%', }),
+            'handed_voting_cert': CheckboxInput(attrs={'class': 'form-control', }),
+            'voting_cert_img': ImageThumbnailFileInput(attrs={'style': 'width:100%', }),
+            'handed_degree': CheckboxInput(attrs={'class': 'form-control', }),
+            'handed_degree_img': ImageThumbnailFileInput(attrs={'style': 'width:100%', }),
+            'handed_medical_cert': CheckboxInput(attrs={'class': 'form-control', }),
+            'medical_cert_img': ImageThumbnailFileInput(attrs={'style': 'width:100%', }),
+            'handed_birth_cert': CheckboxInput(attrs={'class': 'form-control', }),
+            'birth_cert_img': ImageThumbnailFileInput(attrs={'style': 'width:100%', }),
 
         }
 
@@ -209,10 +211,10 @@ class UserForm(forms.ModelForm):
         fields = ['first_name', 'last_name', 'username', 'email']
 
         widgets = {
-            'first_name': TextInput(attrs={'class': 'form-control',}),
-            'last_name': TextInput(attrs={'class': 'form-control',}),
-            'username': TextInput(attrs={'class': 'form-control',}),
-            'email': EmailInput(attrs={'class': 'form-control',}),
+            'first_name': TextInput(attrs={'class': 'form-control', }),
+            'last_name': TextInput(attrs={'class': 'form-control', }),
+            'username': TextInput(attrs={'class': 'form-control', }),
+            'email': EmailInput(attrs={'class': 'form-control', }),
         }
 
     def clean_first_name(self):
@@ -241,16 +243,16 @@ class TeacherForm(forms.ModelForm):
                   'hours_to_research', 'hours_to_society', 'hours_to_other', 'other_activities', 'studying']
 
         widgets = {
-            'institutional_email': EmailInput(attrs={'class': 'form-control',}),
-            'academic_category': TextInput(attrs={'class': 'form-control',}),
-            'contract_type': Select(attrs={'class': 'form-control',}),
-            'academic_unity': TextInput(attrs={'class': 'form-control',}),
-            'hours_to_pedagogy': NumberInput(attrs={'class': 'form-control',}),
-            'hours_to_research': NumberInput(attrs={'class': 'form-control',}),
-            'hours_to_society': NumberInput(attrs={'class': 'form-control',}),
-            'hours_to_other': NumberInput(attrs={'class': 'form-control',}),
-            'other_activities': TextInput(attrs={'class': 'form-control',}),
-            'studying': CheckboxInput(attrs={'class': 'form-control',}),
+            'institutional_email': EmailInput(attrs={'class': 'form-control', }),
+            'academic_category': TextInput(attrs={'class': 'form-control', }),
+            'contract_type': Select(attrs={'class': 'form-control', }),
+            'academic_unity': TextInput(attrs={'class': 'form-control', }),
+            'hours_to_pedagogy': NumberInput(attrs={'class': 'form-control', }),
+            'hours_to_research': NumberInput(attrs={'class': 'form-control', }),
+            'hours_to_society': NumberInput(attrs={'class': 'form-control', }),
+            'hours_to_other': NumberInput(attrs={'class': 'form-control', }),
+            'other_activities': TextInput(attrs={'class': 'form-control', }),
+            'studying': CheckboxInput(attrs={'class': 'form-control', }),
         }
 
 
@@ -260,36 +262,37 @@ class EventTypeForm(forms.ModelForm):
         fields = ['name', 'description', 'student_type']
 
         widgets = {
-            'name': TextInput(attrs={'class': 'form-control',}),
-            'description': Textarea(attrs={'class': 'form-control',}),
-            'student_type': Select(attrs={'class': 'form-control',}),
+            'name': TextInput(attrs={'class': 'form-control', }),
+            'description': Textarea(attrs={'class': 'form-control', }),
+            'student_type': Select(attrs={'class': 'form-control', }),
         }
 
 
 class StudentEventForm(forms.ModelForm):
-    student = ModelChoiceField(label='Estudiante', widget=forms.Select(attrs={'class': 'form-control',}),
+    student = ModelChoiceField(label='Estudiante', widget=forms.Select(attrs={'class': 'form-control', }),
                                queryset=Student.objects.all().order_by("user__last_name", "user__first_name"))
     tutor = ModelChoiceField(label='Tutor/Supervisor', required=False,
-                             widget=forms.Select(attrs={'class': 'form-control',}),
+                             widget=forms.Select(attrs={'class': 'form-control', }),
                              queryset=Teacher.objects.all().order_by("user__last_name", "user__first_name"))
-    manager = UserModelChoiceField(label='Administrativo', widget=forms.Select(attrs={'class': 'form-control',}),
+    manager = UserModelChoiceField(label='Administrativo', widget=forms.Select(attrs={'class': 'form-control', }),
                                    queryset=Group.objects.get(name="secretary").user_set.all().
                                    order_by("last_name", "first_name"))
 
-    class Meta:
-        model = StudentEvent
-        fields = ['type', 'student', 'start_date', 'end_date', 'end_date',
-                  'ini_obs', 'tutor', 'manager']
 
-        widgets = {
-            'type': Select(attrs={'class': 'form-control',}),
-            'student': Select(attrs={'class': 'form-control',}),
-            'start_date': DateInput(attrs={'class': 'form-control',}),
-            'end_date': DateInput(attrs={'class': 'form-control',}),
-            'ini_obs': Textarea(attrs={'class': 'form-control',}),
-            'tutor': Select(attrs={'class': 'form-control',}),
-            'manager': Select(attrs={'class': 'form-control',}),
-        }
+class Meta:
+    model = StudentEvent
+    fields = ['type', 'student', 'start_date', 'end_date', 'end_date',
+              'ini_obs', 'tutor', 'manager']
+
+    widgets = {
+        'type': Select(attrs={'class': 'form-control', }),
+        'student': Select(attrs={'class': 'form-control', }),
+        'start_date': DateInput(attrs={'class': 'form-control', }),
+        'end_date': DateInput(attrs={'class': 'form-control', }),
+        'ini_obs': Textarea(attrs={'class': 'form-control', }),
+        'tutor': Select(attrs={'class': 'form-control', }),
+        'manager': Select(attrs={'class': 'form-control', }),
+    }
 
 
 class EthnicGroupForm(forms.ModelForm):
@@ -298,8 +301,8 @@ class EthnicGroupForm(forms.ModelForm):
         fields = ['name', 'description']
 
         widgets = {
-            'name': TextInput(attrs={'class': 'form-control',}),
-            'description': TextInput(attrs={'class': 'form-control',}),
+            'name': TextInput(attrs={'class': 'form-control', }),
+            'description': TextInput(attrs={'class': 'form-control', }),
         }
 
 
@@ -309,8 +312,8 @@ class CareerForm(forms.ModelForm):
         fields = ['name', 'description']
 
         widgets = {
-            'name': TextInput(attrs={'class': 'form-control',}),
-            'description': TextInput(attrs={'class': 'form-control',}),
+            'name': TextInput(attrs={'class': 'form-control', }),
+            'description': TextInput(attrs={'class': 'form-control', }),
         }
 
 
@@ -322,20 +325,20 @@ class CourseForm(forms.ModelForm):
                   'applied_scholarship_from']
 
         widgets = {
-            'career': Select(attrs={'class': 'form-control',}),
-            'description': TextInput(attrs={'class': 'form-control',}),
-            'type': Select(attrs={'class': 'form-control',}),
-            'period': Select(attrs={'class': 'form-control',}),
-            'semester': Select(attrs={'class': 'form-control',}),
-            'parallel': Select(attrs={'class': 'form-control',}),
-            'level': Select(attrs={'class': 'form-control',}),
-            'max_quota': TextInput(attrs={'class': 'form-control',}),
-            'payment_reg': TextInput(attrs={'class': 'form-control',}),
-            'payment_ext': TextInput(attrs={'class': 'form-control',}),
-            'payment_esp': TextInput(attrs={'class': 'form-control',}),
-            'amount_payments': NumberInput(attrs={'class': 'form-control',}),
-            'value_payments': TextInput(attrs={'class': 'form-control',}),
-            'applied_scholarship_from': NumberInput(attrs={'class': 'form-control',}),
+            'career': Select(attrs={'class': 'form-control', }),
+            'description': TextInput(attrs={'class': 'form-control', }),
+            'type': Select(attrs={'class': 'form-control', }),
+            'period': Select(attrs={'class': 'form-control', }),
+            'semester': Select(attrs={'class': 'form-control', }),
+            'parallel': Select(attrs={'class': 'form-control', }),
+            'level': Select(attrs={'class': 'form-control', }),
+            'max_quota': TextInput(attrs={'class': 'form-control', }),
+            'payment_reg': TextInput(attrs={'class': 'form-control', }),
+            'payment_ext': TextInput(attrs={'class': 'form-control', }),
+            'payment_esp': TextInput(attrs={'class': 'form-control', }),
+            'amount_payments': NumberInput(attrs={'class': 'form-control', }),
+            'value_payments': TextInput(attrs={'class': 'form-control', }),
+            'applied_scholarship_from': NumberInput(attrs={'class': 'form-control', }),
         }
 
 
@@ -346,19 +349,19 @@ class InstitutionForm(forms.ModelForm):
                   'mission', 'vision', 'phone_one', 'phone_two']
 
         widgets = {
-            'name': TextInput(attrs={'class': 'form-control',}),
-            'main': TextInput(attrs={'class': 'form-control',}),
-            'photo': ImageThumbnailFileInput(attrs={'class': 'form-control',}),
-            'logo': ImageThumbnailFileInput(attrs={'class': 'form-control',}),
-            'address': TextInput(attrs={'class': 'form-control',}),
-            'zip_address': TextInput(attrs={'class': 'form-control',}),
-            'ruc': TextInput(attrs={'class': 'form-control',}),
-            'active_semester': TextInput(attrs={'class': 'form-control',}),
-            'active_period': TextInput(attrs={'class': 'form-control',}),
-            'mission': TextInput(attrs={'class': 'form-control',}),
-            'vision': TextInput(attrs={'class': 'form-control',}),
-            'phone_one': TextInput(attrs={'class': 'form-control',}),
-            'phone_two': TextInput(attrs={'class': 'form-control',}),
+            'name': TextInput(attrs={'class': 'form-control', }),
+            'main': TextInput(attrs={'class': 'form-control', }),
+            'photo': ImageThumbnailFileInput(attrs={'class': 'form-control', }),
+            'logo': ImageThumbnailFileInput(attrs={'class': 'form-control', }),
+            'address': TextInput(attrs={'class': 'form-control', }),
+            'zip_address': TextInput(attrs={'class': 'form-control', }),
+            'ruc': TextInput(attrs={'class': 'form-control', }),
+            'active_semester': TextInput(attrs={'class': 'form-control', }),
+            'active_period': TextInput(attrs={'class': 'form-control', }),
+            'mission': TextInput(attrs={'class': 'form-control', }),
+            'vision': TextInput(attrs={'class': 'form-control', }),
+            'phone_one': TextInput(attrs={'class': 'form-control', }),
+            'phone_two': TextInput(attrs={'class': 'form-control', }),
         }
 
 
@@ -368,9 +371,9 @@ class PeriodCreateForm(forms.ModelForm):
         fields = ['name', 'predecessor', 'start_notes']
 
         widgets = {
-            'name': TextInput(attrs={'class': 'form-control',}),
-            'predecessor': Select(attrs={'class': 'form-control',}),
-            'start_notes': TextInput(attrs={'class': 'form-control',}),
+            'name': TextInput(attrs={'class': 'form-control', }),
+            'predecessor': Select(attrs={'class': 'form-control', }),
+            'start_notes': TextInput(attrs={'class': 'form-control', }),
         }
 
 
@@ -380,10 +383,10 @@ class BugReportForm(forms.ModelForm):
         fields = ['name', 'gravity', 'description', 'snapshot']
 
         widgets = {
-            'name': TextInput(attrs={'class': 'form-control',}),
-            'gravity': Select(attrs={'class': 'form-control',}),
+            'name': TextInput(attrs={'class': 'form-control', }),
+            'gravity': Select(attrs={'class': 'form-control', }),
             'description': Textarea(attrs={'class': 'form-control', 'rows': 6}),
-            'snapshot': ImageThumbnailFileInput(attrs={'style': 'width:100%',}),
+            'snapshot': ImageThumbnailFileInput(attrs={'style': 'width:100%', }),
         }
 
 
@@ -393,8 +396,8 @@ class CountryForm(forms.ModelForm):
         fields = ['name', 'gentilicio', ]
 
         widgets = {
-            'name': TextInput(attrs={'class': 'form-control',}),
-            'gentilicio': TextInput(attrs={'class': 'form-control',}),
+            'name': TextInput(attrs={'class': 'form-control', }),
+            'gentilicio': TextInput(attrs={'class': 'form-control', }),
         }
 
 
@@ -404,8 +407,8 @@ class ProvinceForm(forms.ModelForm):
         fields = ['name', 'country', ]
 
         widgets = {
-            'name': TextInput(attrs={'class': 'form-control',}),
-            'country': Select(attrs={'class': 'form-control',}),
+            'name': TextInput(attrs={'class': 'form-control', }),
+            'country': Select(attrs={'class': 'form-control', }),
         }
 
 
@@ -415,8 +418,8 @@ class CantonForm(forms.ModelForm):
         fields = ['name', 'province', ]
 
         widgets = {
-            'name': TextInput(attrs={'class': 'form-control',}),
-            'province': Select(attrs={'class': 'form-control',}),
+            'name': TextInput(attrs={'class': 'form-control', }),
+            'province': Select(attrs={'class': 'form-control', }),
         }
 
 
@@ -426,13 +429,13 @@ class ParishForm(forms.ModelForm):
         fields = ['name', 'canton', ]
 
         widgets = {
-            'name': TextInput(attrs={'class': 'form-control',}),
-            'canton': Select(attrs={'class': 'form-control',}),
+            'name': TextInput(attrs={'class': 'form-control', }),
+            'canton': Select(attrs={'class': 'form-control', }),
         }
 
 
 class PaymentOrderForm(forms.ModelForm):
-    user = UserModelChoiceField(widget=forms.Select(attrs={'class': 'form-control',}),
+    user = UserModelChoiceField(widget=forms.Select(attrs={'class': 'form-control', }),
                                 queryset=User.objects.all().order_by("last_name", "first_name"))
 
     class Meta:
@@ -441,15 +444,15 @@ class PaymentOrderForm(forms.ModelForm):
                   'payment_concept']
 
         widgets = {
-            'user': Select(attrs={'class': 'form-control',}),
-            'date_issue': TextInput(attrs={'class': 'form-control',}),
-            'payout': CheckboxInput(attrs={'class': 'form-control',}),
-            'date_payment': TextInput(attrs={'class': 'form-control',}),
-            'level': Select(attrs={'class': 'form-control',}),
-            'period': Select(attrs={'class': 'form-control',}),
-            'semester': Select(attrs={'class': 'form-control',}),
-            'value': TextInput(attrs={'class': 'form-control',}),
-            'payment_concept': Select(attrs={'class': 'form-control',}),
+            'user': Select(attrs={'class': 'form-control', }),
+            'date_issue': TextInput(attrs={'class': 'form-control', }),
+            'payout': CheckboxInput(attrs={'class': 'form-control', }),
+            'date_payment': TextInput(attrs={'class': 'form-control', }),
+            'level': Select(attrs={'class': 'form-control', }),
+            'period': Select(attrs={'class': 'form-control', }),
+            'semester': Select(attrs={'class': 'form-control', }),
+            'value': TextInput(attrs={'class': 'form-control', }),
+            'payment_concept': Select(attrs={'class': 'form-control', }),
         }
 
 
@@ -466,14 +469,14 @@ class StudiesForm(forms.ModelForm):
                   'date_award', 'country', 'senescyt_id']
 
         widgets = {
-            'teacher': Select(attrs={'class': 'form-control',}),
-            'academic_level': NumberInput(attrs={'class': 'form-control',}),
-            'institute': TextInput(attrs={'class': 'form-control',}),
-            'title': TextInput(attrs={'class': 'form-control',}),
-            'title_img': ImageThumbnailFileInput(attrs={'class': 'form-control',}),
-            'date_award': DateInput(attrs={'class': 'form-control',}),
-            'country': Select(attrs={'class': 'form-control',}),
-            'senescyt_id': TextInput(attrs={'class': 'form-control',}),
+            'teacher': Select(attrs={'class': 'form-control', }),
+            'academic_level': NumberInput(attrs={'class': 'form-control', }),
+            'institute': TextInput(attrs={'class': 'form-control', }),
+            'title': TextInput(attrs={'class': 'form-control', }),
+            'title_img': ImageThumbnailFileInput(attrs={'class': 'form-control', }),
+            'date_award': DateInput(attrs={'class': 'form-control', }),
+            'country': Select(attrs={'class': 'form-control', }),
+            'senescyt_id': TextInput(attrs={'class': 'form-control', }),
         }
 
 
@@ -485,21 +488,21 @@ class StudentAcademicInfoForm(forms.ModelForm):
                   'cohort_semester', 'date_graduation', 'date_thesis_defense', 'act_number', 'senescyt_number']
 
         widgets = {
-            'career': Select(attrs={'class': 'form-control',}),
-            'campus_orig': TextInput(attrs={'class': 'form-control',}),
-            'campus_city': TextInput(attrs={'class': 'form-control',}),
-            'specialization': TextInput(attrs={'class': 'form-control',}),
-            'language_know_lvl': Select(attrs={'class': 'form-control',}),
-            'informatic_know_lvl': Select(attrs={'class': 'form-control',}),
-            'first_time_ingress': DateInput(attrs={'class': 'form-control',}),
-            'income_sys': Select(attrs={'class': 'form-control',}),
-            'type': Select(attrs={'class': 'form-control',}),
-            'cohort_period': Select(attrs={'class': 'form-control',}),
-            'cohort_semester': Select(attrs={'class': 'form-control',}),
-            'date_graduation': TextInput(attrs={'class': 'form-control',}),
-            'date_thesis_defense': TextInput(attrs={'class': 'form-control',}),
-            'act_number': TextInput(attrs={'class': 'form-control',}),
-            'senescyt_number': TextInput(attrs={'class': 'form-control',}),
+            'career': Select(attrs={'class': 'form-control', }),
+            'campus_orig': TextInput(attrs={'class': 'form-control', }),
+            'campus_city': TextInput(attrs={'class': 'form-control', }),
+            'specialization': TextInput(attrs={'class': 'form-control', }),
+            'language_know_lvl': Select(attrs={'class': 'form-control', }),
+            'informatic_know_lvl': Select(attrs={'class': 'form-control', }),
+            'first_time_ingress': DateInput(attrs={'class': 'form-control', }),
+            'income_sys': Select(attrs={'class': 'form-control', }),
+            'type': Select(attrs={'class': 'form-control', }),
+            'cohort_period': Select(attrs={'class': 'form-control', }),
+            'cohort_semester': Select(attrs={'class': 'form-control', }),
+            'date_graduation': TextInput(attrs={'class': 'form-control', }),
+            'date_thesis_defense': TextInput(attrs={'class': 'form-control', }),
+            'act_number': TextInput(attrs={'class': 'form-control', }),
+            'senescyt_number': TextInput(attrs={'class': 'form-control', }),
         }
 
 
@@ -509,12 +512,12 @@ class StudentWorkInfoForm(forms.ModelForm):
         fields = ['working', 'company_name', 'company_address', 'charge', 'work_telephone', 'work_email']
 
         widgets = {
-            'working': CheckboxInput(attrs={'class': 'form-control',}),
-            'company_name': TextInput(attrs={'class': 'form-control',}),
+            'working': CheckboxInput(attrs={'class': 'form-control', }),
+            'company_name': TextInput(attrs={'class': 'form-control', }),
             'company_address': Textarea(attrs={'class': 'form-control', 'rows': 4}),
-            'charge': TextInput(attrs={'class': 'form-control',}),
-            'work_telephone': TextInput(attrs={'class': 'form-control',}),
-            'work_email': EmailInput(attrs={'class': 'form-control',}),
+            'charge': TextInput(attrs={'class': 'form-control', }),
+            'work_telephone': TextInput(attrs={'class': 'form-control', }),
+            'work_email': EmailInput(attrs={'class': 'form-control', }),
         }
 
     def clean_company_name(self):
@@ -544,7 +547,7 @@ class StudentWorkInfoForm(forms.ModelForm):
 
 class CreateEnrollmentForm(forms.ModelForm):
     # period = ModelChoiceField(widget=forms.Select(attrs={'class': 'form-control',}), queryset=Period.objects.all().order_by('name'))
-    course = ModelChoiceField(widget=forms.Select(attrs={'class': 'form-control',}),
+    course = ModelChoiceField(widget=forms.Select(attrs={'class': 'form-control', }),
                               queryset=Course.objects.all().order_by('career', 'level'))
 
     class Meta:
@@ -552,13 +555,13 @@ class CreateEnrollmentForm(forms.ModelForm):
         fields = ['student', 'course', 'type', 'date', 'financing_sys', 'condition', 'scholarship']
 
         widgets = {
-            'student': Select(attrs={'class': 'form-control',}),
-            'course': Select(attrs={'class': 'form-control',}),
-            'type': Select(attrs={'class': 'form-control',}),
-            'date': Select(attrs={'class': 'form-control',}),
-            'financing_sys': Select(attrs={'class': 'form-control',}),
-            'condition': Select(attrs={'class': 'form-control',}),
-            'scholarship': NumberInput(attrs={'class': 'form-control',}),
+            'student': Select(attrs={'class': 'form-control', }),
+            'course': Select(attrs={'class': 'form-control', }),
+            'type': Select(attrs={'class': 'form-control', }),
+            'date': Select(attrs={'class': 'form-control', }),
+            'financing_sys': Select(attrs={'class': 'form-control', }),
+            'condition': Select(attrs={'class': 'form-control', }),
+            'scholarship': NumberInput(attrs={'class': 'form-control', }),
         }
 
     def clean_student(self):
@@ -598,8 +601,9 @@ class CreateEnrollmentForm(forms.ModelForm):
             if student.type == "SBA" and (course.level != 10 or enrollment_type != 'SBA'):
                 raise forms.ValidationError(
                     "Los estudiantes de Ser Bachiller solo pueden ser matriculados con matrículas del tipo Ser Bachiller.")
-            if student.type == "EST" and (course.level == 0 or course.level == 8 or course.level == 10 or \
-                                                      enrollment_type == 'PRE' or enrollment_type == 'SBA' or enrollment_type == 'ENE'):
+            if student.type == "EST" and (course.level == 0 or course.level == 8 or course.level == 10 or
+                                                  enrollment_type == 'PRE' or enrollment_type == 'SBA' or
+                                                  enrollment_type == 'ENE'):
                 raise forms.ValidationError(
                     "Los estudiantes regulares no se pueden matricular con una matrícula de ese tipo.")
             return enrollment_type
@@ -614,13 +618,13 @@ class UpdateEnrollmentForm(forms.ModelForm):
         fields = ['student', 'course', 'type', 'date', 'financing_sys', 'condition', 'scholarship']
 
         widgets = {
-            'student': Select(attrs={'class': 'form-control',}),
-            'course': Select(attrs={'class': 'form-control',}),
-            'type': Select(attrs={'class': 'form-control',}),
-            'date': Select(attrs={'class': 'form-control',}),
-            'financing_sys': Select(attrs={'class': 'form-control',}),
-            'condition': Select(attrs={'class': 'form-control',}),
-            'scholarship': NumberInput(attrs={'class': 'form-control',}),
+            'student': Select(attrs={'class': 'form-control', }),
+            'course': Select(attrs={'class': 'form-control', }),
+            'type': Select(attrs={'class': 'form-control', }),
+            'date': Select(attrs={'class': 'form-control', }),
+            'financing_sys': Select(attrs={'class': 'form-control', }),
+            'condition': Select(attrs={'class': 'form-control', }),
+            'scholarship': NumberInput(attrs={'class': 'form-control', }),
         }
 
     def clean_course(self):
@@ -681,7 +685,15 @@ class CreateMedicRecordForm(forms.ModelForm):
                 attrs={'class': 'form-control', 'type': 'number', 'placeholder': 'm', 'step': "0.01", 'min': '0'}),
             'imc': TextInput(attrs={'class': 'form-control', 'type': 'number'}),
             'p_cephalico': TextInput(attrs={'class': 'form-control', 'type': 'number'}),
+            'date': DateInput(attrs={'class': 'form-control'}),
         }
+
+    def clean_id_patient(self):
+        id_patient = self.cleaned_data['id_patient']
+        if id_patient:
+            return id_patient
+        else:
+            raise forms.ValidationError("Este campo es obligatorio")
 
 
 class PersonalMedicBackground(forms.ModelForm):
@@ -745,6 +757,10 @@ class MedicContact(forms.ModelForm):
             'phone_number': TextInput(attrs={'class': 'form-control', 'placeholder': 'Teléfono'})
         }
 
+    def __init__(self, *arg, **kwarg):
+        super(MedicContact, self).__init__(*arg, **kwarg)
+        self.empty_permitted = False
+
 
 class PhysicalExam(forms.ModelForm):
     type_background = ModelChoiceField(
@@ -752,9 +768,11 @@ class PhysicalExam(forms.ModelForm):
             attrs={'class': 'form-control', 'data-live-search': "true", 'autocomplete': 'off'}),
         queryset=SigiaMedicPhysicalExamDetail.objects.filter(id__range=[1, 25]), label="General")
     cp = forms.BooleanField(widget=RadioSelect(choices=[(True, 'Si'),
-                                                        (False, 'No')]), label="Con evidencia de patología")
+                                                        (False, 'No')]), label="Con evidencia de patología",
+                            initial=False, required=False)
     sp = forms.BooleanField(widget=RadioSelect(choices=[(True, 'Si'),
-                                                        (False, 'No')]), label="Sin evidencia de patología")
+                                                        (False, 'No')]), label="Sin evidencia de patología",
+                            initial=False, required=False)
 
     class Meta:
         model = SigiaMedicPhysicalExam
@@ -776,7 +794,7 @@ class DiagnosticPlan(forms.ModelForm):
     type_background = ModelChoiceField(
         widget=forms.Select(
             attrs={'class': 'form-control', 'data-live-search': "true", 'autocomplete': 'off'}),
-        queryset=SigiaMedicDiagnosticPlanDetail.objects.filter(id__range=[1, 16]), label="General")
+        queryset=SigiaMedicDiagnosticPlanDetail.objects.filter(id__range=[1, 17]), label="General")
 
     class Meta:
         model = SigiaMedicDiagnosticPlan
@@ -796,5 +814,35 @@ class DiagnosticPresumptive(forms.ModelForm):
         widgets = {
             'detail_background': TextInput(attrs={'class': 'form-control llenar', 'placeholder': 'Enfermedad'}),
             'cie': TextInput(
-                attrs={'class': 'form-control autocomplete-me', 'placeholder': 'Escriba el CIE-10 o la enfermedad...'})
+                attrs={'class': 'form-control cie10 autocomplete-me',
+                       'placeholder': 'Escriba el CIE-10 o la enfermedad...'})
         }
+
+
+class MedicalCenter(forms.ModelForm):
+    class Meta:
+        model = SigiaMedicalCenter
+        exclude = ['live']
+        widgets = {
+            'report_image': ImageThumbnailFileInput(attrs={'class': 'form-control'})
+        }
+
+
+personal = inlineformset_factory(parent_model=SigiaMedicrecord, model=SigiaMedicPersonalBackground,
+                                 form=PersonalMedicBackground, min_num=0, max_num=24, can_delete=True, can_order=True,
+                                 validate_min=0, extra=1)
+personal_fem = inlineformset_factory(parent_model=SigiaMedicrecord, model=SigiaMedicPersonalBackground,
+                                     form=PersonalFemMedicBackground, min_num=0, max_num=24, can_delete=True,
+                                     can_order=True, validate_min=0, extra=1)
+family = inlineformset_factory(parent_model=SigiaMedicrecord, model=SigiaMedicFamilyBackground,
+                               form=FamilyMedicBackground, min_num=0, max_num=11, can_delete=True, can_order=True,
+                               validate_min=0, extra=1)
+contacto = inlineformset_factory(parent_model=SigiaMedicrecord, model=SigiaMedicContact, form=MedicContact, min_num=0,
+                                 max_num=5, can_delete=True, can_order=True, validate_min=0, extra=1)
+fisico = inlineformset_factory(parent_model=SigiaMedicrecord, model=SigiaMedicPhysicalExam, form=PhysicalExam,
+                               min_num=0, max_num=20, can_delete=True, can_order=True, validate_min=0, extra=1)
+diagnostic = inlineformset_factory(parent_model=SigiaMedicrecord, model=SigiaMedicDiagnosticPlan, form=DiagnosticPlan,
+                                   min_num=0, max_num=20, can_delete=True, can_order=True, validate_min=0, extra=1)
+presumptive = inlineformset_factory(parent_model=SigiaMedicrecord, model=SigiaMedicDiagnosticPresumptive,
+                                    form=DiagnosticPresumptive, min_num=0, max_num=20, can_delete=True, can_order=True,
+                                    validate_min=0, extra=1)

@@ -8,10 +8,10 @@ import djcelery
 
 djcelery.setup_loader()
 
-# MESSAGE_TAGS = {
-#     messages.ERROR: 'danger',
-#     127: 'script',
-# }
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+    127: 'script',
+}
 
 # JS_MESSAGE = 127
 
@@ -62,7 +62,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'audit_log.middleware.UserLoggingMiddleware',
-#    'sigia.middleware.HttpPostTunnelingMiddleware',
+    #    'sigia.middleware.HttpPostTunnelingMiddleware',
     'sigia.middleware.TimezoneMiddleware',
 )
 
@@ -70,28 +70,33 @@ ROOT_URLCONF = 'sigia.urls'
 
 WSGI_APPLICATION = 'sigia.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'sigia_dev',                      # Or path to database file if using sqlite3.
-        'USER': 'sigia',                      # Not used with sqlite3.
-        'PASSWORD': 'sigia2015',                  # Not used with sqlite3.
-        'HOST': '181.196.187.66',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'
+        'NAME': 'sigia_dev',  # Or path to database file if using sqlite3.
+        'USER': 'sigia',  # Not used with sqlite3.
+        'PASSWORD': 'sigia2015',  # Not used with sqlite3.
+        'HOST': '181.196.187.66',  # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '5432',  # Set to empty string for default. Not used with sqlite3.
         'OPTIONS': {
             'sslmode': 'require',
         },
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': 'test.sqlite',
+#     }
+# }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
-LANGUAGE_CODE = 'es-es'
+LANGUAGE_CODE = 'es-EC'
 
 TIME_ZONE = 'UTC'
 
@@ -119,7 +124,7 @@ STATICFILES_FINDERS = (
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    #     'django.template.loaders.eggs.Loader',
 )
 
 REPORT_SERVER = "192.168.201.6:8080"
@@ -161,10 +166,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 # }
 
 THUMBNAIL_PROCESSORS = (
-    'image_cropping.thumbnail_processors.crop_corners',
-) + thumbnail_settings.THUMBNAIL_PROCESSORS
+                           'image_cropping.thumbnail_processors.crop_corners',
+                       ) + thumbnail_settings.THUMBNAIL_PROCESSORS
 
-CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend' 
+CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 BROKER_URL = 'amqp://sigia:Sigia*2015@192.168.201.6:5672/sigia'
 CELERY_ACCEPT_CONTENT = ['json']

@@ -13,7 +13,11 @@
         <div class="box-content" style="display: block;">
 
             <blockquote>
-                Por favor llene los datos del paciente
+                {% if action == 'CREATE' %}
+                    Por favor llene los datos del paciente
+                {% else %}
+                    Puede editar los datos del paciente
+                {% endif %}
             </blockquote>
 
             <form id="medicoform" class="form-horizontal" method="post" enctype="multipart/form-data">{% csrf_token %}
@@ -47,6 +51,10 @@
                                 <div class="form-group">
                                     <label for="{{ medic_form.id_patient.auto_id }}"
                                            class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ medic_form.id_patient.label }}</label>
+                                    {% if medic_form.id_patient.errors %}
+                                        <label class="error" data-toggle="tooltip" data-placement="top"
+                                               title='{{ medic_form.id_patient.errors.as_text }}'>*</label>
+                                    {% endif %}
                                     <div class="col-sm-9 col-md-9 col-lg-9">
                                         {{ medic_form.id_patient }}
                                     </div>
@@ -111,11 +119,19 @@
                                     </div>
                                     <label for="{{ medic_form.blood_type_by.auto_id }}"
                                            class="control-label col-sm-2 col-md-2 col-lg-2">{{ medic_form.blood_type_by.label }}</label>
+                                    {% if medic_form.blood_type_by.errors %}
+                                        <label class="error" data-toggle="tooltip" data-placement="top"
+                                               title='{{ medic_form.blood_type_by.errors.as_text }}'>*</label>
+                                    {% endif %}
                                     <div class="col-sm-2 col-md-2 col-lg-2">
                                         {{ medic_form.blood_type_by }}
                                     </div>
                                     <label for="{{ medic_form.blood_type.auto_id }}"
                                            class="control-label col-sm-1 col-md-1 col-lg-1">{{ medic_form.blood_type.label }}</label>
+                                    {% if medic_form.blood_type.errors %}
+                                        <label class="error" data-toggle="tooltip" data-placement="top"
+                                               title='{{ medic_form.blood_type.errors.as_tex }}'>*</label>
+                                    {% endif %}
                                     <div class="col-sm-2 col-md-2 col-lg-2">
                                         {{ medic_form.blood_type }}
                                     </div>
@@ -124,7 +140,7 @@
                                 <div class="form-group">
                                     <label for="date1" class="control-label co2-sm-2 col-md-2 col-lg-2">Fecha</label>
                                     <div class="col-sm-2 col-md-2 col-lg-2">
-                                        <input type="date" class="form-control" id="date1" required name="fecha">
+                                        {{ medic_form.date }}
                                     </div>
                                     <label for="time1" class="control-label col-sm-2 col-md-2 col-lg-2">Hora</label>
                                     <div class="col-sm-2 col-md-2 col-lg-2">
@@ -136,13 +152,27 @@
                                     {{ contacto_form.management_form }}
                                     {% for forma in contacto_form %}
                                         <div class="form-group contactos" id="{{ forma.prefix }}-row">
+                                            {% for fld in forma.hidden_fields %}{{ fld }}{% endfor %}
+                                            {% if forma.instance.pk %}{{ forma.DELETE }}{% endif %}
                                             <label class="control-label col-sm-2 col-md-2 col-lg-2">Contacto</label>
+                                            {% if forma.name.errors %}
+                                                <label class="error" data-toggle="tooltip" data-placement="top"
+                                                       title='{{ forma.name.errors.as_text }}'>*</label>
+                                            {% endif %}
                                             <div class="col-sm-3 col-md-3 col-lg-3">
                                                 {{ forma.name }}
                                             </div>
+                                            {% if forma.relationship_type.errors %}
+                                                <label class="error" data-toggle="tooltip" data-placement="top"
+                                                       title='{{ forma.relationship_type.as_text }}'>*</label>
+                                            {% endif %}
                                             <div class="col-sm-3 col-md-3 col-lg-3">
                                                 {{ forma.relationship_type }}
                                             </div>
+                                            {% if forma.phone_number.errors %}
+                                                <label class="error" data-toggle="tooltip" data-placement="top"
+                                                       title='{{ forma.phone_number.errors.as_text }}'>*</label>
+                                            {% endif %}
                                             <div class="col-sm-2 col-md-2 col-lg-2">
                                                 {{ forma.phone_number }}
                                             </div>
@@ -158,15 +188,33 @@
                                         {{ medic_form.form_arrival }}
                                     </div>
                                     <div class="col-sm-3 col-md-3 col-lg-3">
-                                        {{ medic_form.source_information }}
-                                    </div>
+                                        <div class="col-sm-11 col-md-11 col-lg-11">
+                                            {{ medic_form.source_information }}
+                                        </div>
+                                        {% if medic_form.source_information.errors %}
+                                            <label class="error" data-toggle="tooltip" data-placement="top"
+                                                   title='{{ medic_form.source_information.errors.as_text }}'>*</label>
+                                        {% endif %}</div>
+
                                     <div class="col-sm-4 col-md-4 col-lg-4">
-                                        {{ medic_form.delivery_patient }}
-                                    </div>
+                                        <div class="col-sm-11 col-md-11 col-lg-11">
+                                            {{ medic_form.delivery_patient }}
+                                        </div>
+                                        {% if medic_form.delivery_patient.errors %}
+                                            <label class="error" data-toggle="tooltip" data-placement="top"
+                                                   title='{{ medic_form.delivery_patient.errors.as_text }}'>*</label>
+                                        {% endif %}</div>
                                     <label class="control-label col-sm-2 col-md-2 col-lg-2"></label>
-                                    <div class="col-sm-2 col-md-2 col-lg-2">
+
+                                    <div class="col-sm-3 col-md-3 col-lg-3">
                                         {{ medic_form.phone_delivery }}
                                     </div>
+                                    {% if medic_form.phone_delivery.errors %}
+                                        <div class="col-sm-1 col-md-1 col-lg-1">
+                                            <label class="error" data-toggle="tooltip"
+                                                   title='{{ medic_form.phone_delivery.errors.as_text }}'>*</label>
+                                        </div>
+                                    {% endif %}
                                 </div>
                                 <div class="form-group">
                                     <div class="col-lg-11 col-xs-11 col-md-11 col-sm-11">
@@ -187,6 +235,8 @@
                                 {{ formset.management_form }}
                                 {% for form in formset %}
                                     <div class="form-group esto" id="{{ form.prefix }}-row">
+                                        {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
+                                        {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
                                         <label for="{{ form.type_background.auto_id }}"
                                                class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.type_background.label }}</label>
                                         <div class="col-sm-9 col-md-9 col-lg-9">
@@ -197,6 +247,10 @@
                                         <div class="col-sm-9 col-md-9 col-lg-9">
                                             {{ form.detail_background }}
                                         </div>
+                                        {% if form.detail_background.errors %}
+                                            <label class="error" data-toggle="tooltip" data-placement="top"
+                                                   title='{{ form.detail_background.errors.as_text }}'>*</label>
+                                        {% endif %}
                                     </div>
                                 {% endfor %}
                             </div>
@@ -206,6 +260,8 @@
                                 {{ personalFemForm.management_form }}
                                 {% for form in personalFemForm %}
                                     <div class="form-group esta" id="{{ form.prefix }}-row">
+                                        {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
+                                        {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
                                         <label for="{{ form.type_background.auto_id }}"
                                                class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.type_background.label }}</label>
                                         <div class="col-sm-9 col-md-9 col-lg-9">
@@ -228,6 +284,8 @@
                                 {{ familyform.management_form }}
                                 {% for form in familyform %}
                                     <div class="form-group familia" id="{{ form.prefix }}-row">
+                                        {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
+                                        {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
                                         <label for="{{ form.type_background.auto_id }}"
                                                class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.type_background.label }}</label>
                                         <div class="col-sm-9 col-md-9 col-lg-9">
@@ -238,6 +296,10 @@
                                         <div class="col-sm-9 col-md-9 col-lg-9">
                                             {{ form.detail_background }}
                                         </div>
+                                        {% if form.detail_background.errors %}
+                                            <label class="error" data-toggle="tooltip" data-placement="top"
+                                                   title='{{ form.detail_background.errors.as_text }}'>*</label>
+                                        {% endif %}
                                     </div>
                                 {% endfor %}
                             </div>
@@ -265,6 +327,10 @@
                                             <div class="col-sm-9 col-md-9 col-lg-9">
                                                 {{ medic_form.actual_problem }}
                                             </div>
+                                            {% if medic_form.actual_problem.errors %}
+                                                <label class="error" data-toggle="tooltip" data-placement="top"
+                                                       title='{{ medic_form.actual_problem.errors.as_text }}'>*</label>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -366,6 +432,8 @@
                                             {{ fisico_form.management_form }}
                                             {% for form in fisico_form %}
                                                 <div class="form-group fisico" id="{{ form.prefix }}-row">
+                                                    {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
+                                                    {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
                                                     <label for="{{ form.type_background.auto_id }}"
                                                            class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.type_background.label }}</label>
                                                     <div class="col-sm-4 col-md-4 col-lg-4">
@@ -385,6 +453,11 @@
                                                            for="{{ form.sp.auto_id }}">{{ form.sp.label }}</label>
                                                     <div class="col-sm-3 col-md-3 col-lg-3">
                                                         {{ form.sp }}
+                                                    </div>
+                                                    <label class="control-label col-sm-2 col-md-2 col-lg-2"
+                                                           for="{{ form.detail_background.auto_id }}">{{ form.detail_background.label }}</label>
+                                                    <div class="col-sm-9 col-md-9 col-lg-9">
+                                                        {{ form.detail_background }}
                                                     </div>
                                                 </div>
                                             {% endfor %}
@@ -410,6 +483,8 @@
                                             {{ diagnostic_form.management_form }}
                                             {% for form in diagnostic_form %}
                                                 <div class="form-group diagnostico" id="{{ form.prefix }}-row">
+                                                    {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
+                                                    {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
                                                     <label for="{{ form.type_background.auto_id }}"
                                                            class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.type_background.label }}</label>
                                                     <div class="col-sm-9 col-md-9 col-lg-9">
@@ -432,7 +507,7 @@
                                     <h4 class="panel-title">
                                         <a role="button" data-toggle="collapse" data-parent="#accordion"
                                            href="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
-                                            PLAN DIAGNÓSTICO
+                                            DIAGNÓSTICO PRESUNTIVO
                                         </a>
                                     </h4>
                                 </div>
@@ -444,11 +519,13 @@
                                             {{ presumptive_form.management_form }}
                                             {% for form in presumptive_form %}
                                                 <div class="form-group presumptive" id="{{ form.prefix }}-row">
-                                                        <label for="{{ form.cie.auto_id }}"
-                                                               class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.cie.label }}</label>
-                                                        <div class="col-sm-9 col-md-9 col-lg-9">
-                                                            {{ form.cie }}
-                                                        </div>
+                                                    {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
+                                                    {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+                                                    <label for="{{ form.cie.auto_id }}"
+                                                           class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.cie.label }}</label>
+                                                    <div class="col-sm-9 col-md-9 col-lg-9">
+                                                        {{ form.cie }}
+                                                    </div>
 
                                                     <label class="control-label col-sm-2 col-md-2 col-lg-2"
                                                            for="{{ form.detail_background.auto_id }}">{{ form.detail_background.label }}</label>
@@ -479,136 +556,24 @@
     <!-- Latest compiled and minified JavaScript -->
     <script src="{{ STATIC_URL }}js/bootstrap-select.min.js"></script>
     <script src="{{ STATIC_URL }}js/jquery.formset.js"></script>
-
+    <script src="{{ STATIC_URL }}js/medic_intro.js"></script>
     <script>
-        function log(message, context, id) {
-            $('input[class$=llenar]', context || null).val(message);
-            $('input[class$=autocomplete-me]', context || null).val(id);
-            $('input[class$=autocomplete-me]', context || null).text(id);
-            console.log(id)
-        }
-
-        function enableAutocomplete(context) {
-            $('input[class$=autocomplete-me]', context || null).autocomplete({
-                source: "/api/medic/cie10/",
-                minLength: 2,
-                response: function (event, ui ){
-                    console.log(event);
-                    console.log(ui);
-                },
-                select: function (event, ui) {
-                    log(ui.item ?
-                    "" + ui.item.value + "    CIE-10: " + ui.item.id :
-                    "Nothing selected, input was " + this.value, context, ui.item.id);
-                }
+        {% if action == 'CREATE' %}
+            $('#formulario').click(function () {
+                $('#medicoform')[0].action = "/medic/new/";
+                PostAndLoadAjaxContent($('#medicoform'));
             });
-        }
-        $(document).ready(function () {
-            Date.prototype.toDateInputValue = (function () {
-                var local = new Date(this);
-                local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
-                return local.toJSON().slice(0, 10);
+        {% else %}
+            $('#formulario').click(function () {
+                $('#medicoform')[0].action = "/medic/" + {{ registro_id }} +"/upgrade/";
+                PostAndLoadAjaxContent($('#medicoform'));
             });
-            $('#date1').val(new Date().toDateInputValue());
-            var dt = new Date();
-            var time = dt.toTimeString().split(' ')[0];
-            $('#time1').val(time);
-            $('.id_paciente').selectpicker();
-            $('.id_paciente').selectpicker('render');
-            $('form div .contactos').formset({
-                prefix: "{{ contacto_form.prefix }}",
-                addText: "Agregar Contacto",
-                deleteText: "Borrar"
-            });
-            $('form div .esto').formset({
-                prefix: '{{ formset.prefix }}'
-            });
-            $('form div .esta').formset({
-                prefix: "{{ personalFemForm.prefix }}"
-            });
-            $('form div .familia').formset({
-                prefix: "{{ familyform.prefix }}"
-            });
-            $('form div .fisico').formset({
-                prefix: "{{ fisico_form.prefix }}",
-                deleteText: "Borrar"
-            });
-            $('form div .diagnostico').formset({
-                prefix: "{{ fisico_form.prefix }}",
-                deleteText: "Borrar"
-            });
-            $('form div .presumptive').formset({
-                prefix: "{{ presumptive_form.prefix }}",
-                deleteText: "Borrar",
-                added: function (row) {
-                    enableAutocomplete(row);
-                    console.log("Funciona")
-                }
-            });
-            enableAutocomplete();
-            $('#id_medico-id_patient').change(function () {
-                        var num = $('#id_medico-id_patient').children("option").filter(":selected").val();
-                        $.ajax({
-                            type: 'GET',
-                            url: '/user/api/lista/',
-                            data: {
-                                ids: num
-                            },
-                            contentType: 'json',
-                            success: function (data) {
-                                var nuevo = JSON.parse(data);
-                                $('#apellido').val(nuevo[1].fields.last_name);
-                                $('#nombre').val(nuevo[1].fields.first_name);
-                                $('#direccion').val(nuevo[0].fields.address);
-                                $('#telefono').val(nuevo[0].fields.cellphone);
-                                $('#cedula').val(nuevo[0].fields.id_doc_num);
-                                $("#marital").val(nuevo[0].fields.marital_status);
-                                if (Object.keys(nuevo).length > 2) {
-                                    $('#nacionalidad').val(nuevo[2].fields.name);
-                                    $('#canton').val(nuevo[4].fields.name);
-                                    $('#provincia').val(nuevo[3].fields.name);
-                                } else {
-                                    $('#nacionalidad').val("Sin datos");
-                                    $('#canton').val("Sin datos");
-                                    $('#provincia').val("Sin datos");
-                                }
-                            }
-                        });
-                    }
-            );
-
-            var max_fields = 2; //maximum input boxes allowed
-            var wrapper = $(".contactos"); //Fields wrapper
-            var add_button = $(".addButton"); //Add button ID
-
-            var x = 1; //initlal text box count
-            $(add_button).click(function (e) { //on add input button click
-                e.preventDefault();
-                if (x < max_fields) { //max input box allowed
-                    x++; //text box increment
-                    $(wrapper).append('<div><label class="control-label col-sm-2 col-md-2 col-lg-2"></label><div class="col-sm-3 col-md-3 col-lg-3"><input type="text" class="form-control" name="contacto.name" placeholder="Nombre"/></div><div class="col-sm-3 col-md-3 col-lg-3"><input type="text" class="form-control" name="contacto.relation" placeholder="Tipo de relacion"/></div><div class="col-sm-3 col-md-3 col-lg-3"><input type="text" class="form-control" name="contacto.phone" placeholder="Telefono"/></div><a class="col-xs-1 remove_field"><button class="btn btn-default"><i class="fa fa-minus "></i></button></a></div>'); //add input box
-                }
-            });
-
-            $(wrapper).on("click", ".remove_field", function (e) { //user click on remove text
-                e.preventDefault();
-                $(this).parent('div').remove();
-                x--;
-            })
-        });
-        $(function () {
-            $("#tabs").tabs();
-        });
-
-        $('#formulario').click(function () {
-            $('#medicoform')[0].action = "/hola/";
-            PostAndLoadAjaxContent($('#medicoform'));
-        });
-
-
+            $('#id_medico-id_patient').change();
+            $('#id_medico-date').val("{{ registro.date|date:"Y-m-d"}}");
+            $('#time1').val("{{ registro.date|time:"H:i:s"}}");
+        {% endif %}
     </script>
     <style>
-
         .add-row {
             color: #4cae4c !important;
             padding-left: 18px;

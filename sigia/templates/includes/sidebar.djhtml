@@ -147,7 +147,8 @@
                 <li><a class="ajax-link" href="/bug_report/">Informar de un problema</a></li>
                 <li><a class="ajax-link" href="/under_construction/">Solicitar funcionalidad</a></li>
                 <li><a class="ajax-link" href="/under_construction/">Acerca de SIGIA</a></li>
-                <li><a class="ajax-link" href="/hola/">Hola</a></li>
+                <li><a class="ajax-link" href="/medic/new/">Nueva historia</a></li>
+                <li><a class="ajax-link" href="/medic/">Historiales medicos</a></li>
             </ul>
         </li>
     </ul>

@@ -7,7 +7,7 @@ Created on 12/12/2014
 
 from __future__ import unicode_literals
 
-from django.forms import formset_factory
+import locale
 from django.utils import timezone
 from django.contrib import auth
 from django.shortcuts import render_to_response
@@ -21,14 +21,15 @@ from sigia.forms import LoginForm, UserForm, UserPersonalInfoForm, \
     GenEnrollmentBookForm, UpdateEnrollmentForm, CreateEnrollmentForm, \
     EthnicGroupForm, BugReportForm, CountryForm, ProvinceForm, CantonForm, \
     ParishForm, ReducedStudentForm, ContactForm, TeacherForm, EventTypeForm, \
-    StudentEventForm, StudiesForm, EventGroupForm, EmailForm, InstitutionForm, CreateMedicRecordForm, \
-    PersonalMedicBackground, PersonalFemMedicBackground, FamilyMedicBackground, MedicContact, PhysicalExam, \
-    DiagnosticPlan, DiagnosticPresumptive
+    StudentEventForm, StudiesForm, EventGroupForm, EmailForm, InstitutionForm, CreateMedicRecordForm, personal, \
+    personal_fem, family, contacto, fisico, diagnostic, presumptive
 from django.views.generic.base import TemplateView
 from sigia.models import Student, UserProfile, Career, Course, Enrollment, \
     Period, PaymentOrder, Province, Canton, Parish, EthnicGroup, BugReport, \
     Country, Teacher, EventType, StudentEvent, Studies, EventsGroup, \
-    EventsGroupRelation, StudentEventsGroupRelation, EmailLog, Institution, SigiaMedicCie10
+    EventsGroupRelation, StudentEventsGroupRelation, EmailLog, Institution, SigiaMedicCie10, SigiaMedicrecord, \
+    SigiaMedicPersonalBackground, SigiaMedicFamilyBackground, SigiaMedicContact, SigiaMedicPhysicalExam, \
+    SigiaMedicDiagnosticPlan, SigiaMedicDiagnosticPresumptive
 from django.http.response import JsonResponse, HttpResponse, \
     HttpResponseRedirect
 from django.contrib import messages
@@ -40,7 +41,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 import base64
 from sigia.utils import BreadCrumb, convert_enrrollment_type_to_payment_concept, \
-    chunks, send_emails
+    chunks, send_emails, control_save, control_save_update
 from roman import fromRoman, toRoman
 from django.db.models import Q
 from cProfile import Profile
@@ -267,7 +268,7 @@ class GetProvincesByCountry(View):
         provinces = Province.objects.filter(country__id=country_id).order_by('id')
         for province in provinces:
             std = {'id': province.id,
-                   'name': "%s" % province.name,}
+                   'name': "%s" % province.name, }
             array.append(std)
         return JsonResponse(array, safe=False)
 
@@ -279,7 +280,7 @@ class GetCantonByProvince(View):
         cantons = Canton.objects.filter(province__id=province_id).order_by('id')
         for canton in cantons:
             std = {'id': canton.id,
-                   'name': "%s" % canton.name,}
+                   'name': "%s" % canton.name, }
             array.append(std)
         return JsonResponse(array, safe=False)
 
@@ -291,7 +292,7 @@ class GetParishByCanton(View):
         parishes = Parish.objects.filter(canton__id=canton_id).order_by('id')
         for parish in parishes:
             std = {'id': parish.id,
-                   'name': "%s" % parish.name,}
+                   'name': "%s" % parish.name, }
             array.append(std)
         return JsonResponse(array, safe=False)
 
@@ -315,7 +316,7 @@ class CareerListData(View):
         for career in careers:
             std = {'id': career.id,
                    'name': "%s" % (career.name),
-                   'description': career.description,}
+                   'description': career.description, }
             array.append(std)
         return JsonResponse(array, safe=False)
 
@@ -371,7 +372,7 @@ class CareerUpdateView(View):
         career = Career.objects.get(id=career_id)
         career_form = CareerForm(instance=career)
         context = {'title': self.title, 'action': self.action, 'career_form': career_form, 'career_id': career.id,
-                   'breadCrumbEntries': self.breadCrumbEntries,}
+                   'breadCrumbEntries': self.breadCrumbEntries, }
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
@@ -389,7 +390,7 @@ class CareerUpdateView(View):
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
             context = {'title': self.title, 'action': self.action, 'career_form': career_form, 'career_id': career.id,
-                       'breadCrumbEntries': self.breadCrumbEntries,}
+                       'breadCrumbEntries': self.breadCrumbEntries, }
             return render_to_response(self.template_name, RequestContext(request, context))
 
 
@@ -512,7 +513,7 @@ class UserUpdateView(View):
 
         context = {'action': self.action, 'user_form': user_form, 'id_user': user.id,
                    'personal_info_form': personal_info_form,
-                   'title': self.title, 'breadCrumbEntries': self.breadCrumbEntries,}
+                   'title': self.title, 'breadCrumbEntries': self.breadCrumbEntries, }
 
         return render_to_response(self.template_name, RequestContext(request, context))
 
@@ -538,7 +539,7 @@ class UserUpdateView(View):
 
             context = {'action': self.action, 'user_form': user_form, 'user_id': user.id,
                        'personal_info_form': personal_info_form,
-                       'title': self.title, 'breadCrumbEntries': self.breadCrumbEntries,}
+                       'title': self.title, 'breadCrumbEntries': self.breadCrumbEntries, }
 
             return render_to_response(self.template_name, RequestContext(request, context))
 
@@ -547,14 +548,14 @@ class StudentsListData(View):
     def get(self, request, *args, **kwargs):
         cursor = connections['default'].cursor()
         cursor.execute("""
-        select array_to_json(array_agg(row_to_json(t)))
-        from (
+        SELECT array_to_json(array_agg(row_to_json(t)))
+        FROM (
             SELECT
                  
-                 created_user."username" as created_by,
-                 modified_user."username" as modified_by,
-                 to_char("public"."sigia_student"."created", 'DD/MM/YY HH24:MI') as created,
-                 to_char("public"."sigia_student"."modified", 'DD/MM/YY HH24:MI') as modified,
+                 created_user."username" AS created_by,
+                 modified_user."username" AS modified_by,
+                 to_char("public"."sigia_student"."created", 'DD/MM/YY HH24:MI') AS created,
+                 to_char("public"."sigia_student"."modified", 'DD/MM/YY HH24:MI') AS modified,
                  student_user."first_name" AS first_name,
                  student_user."last_name" AS last_name,
                  student_user.email,
@@ -562,7 +563,7 @@ class StudentsListData(View):
                  "public"."sigia_career"."name" AS career,
                  "public"."sigia_student"."working",
                  "public"."sigia_student"."approved",
-                 "public"."sigia_student"."type" as student_type,
+                 "public"."sigia_student"."type" AS student_type,
                  "public"."sigia_student"."campus_orig"
             FROM
                  "public"."auth_user" created_user RIGHT OUTER JOIN "public"."sigia_student" ON created_user."id" = "public"."sigia_student"."created_by_id"
@@ -570,7 +571,7 @@ class StudentsListData(View):
                  LEFT OUTER JOIN "public"."auth_user" student_user ON "public"."sigia_student"."user_id" = student_user."id"
                  LEFT OUTER JOIN "public"."sigia_career" ON "public"."sigia_student"."career_id" = "public"."sigia_career"."id"
             WHERE
-                 "public"."sigia_student"."live" = true
+                 "public"."sigia_student"."live" = TRUE
             ORDER BY
                 "public"."sigia_student"."id"
         ) t
@@ -583,15 +584,15 @@ class TeachersAndAdminsListData(View):
     def get(self, request, *args, **kwargs):
         cursor = connections['default'].cursor()
         cursor.execute("""
-        select array_to_json(array_agg(row_to_json(t)))
-        from (
+        SELECT array_to_json(array_agg(row_to_json(t)))
+        FROM (
             SELECT 
                 id, first_name, last_name, email
             FROM
                 auth_user 
-            where 
-                auth_user.id not in (SELECT user_id FROM sigia_student)
-            order by
+            WHERE
+                auth_user.id NOT IN (SELECT user_id FROM sigia_student)
+            ORDER BY
                 last_name,
                 first_name
         ) t
@@ -841,7 +842,7 @@ class CourseListData(View):
                    'parallel': course.parallel,
                    'quota': course.quota(),
                    'quota_payout': course.quota_payout(),
-                   'max_quota': course.max_quota,}
+                   'max_quota': course.max_quota, }
             array.append(std)
         return JsonResponse(array, safe=False)
 
@@ -966,8 +967,8 @@ class EnrollmentListData(View):
     def get(self, request, *args, **kwargs):
         cursor = connections['default'].cursor()
         cursor.execute("""
-        select array_to_json(array_agg(row_to_json(t)))
-        from (
+        SELECT array_to_json(array_agg(row_to_json(t)))
+        FROM (
             SELECT
                  student_user.last_name||', '||student_user.first_name AS name,
                  to_char("public"."sigia_enrollment"."created",'DD/MM/YY HH24:MI') AS created,
@@ -995,8 +996,8 @@ class EnrollmentListData(View):
                  LEFT OUTER JOIN "public"."sigia_career" ON "public"."sigia_course"."career_id" = "public"."sigia_career"."id"
                  LEFT OUTER JOIN "public"."sigia_period" ON "public"."sigia_course"."period_id" = "public"."sigia_period"."id"
             WHERE
-                 "public"."sigia_enrollment"."live" = true
-             AND "public"."sigia_student"."live" = true
+                 "public"."sigia_enrollment"."live" = TRUE
+             AND "public"."sigia_student"."live" = TRUE
             ORDER BY
                  student_user."last_name" ASC,
                  student_user."first_name" ASC
@@ -1047,7 +1048,7 @@ class EnrollmentCreateView(View):
             cursor = connections['default'].cursor()
             # print (""" select count(id) from sigia_paymentorder where  payout != true and live = true and user_id = %s """,(enrollment.student.user_id,))
             cursor.execute(
-                """ select count(id) from sigia_paymentorder where  payout != true and live = true and user_id = %s """,
+                """ SELECT count(id) FROM sigia_paymentorder WHERE  payout != TRUE AND live = TRUE AND user_id = %s """,
                 (enrollment.student.user_id,))
             contador = cursor.fetchone()[0]
             # print contador
@@ -1288,7 +1289,7 @@ class PeriodCreateView(View):
     def get(self, request, *args, **kwargs):
         period_form = PeriodCreateForm()
         context = {'action': self.action, 'period_form': period_form, 'title': self.title,
-                   'breadCrumbEntries': self.breadCrumbEntries,}
+                   'breadCrumbEntries': self.breadCrumbEntries, }
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
@@ -1304,7 +1305,7 @@ class PeriodCreateView(View):
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
             context = {'action': self.action, 'period_form': period_form, 'title': self.title,
-                       'breadCrumbEntries': self.breadCrumbEntries,}
+                       'breadCrumbEntries': self.breadCrumbEntries, }
             return render_to_response(self.template_name, RequestContext(request, context))
 
 
@@ -1404,10 +1405,10 @@ class PaymentOrderListData(View):
     def get(self, request, *args, **kwargs):
         cursor = connections['default'].cursor()
         cursor.execute("""
-        select array_to_json(array_agg(row_to_json(t)))
-        from (
+        SELECT array_to_json(array_agg(row_to_json(t)))
+        FROM (
             SELECT
-                 "auth_user"."last_name" || ', ' || "auth_user"."first_name" as name,
+                 "auth_user"."last_name" || ', ' || "auth_user"."first_name" AS name,
                  created_user."username" AS created_by,
                  modified_user."username" AS modified_by,
                  "public"."sigia_paymentorder"."created",
@@ -1428,7 +1429,7 @@ class PaymentOrderListData(View):
                  LEFT OUTER JOIN "public"."auth_user" modified_user ON "public"."sigia_paymentorder"."modified_by_id" = modified_user."id"
                  LEFT OUTER JOIN "public"."sigia_period" ON "public"."sigia_paymentorder"."period_id" = "public"."sigia_period"."id"
             WHERE
-                 "public"."sigia_paymentorder"."live" = true
+                 "public"."sigia_paymentorder"."live" = TRUE
             ORDER BY
                 "public"."sigia_paymentorder"."id"
         ) t
@@ -1458,7 +1459,7 @@ class PaymentOrderCreateView(View):
             student = Student.objects.get(id=student_id)
             payment_order_form = PaymentOrderForm(initial={'date_issue': data, 'user': student.user})
         context = {'action': self.action, 'payment_order_form': payment_order_form, 'title': self.title,
-                   'breadCrumbEntries': self.breadCrumbEntries,}
+                   'breadCrumbEntries': self.breadCrumbEntries, }
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
@@ -1475,7 +1476,7 @@ class PaymentOrderCreateView(View):
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
             context = {'action': self.action, 'payment_order_form': payment_order_form, 'title': self.title,
-                       'breadCrumbEntries': self.breadCrumbEntries,}
+                       'breadCrumbEntries': self.breadCrumbEntries, }
             return render_to_response(self.template_name, RequestContext(request, context))
 
 
@@ -1538,7 +1539,7 @@ class PaymentOrderCancelView(View):
         payment_order = PaymentOrder.objects.get(id=payment_order_id)
         payment_order_form = PaymentOrderForm(instance=payment_order,
                                               initial={'date_payment': timezone.now(), 'payout': True})
-        context = {'payment_order_form': payment_order_form, 'payment_order': payment_order, 'title': self.title,}
+        context = {'payment_order_form': payment_order_form, 'payment_order': payment_order, 'title': self.title, }
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
@@ -1609,7 +1610,7 @@ class GenerateEnrollmentBookView(View):
         if Period.objects.filter(active=True).count() > 0:
             active_period = Period.objects.filter(active=True)[0]
             gen_enbook = GenEnrollmentBookForm(initial={'period': active_period})
-            context = {'gen_enbook': gen_enbook, 'title': self.title, 'breadCrumbEntries': self.breadCrumbEntries,}
+            context = {'gen_enbook': gen_enbook, 'title': self.title, 'breadCrumbEntries': self.breadCrumbEntries, }
             return render_to_response(self.template_name, RequestContext(request, context))
         else:
             return redirect_view(EnrollmentListView, request)
@@ -1640,7 +1641,7 @@ class EthnicGroupListData(View):
         for ethnic_group in ethnic_groups:
             std = {'id': ethnic_group.id,
                    'name': "%s" % (ethnic_group.name),
-                   'description': ethnic_group.description,}
+                   'description': ethnic_group.description, }
             array.append(std)
         return JsonResponse(array, safe=False)
 
@@ -1661,7 +1662,7 @@ class EthnicGroupCreateView(View):
     def get(self, request, *args, **kwargs):
         ethnic_group_form = EthnicGroupForm()
         context = {'title': self.title, 'action': self.action, 'ethnic_group_form': ethnic_group_form,
-                   'breadCrumbEntries': self.breadCrumbEntries,}
+                   'breadCrumbEntries': self.breadCrumbEntries, }
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
@@ -1676,7 +1677,7 @@ class EthnicGroupCreateView(View):
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
             context = {'title': self.title, 'action': self.action, 'ethnic_group_form': ethnic_group_form,
-                       'breadCrumbEntries': self.breadCrumbEntries,}
+                       'breadCrumbEntries': self.breadCrumbEntries, }
             return render_to_response(self.template_name, RequestContext(request, context))
 
 
@@ -1699,7 +1700,7 @@ class EthnicGroupUpdateView(View):
         ethnic_group = EthnicGroup.objects.get(id=ethnic_group_id)
         ethnic_group_form = EthnicGroupForm(instance=ethnic_group)
         context = {'title': self.title, 'action': self.action, 'ethnic_group_form': ethnic_group_form,
-                   'ethnic_group_id': ethnic_group.id, 'breadCrumbEntries': self.breadCrumbEntries,}
+                   'ethnic_group_id': ethnic_group.id, 'breadCrumbEntries': self.breadCrumbEntries, }
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
@@ -1718,7 +1719,7 @@ class EthnicGroupUpdateView(View):
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
             context = {'title': self.title, 'action': self.action, 'ethnic_group_form': ethnic_group_form,
-                       'ethnic_group_id': ethnic_group.id, 'breadCrumbEntries': self.breadCrumbEntries,}
+                       'ethnic_group_id': ethnic_group.id, 'breadCrumbEntries': self.breadCrumbEntries, }
             return render_to_response(self.template_name, RequestContext(request, context))
 
 
@@ -1761,7 +1762,7 @@ class BugReportListData(View):
                    'name': "%s" % (bug_report.name),
                    'description': bug_report.description,
                    'gravity': bug_report.get_gravity_display(),
-                   'bug_state': bug_report.get_state_display(),}
+                   'bug_state': bug_report.get_state_display(), }
             array.append(std)
         return JsonResponse(array, safe=False)
 
@@ -1781,7 +1782,7 @@ class BugReportCreateView(View):
     def get(self, request, *args, **kwargs):
         bug_report_form = BugReportForm()
         context = {'title': self.title, 'action': self.action, 'bug_report_form': bug_report_form,
-                   'breadCrumbEntries': self.breadCrumbEntries,}
+                   'breadCrumbEntries': self.breadCrumbEntries, }
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
@@ -1798,7 +1799,7 @@ class BugReportCreateView(View):
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
             context = {'title': self.title, 'action': self.action, 'bug_report_form': bug_report_form,
-                       'breadCrumbEntries': self.breadCrumbEntries,}
+                       'breadCrumbEntries': self.breadCrumbEntries, }
             return render_to_response(self.template_name, RequestContext(request, context))
 
 
@@ -1819,7 +1820,7 @@ class BugReportUpdateView(View):
         bug_report = BugReport.objects.get(id=bug_report_id)
         bug_report_form = BugReportForm(instance=bug_report)
         context = {'title': self.title, 'action': self.action, 'bug_report_form': bug_report_form,
-                   'bug_report_id': bug_report.id, 'breadCrumbEntries': self.breadCrumbEntries,}
+                   'bug_report_id': bug_report.id, 'breadCrumbEntries': self.breadCrumbEntries, }
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
@@ -1837,7 +1838,7 @@ class BugReportUpdateView(View):
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
             context = {'title': self.title, 'action': self.action, 'bug_report_form': bug_report_form,
-                       'bug_report_id': bug_report.id, 'breadCrumbEntries': self.breadCrumbEntries,}
+                       'bug_report_id': bug_report.id, 'breadCrumbEntries': self.breadCrumbEntries, }
             return render_to_response(self.template_name, RequestContext(request, context))
 
 
@@ -1883,7 +1884,7 @@ class CountryListData(View):
         for country in countrys:
             std = {'id': country.id,
                    'name': "%s" % (country.name),
-                   'gentilicio': country.gentilicio,}
+                   'gentilicio': country.gentilicio, }
             array.append(std)
         return JsonResponse(array, safe=False)
 
@@ -1903,7 +1904,7 @@ class CountryCreateView(View):
     def get(self, request, *args, **kwargs):
         country_form = CountryForm()
         context = {'title': self.title, 'action': self.action, 'country_form': country_form,
-                   'breadCrumbEntries': self.breadCrumbEntries,}
+                   'breadCrumbEntries': self.breadCrumbEntries, }
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
@@ -1918,7 +1919,7 @@ class CountryCreateView(View):
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
             context = {'title': self.title, 'action': self.action, 'country_form': country_form,
-                       'breadCrumbEntries': self.breadCrumbEntries,}
+                       'breadCrumbEntries': self.breadCrumbEntries, }
             return render_to_response(self.template_name, RequestContext(request, context))
 
 
@@ -1939,7 +1940,7 @@ class CountryUpdateView(View):
         country = Country.objects.get(id=country_id)
         country_form = CountryForm(instance=country)
         context = {'title': self.title, 'action': self.action, 'country_form': country_form,
-                   'country_id': country.id, 'breadCrumbEntries': self.breadCrumbEntries,}
+                   'country_id': country.id, 'breadCrumbEntries': self.breadCrumbEntries, }
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
@@ -1957,7 +1958,7 @@ class CountryUpdateView(View):
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
             context = {'title': self.title, 'action': self.action, 'country_form': country_form,
-                       'country_id': country.id, 'breadCrumbEntries': self.breadCrumbEntries,}
+                       'country_id': country.id, 'breadCrumbEntries': self.breadCrumbEntries, }
             return render_to_response(self.template_name, RequestContext(request, context))
 
 
@@ -2003,7 +2004,7 @@ class ProvinceListData(View):
         for province in provinces:
             std = {'id': province.id,
                    'name': "%s" % (province.name),
-                   'country': "%s" % province.country,}
+                   'country': "%s" % province.country, }
             array.append(std)
         return JsonResponse(array, safe=False)
 
@@ -2023,7 +2024,7 @@ class ProvinceCreateView(View):
     def get(self, request, *args, **kwargs):
         province_form = ProvinceForm()
         context = {'title': self.title, 'action': self.action, 'province_form': province_form,
-                   'breadCrumbEntries': self.breadCrumbEntries,}
+                   'breadCrumbEntries': self.breadCrumbEntries, }
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
@@ -2038,7 +2039,7 @@ class ProvinceCreateView(View):
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
             context = {'title': self.title, 'action': self.action, 'province_form': province_form,
-                       'breadCrumbEntries': self.breadCrumbEntries,}
+                       'breadCrumbEntries': self.breadCrumbEntries, }
             return render_to_response(self.template_name, RequestContext(request, context))
 
 
@@ -2059,7 +2060,7 @@ class ProvinceUpdateView(View):
         province = Province.objects.get(id=province_id)
         province_form = ProvinceForm(instance=province)
         context = {'title': self.title, 'action': self.action, 'province_form': province_form,
-                   'province_id': province.id, 'breadCrumbEntries': self.breadCrumbEntries,}
+                   'province_id': province.id, 'breadCrumbEntries': self.breadCrumbEntries, }
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
@@ -2077,7 +2078,7 @@ class ProvinceUpdateView(View):
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
             context = {'title': self.title, 'action': self.action, 'province_form': province_form,
-                       'province_id': province.id, 'breadCrumbEntries': self.breadCrumbEntries,}
+                       'province_id': province.id, 'breadCrumbEntries': self.breadCrumbEntries, }
             return render_to_response(self.template_name, RequestContext(request, context))
 
 
@@ -2123,7 +2124,7 @@ class CantonListData(View):
         for canton in cantons:
             std = {'id': canton.id,
                    'name': "%s" % (canton.name),
-                   'province': "%s" % canton.province,}
+                   'province': "%s" % canton.province, }
             array.append(std)
         return JsonResponse(array, safe=False)
 
@@ -2143,7 +2144,7 @@ class CantonCreateView(View):
     def get(self, request, *args, **kwargs):
         canton_form = CantonForm()
         context = {'title': self.title, 'action': self.action, 'canton_form': canton_form,
-                   'breadCrumbEntries': self.breadCrumbEntries,}
+                   'breadCrumbEntries': self.breadCrumbEntries, }
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
@@ -2158,7 +2159,7 @@ class CantonCreateView(View):
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
             context = {'title': self.title, 'action': self.action, 'canton_form': canton_form,
-                       'breadCrumbEntries': self.breadCrumbEntries,}
+                       'breadCrumbEntries': self.breadCrumbEntries, }
             return render_to_response(self.template_name, RequestContext(request, context))
 
 
@@ -2179,7 +2180,7 @@ class CantonUpdateView(View):
         canton = Canton.objects.get(id=canton_id)
         canton_form = CantonForm(instance=canton)
         context = {'title': self.title, 'action': self.action, 'canton_form': canton_form,
-                   'canton_id': canton.id, 'breadCrumbEntries': self.breadCrumbEntries,}
+                   'canton_id': canton.id, 'breadCrumbEntries': self.breadCrumbEntries, }
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
@@ -2197,7 +2198,7 @@ class CantonUpdateView(View):
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
             context = {'title': self.title, 'action': self.action, 'canton_form': canton_form,
-                       'canton_id': canton.id, 'breadCrumbEntries': self.breadCrumbEntries,}
+                       'canton_id': canton.id, 'breadCrumbEntries': self.breadCrumbEntries, }
             return render_to_response(self.template_name, RequestContext(request, context))
 
 
@@ -2243,7 +2244,7 @@ class ParishListData(View):
         for parish in parishs:
             std = {'id': parish.id,
                    'name': "%s" % (parish.name),
-                   'canton': "%s" % parish.canton,}
+                   'canton': "%s" % parish.canton, }
             array.append(std)
         return JsonResponse(array, safe=False)
 
@@ -2263,7 +2264,7 @@ class ParishCreateView(View):
     def get(self, request, *args, **kwargs):
         parish_form = ParishForm()
         context = {'title': self.title, 'action': self.action, 'parish_form': parish_form,
-                   'breadCrumbEntries': self.breadCrumbEntries,}
+                   'breadCrumbEntries': self.breadCrumbEntries, }
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
@@ -2278,7 +2279,7 @@ class ParishCreateView(View):
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
             context = {'title': self.title, 'action': self.action, 'parish_form': parish_form,
-                       'breadCrumbEntries': self.breadCrumbEntries,}
+                       'breadCrumbEntries': self.breadCrumbEntries, }
             return render_to_response(self.template_name, RequestContext(request, context))
 
 
@@ -2299,7 +2300,7 @@ class ParishUpdateView(View):
         parish = Parish.objects.get(id=parish_id)
         parish_form = ParishForm(instance=parish)
         context = {'title': self.title, 'action': self.action, 'parish_form': parish_form,
-                   'parish_id': parish.id, 'breadCrumbEntries': self.breadCrumbEntries,}
+                   'parish_id': parish.id, 'breadCrumbEntries': self.breadCrumbEntries, }
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
@@ -2317,7 +2318,7 @@ class ParishUpdateView(View):
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
             context = {'title': self.title, 'action': self.action, 'parish_form': parish_form,
-                       'parish_id': parish.id, 'breadCrumbEntries': self.breadCrumbEntries,}
+                       'parish_id': parish.id, 'breadCrumbEntries': self.breadCrumbEntries, }
             return render_to_response(self.template_name, RequestContext(request, context))
 
 
@@ -2656,24 +2657,24 @@ class StudentEventListData(View):
     def get(self, request, *args, **kwargs):
         cursor = connections['default'].cursor()
         cursor.execute("""
-        select array_to_json(array_agg(row_to_json(t)))
-        from (
+        SELECT array_to_json(array_agg(row_to_json(t)))
+        FROM (
             SELECT
                 sigia_studentevent.id, 
-                to_char(sigia_studentevent.created, 'DD/MM/YY HH24:MI') as created,
-                to_char(sigia_studentevent.modified, 'DD/MM/YY HH24:MI') as modified,
+                to_char(sigia_studentevent.created, 'DD/MM/YY HH24:MI') AS created,
+                to_char(sigia_studentevent.modified, 'DD/MM/YY HH24:MI') AS modified,
                 created_user.username AS created_by, 
                 modified_user.username AS modified_by, 
                 student_user.last_name || ', ' || student_user.first_name AS name,
                 sigia_eventtype.name AS event_type, 
-                to_char(sigia_studentevent.start_date, 'DD/MM/YY') as start_date,
-                to_char(sigia_studentevent.end_date, 'DD/MM/YY') as end_date,
+                to_char(sigia_studentevent.start_date, 'DD/MM/YY') AS start_date,
+                to_char(sigia_studentevent.end_date, 'DD/MM/YY') AS end_date,
                 sigia_studentevent.ini_obs, 
-                sigia_studentevent.state as event_state, 
+                sigia_studentevent.state AS event_state,
                 sigia_studentevent.end_obs,
                 teacher_user.last_name || ', ' || teacher_user.first_name AS tutor, 
                 manager_user.last_name || ', ' || manager_user.first_name AS manager,
-                "public"."sigia_student"."type" as student_type
+                "public"."sigia_student"."type" AS student_type
             FROM 
                 "public"."auth_user" created_user RIGHT OUTER JOIN "public"."sigia_studentevent" ON created_user."id" = "public"."sigia_studentevent"."created_by_id"
                 LEFT OUTER JOIN "public"."auth_user" modified_user ON "public"."sigia_studentevent"."modified_by_id" = modified_user."id"
@@ -2684,7 +2685,7 @@ class StudentEventListData(View):
                 LEFT OUTER JOIN "public"."auth_user" teacher_user ON "public"."sigia_teacher"."user_id" = teacher_user."id"
                 LEFT OUTER JOIN "public"."auth_user" student_user ON "public"."sigia_student"."user_id" = student_user."id"
             WHERE
-                sigia_studentevent.live = true
+                sigia_studentevent.live = TRUE
             ORDER BY
                 sigia_studentevent.start_date
         ) t
@@ -3342,7 +3343,7 @@ class InstitutionListData(View):
                    'parallel': course.parallel,
                    'quota': course.quota(),
                    'quota_payout': course.quota_payout(),
-                   'max_quota': course.max_quota,}
+                   'max_quota': course.max_quota, }
             array.append(std)
         return JsonResponse(array, safe=False)
 
@@ -3440,10 +3441,12 @@ class InstitutionDeleteView(View):
 
 
 class MedicRecordCreateView(View):
-    title = 'Historia Clinica'
+    title = 'Historia Clínica'
     template_name = 'medic_form.html'
     action = 'CREATE'
-    breadCrumbEntries = (BreadCrumb("Bienvenido", "/welcome/"), BreadCrumb("Hola Mundo", "/hola/"),)
+    breadCrumbEntries = (
+        BreadCrumb("Bienvenido", "/welcome/"), BreadCrumb("Listado de Consultas", "/medic/"),
+        BreadCrumb("Nueva Consulta", "/new/"))
 
     @classmethod
     def as_view(cls, **initkwargs):
@@ -3452,20 +3455,13 @@ class MedicRecordCreateView(View):
 
     def get(self, request, *args, **kwargs):
         medic_form = CreateMedicRecordForm(prefix="medico")
-        personal = formset_factory(form=PersonalMedicBackground, max_num=24, can_delete=True, can_order=True)
-        personal_form = personal(prefix='personal_form')
-        personal_fem = formset_factory(form=PersonalFemMedicBackground, max_num=24, can_delete=True, can_order=True)
-        personal_fem_form = personal_fem(prefix='persona_fem_form')
-        family = formset_factory(form=FamilyMedicBackground, max_num=11, can_delete=True, can_order=True)
-        family_form = family(prefix='family_form')
-        contacto = formset_factory(form=MedicContact, max_num=5, can_delete=True, can_order=True)
-        contacto_form = contacto(prefix='contacto_form')
-        fisico = formset_factory(form=PhysicalExam, max_num=20, can_delete=True, can_order=True)
-        fisico_form = fisico(prefix='physical_form')
-        diagnostic = formset_factory(form=DiagnosticPlan, max_num=20, can_delete=True, can_order=True)
-        diagnostic_form = diagnostic(prefix='diagnostic_form')
-        presumptive = formset_factory(form=DiagnosticPresumptive, max_num=20, can_delete=True, can_order=True)
-        presumptive_form = presumptive(prefix='presumptive_form')
+        personal_form = personal(prefix='personal_form', queryset=SigiaMedicPersonalBackground.objects.none())
+        personal_fem_form = personal_fem(prefix='persona_fem_form', queryset=SigiaMedicPersonalBackground.objects.none())
+        family_form = family(prefix='family_form', queryset=SigiaMedicFamilyBackground.objects.none())
+        contacto_form = contacto(prefix='contacto_form', queryset=SigiaMedicContact.objects.none())
+        fisico_form = fisico(prefix='physical_form', queryset=SigiaMedicPhysicalExam.objects.none())
+        diagnostic_form = diagnostic(prefix='diagnostic_form', queryset=SigiaMedicDiagnosticPlan.objects.none())
+        presumptive_form = presumptive(prefix='presumptive_form', queryset=SigiaMedicDiagnosticPresumptive.objects.none())
         context = {'action': self.action, 'medic_form': medic_form, 'title': self.title, 'formset': personal_form,
                    'breadCrumbEntries': self.breadCrumbEntries, 'personalFemForm': personal_fem_form,
                    'familyform': family_form, 'contacto_form': contacto_form, 'fisico_form': fisico_form,
@@ -3473,26 +3469,45 @@ class MedicRecordCreateView(View):
         return render_to_response(self.template_name, RequestContext(request, context))
 
     def post(self, request, *args, **kwargs):
-        print request.POST
-        personal_detail_form = formset_factory(form=PersonalMedicBackground)
-        personal = personal_detail_form(request.POST, prefix='personal_form')
-        for formulario in personal.forms:
-            if formulario.is_valid():
-                print formulario.cleaned_data
-        sleep(5)
-        return
-        if course_form.is_valid():
-            course = course_form.save(commit=False)
-            course.save()
-            message = 'Se ha añadido correctamente el curso: %s-%s' % (request.POST['level'], request.POST['parallel'])
-            messages.add_message(request, messages.SUCCESS, message)
-            return redirect_view(InstitutionListView, request)
+        medic = CreateMedicRecordForm(request.POST, prefix='medico')
+        personal_form = personal(request.POST, prefix='personal_form')
+        personal_fem_form = personal_fem(request.POST, prefix='persona_fem_form')
+        family_form = family(request.POST, prefix='family_form')
+        contacto_form = contacto(request.POST, prefix='contacto_form')
+        fisico_form = fisico(request.POST, prefix='physical_form')
+        diagnostic_form = diagnostic(request.POST, prefix='diagnostic_form')
+        presumptive_form = presumptive(request.POST, prefix='presumptive_form')
+        if medic.is_valid() and personal_form.is_valid() and personal_fem_form.is_valid() and family_form.is_valid() \
+                and contacto_form.is_valid() and fisico_form.is_valid() and diagnostic_form.is_valid() \
+                and presumptive_form.is_valid():
+            nuevo = medic.save(commit=False)
+            tiempo = request.POST['hora']
+            nuevo.date = "%s %s" % (nuevo.date.date(), tiempo)
+            nuevo.live = True
+            nuevo.save()
+            for form in personal_form.forms:
+                control_save(form, nuevo)
+            for form in personal_fem_form.forms:
+                control_save(form, nuevo)
+            for form in family_form.forms:
+                control_save(form, nuevo)
+            for form in contacto_form.forms:
+                control_save(form, nuevo)
+            for form in fisico_form.forms:
+                control_save(form, nuevo)
+            for form in diagnostic_form:
+                control_save(form, nuevo)
+            for form in presumptive_form.forms:
+                control_save(form, nuevo)
         else:
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
-            context = {'action': self.action, 'course_form': course_form, 'title': self.title,
-                       'breadCrumbEntries': self.breadCrumbEntries}
+            context = {'action': self.action, 'medic_form': medic, 'title': self.title, 'formset': personal_form,
+                       'breadCrumbEntries': self.breadCrumbEntries, 'personalFemForm': personal_fem_form,
+                       'familyform': family_form, 'contacto_form': contacto_form, 'fisico_form': fisico_form,
+                       'diagnostic_form': diagnostic_form, 'presumptive_form': presumptive_form}
             return render_to_response(self.template_name, RequestContext(request, context))
+        return redirect_view(MedicRecordListView, request)
 
 
 class UserLista(View):
@@ -3524,3 +3539,137 @@ class Cie10Lista(View):
         data = json.dumps(results)
         mimetype = 'application/json'
         return HttpResponse(data, mimetype)
+
+
+class MedicRecordListView(TemplateView):
+    title = 'Historia Clínica'
+    template_name = 'medic_list.html'
+    action = 'LIST'
+    breadCrumbEntries = (
+        BreadCrumb("Bienvenido", "/welcome/"), BreadCrumb("Listado de Consultas", "/medic/"))
+
+    def get_context_data(self, **kwargs):
+        context = super(MedicRecordListView, self).get_context_data(**kwargs)
+        context['title'] = self.title
+        context['breadCrumbEntries'] = self.breadCrumbEntries
+        return context
+
+
+class MedicRecordListData(View):
+    def get(self, request, *args, **kwargs):
+        locale.setlocale(locale.LC_ALL, '')
+        array = []
+        records = SigiaMedicrecord.objects.all().order_by('id')
+        for record in records:
+            std = {'id': record.id,
+                   'name': "%s %s" % (record.id_patient.last_name, record.id_patient.first_name),
+                   'date': "%s" % record.date.strftime("%d de %B de %Y a las %H:%M"),
+                   'actual': record.actual_problem}
+            array.append(std)
+        return JsonResponse(array, safe=False)
+
+
+class MedicRecordDeleteView(View):
+    redirect_url = '/medic/'
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(MedicRecordDeleteView, cls).as_view(**initkwargs)
+        return login_required(view, "/")
+
+    def post(self, request, *args, **kwargs):
+        id_register = kwargs['pk']
+        register = SigiaMedicrecord.objects.get(id=id_register)
+        SigiaMedicPersonalBackground.objects.filter(id_sigia_medic_record=register).update(live=False)
+        SigiaMedicFamilyBackground.objects.filter(id_sigia_medic_record=register).update(live=False)
+        SigiaMedicContact.objects.filter(id_sigia_medic_record=register).update(live=False)
+        SigiaMedicPhysicalExam.objects.filter(id_sigia_medic_record=register).update(live=False)
+        SigiaMedicDiagnosticPlan.objects.filter(id_sigia_medic_record=register).update(live=False)
+        SigiaMedicDiagnosticPresumptive.objects.filter(id_sigia_medic_record=register).update(live=False)
+        register.delete()
+        message = 'Se ha eliminado correctamente el registro.'
+        messages.add_message(request, messages.SUCCESS, message)
+        return redirect_view(MedicRecordListView, request)
+
+
+class MedicRecordUpdateView(View):
+    title = 'Actualizar Historia Clínica'
+    template_name = 'medic_form.html'
+    action = 'UPGRADE'
+    breadCrumbEntries = (
+        BreadCrumb("Bienvenido", "/welcome/"), BreadCrumb("Listado de Consultas", "/medic/"))
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(MedicRecordUpdateView, cls).as_view(**initkwargs)
+        return login_required(view, "/")
+
+    def get(self, request, *args, **kwargs):
+        id_register = kwargs['pk']
+        self.breadCrumbEntries += (BreadCrumb("Actualizar Historial", "/medic/%s/upgrade/" % id_register),)
+        register = SigiaMedicrecord.objects.get(id=id_register)
+        fecha = register.date.date()
+        hora = "%s:%s:%s" % (register.date.hour, register.date.minute, register.date.second)
+        medic = CreateMedicRecordForm(prefix="medico", instance=register)
+        personal_query = register.personal_background.filter(id__range=[1, 24]).all()
+        personal_fem_query = register.personal_background.filter(id__range=[25, 41]).all()
+        personal_form = personal(prefix='personal_form', instance=register, queryset=personal_query)
+        personal_fem_form = personal_fem(prefix='persona_fem_form', instance=register, queryset=personal_fem_query)
+        family_form = family(prefix='family_form', instance=register)
+        contacto_form = contacto(prefix='contacto_form', instance=register)
+        fisico_form = fisico(prefix='physical_form', instance=register)
+        diagnostic_form = diagnostic(prefix='diagnostic_form', instance=register)
+        presumptive_form = presumptive(prefix='presumptive_form', instance=register)
+        context = {'action': self.action, 'medic_form': medic, 'title': self.title, 'formset': personal_form,
+                   'breadCrumbEntries': self.breadCrumbEntries, 'personalFemForm': personal_fem_form,
+                   'familyform': family_form, 'contacto_form': contacto_form, 'fisico_form': fisico_form,
+                   'diagnostic_form': diagnostic_form, 'presumptive_form': presumptive_form, "date1": fecha,
+                   "hour": hora, "registro_id": register.id, "registro": register}
+        return render_to_response(self.template_name, RequestContext(request, context))
+
+    def post(self, request, *args, **kwargs):
+        id_register = kwargs['pk']
+        self.breadCrumbEntries += (BreadCrumb("Actualizar Historial", "/medic/%s/upgrade/" % id_register),)
+        registro = SigiaMedicrecord.objects.get(id=id_register)
+        fecha = registro.date.date()
+        hora = "%s:%s:%s" % (registro.date.hour, registro.date.minute, registro.date.second)
+        medic = CreateMedicRecordForm(request.POST, prefix="medico", instance=registro)
+        personal_form = personal(request.POST, prefix='personal_form', instance=registro)
+        personal_fem_form = personal_fem(request.POST, prefix='persona_fem_form', instance=registro)
+        family_form = family(request.POST, prefix='family_form', instance=registro)
+        contacto_form = contacto(request.POST, prefix='contacto_form', instance=registro)
+        fisico_form = fisico(request.POST, prefix='physical_form', instance=registro)
+        diagnostic_form = diagnostic(request.POST, prefix='diagnostic_form', instance=registro)
+        presumptive_form = presumptive(request.POST, prefix='presumptive_form', instance=registro)
+        if medic.is_valid() and personal_form.is_valid() and personal_fem_form.is_valid() and family_form.is_valid() \
+                and contacto_form.is_valid() and fisico_form.is_valid() and diagnostic_form.is_valid() \
+                and presumptive_form.is_valid():
+            nuevo = medic.save(commit=False)
+            tiempo = request.POST['hora']
+            nuevo.date = "%s %s" % (nuevo.date.date(), tiempo)
+            nuevo.live = True
+            nuevo.save()
+            for form in personal_form.forms:
+                control_save_update(form, nuevo)
+            for form in personal_fem_form.forms:
+                control_save_update(form, nuevo)
+            for form in family_form.forms:
+                control_save_update(form, nuevo)
+            for form in contacto_form.forms:
+                control_save_update(form, nuevo)
+            for form in fisico_form.forms:
+                control_save_update(form, nuevo)
+            for form in diagnostic_form:
+                control_save_update(form, nuevo)
+            for form in presumptive_form.forms:
+                control_save_update(form, nuevo)
+        else:
+            message = 'Por favor corrija los errores en el formulario'
+            messages.add_message(request, messages.ERROR, message)
+            context = {'action': self.action, 'medic_form': medic, 'title': self.title, 'formset': personal_form,
+                       'breadCrumbEntries': self.breadCrumbEntries, 'personalFemForm': personal_fem_form,
+                       'familyform': family_form, 'contacto_form': contacto_form, 'fisico_form': fisico_form,
+                       'diagnostic_form': diagnostic_form, 'presumptive_form': presumptive_form, "date1": fecha,
+                       "hour": hora, "registro_id": registro.id, "registro": registro}
+            return render_to_response(self.template_name, RequestContext(request, context))
+        return redirect_view(MedicRecordListView, request)

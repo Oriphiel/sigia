@@ -8472,7 +8472,7 @@ Property_Value_Usage_ID,Valid_Property_Value_ID,Property_Usage_ID,Value_Override
 32,216,32,NULL,0,NULL,1343,0
 33,345,33,MySQL 5.x (system),0,NULL,2550,0
 34,343,34,"<?xml version=""1.0"" encoding=""UTF-8"" standalone=""no"" ?>
-<DataTypeMapping xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xsi:noNamespaceSchemaLocation=""C:\users\Public\Application Data\Embarcadero\ERStudio_8.0\DatatypeMapping\DataTypeMapping.xsd"">
+<DataTypeMapping xmlns:xsi=""http://www.w3.org/2001/XMLSchema-self"" xsi:noNamespaceSchemaLocation=""C:\users\Public\Application Data\Embarcadero\ERStudio_8.0\DatatypeMapping\DataTypeMapping.xsd"">
 
   <DBPlatform MappingName=""MySQL 5.x (system)"" PlatformId=""73"">
     <DataType DatatypeId=""1"" DatatypeName=""BINARY"" Identity="""" Scale=""-1"" ShortName=""BIN"" ShowScale=""false"" ShowType=""true"" ShowWidth=""true"" Undefined=""true"" Width=""10""/>

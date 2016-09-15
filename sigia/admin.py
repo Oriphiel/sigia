@@ -1,7 +1,7 @@
 from django.contrib import admin
 from sigia.models import UserProfile, Student, Teacher, Career, Course, Matter,\
     Enrollment, Studies, Country, Province, Canton, Parish, Period, PaymentOrder,\
-    BugReport, EventType, StudentEvent, Institution
+    BugReport, EventType, StudentEvent, Institution, EthnicGroup, SigiaMedicalCenter
 
 admin.site.register(UserProfile)
 admin.site.register(Student)
@@ -21,3 +21,5 @@ admin.site.register(BugReport)
 admin.site.register(EventType)
 admin.site.register(StudentEvent)
 admin.site.register(Institution)
+admin.site.register(EthnicGroup)
+admin.site.register(SigiaMedicalCenter)

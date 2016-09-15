@@ -100,3 +100,35 @@ def cedula_valida(cedula):
         d10 = 0
 
     return d10 == int(cedula[9])
+
+
+def control_save(form, nuevo):
+    temporal = form.save(commit=False)
+    try:
+        if len(temporal.detail_background) > 0:
+            temporal.id_sigia_medic_record = nuevo
+            temporal.live = True
+            temporal.save()
+        else:
+            pass
+    except AttributeError as e:
+        temporal.id_sigia_medic_record = nuevo
+        temporal.live = True
+        temporal.save()
+
+
+def control_save_update(form, nuevo):
+    temporal = form.save(commit=False)
+    try:
+        if form.cleaned_data.get('DELETE'):
+            temporal.delete()
+            return
+        if len(temporal.detail_background) > 0:
+            temporal.id_sigia_medic_record = nuevo
+            temporal.live = True
+            temporal.save()
+        else:
+            pass
+    except AttributeError as e:
+        print e
+        temporal.save()

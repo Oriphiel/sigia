@@ -20,7 +20,7 @@ from django.utils import timezone
 class Command(BaseCommand):
     args = '<none>'
     help = 'our help string comes here franklin'
-    user = User.objects.get(username='franklin')
+    user = User.objects.get(username='ahaas')
     date = timezone.now()
 
     def _create_personal_background(self):
@@ -64,7 +64,7 @@ class Command(BaseCommand):
         lista = []
         lista_detalle2 = ['BIOMETRÍA', 'UROANALISIS', 'QUÍMICA BAN..', 'ELECTROLITOS', 'GASOMETRÍA',
                           'ELECTRO CARDIOGRAMA', 'ENDOSCOPIA', 'R-X TÓRAX', 'R-X ABDOMEN', 'R-X ÓSEA', 'TOMOGRAFÍA',
-                          'RESONANCIA', 'ECOGRAFÍA PÉLVICA', 'ECOGRAFÍA ABDOMEN', 'INTERCONSULTA', 'OTROS']
+                          'RESONANCIA', 'ECOGRAFÍA PÉLVICA', 'ECOGRAFÍA ABDOMEN', 'INTERCONSULTA', 'OTROS', 'NO APLICA']
         for detalle in lista_detalle2:
             lista.append(SigiaMedicDiagnosticPlanDetail(detail=detalle, created=self.date, modified=self.date,
                                                         created_by=self.user, modified_by=self.user))
@@ -81,8 +81,8 @@ class Command(BaseCommand):
         SigiaMedicCie10.objects.bulk_create(lista)
 
     def handle(self, *args, **options):
-        # self._create_personal_background()
-        # self._create_family_background()
-        # self._create_physical_background()
-        # self._create_diagnostic_background()
+        self._create_personal_background()
+        self._create_family_background()
+        self._create_physical_background()
+        self._create_diagnostic_background()
         self._create_cie10_rows()

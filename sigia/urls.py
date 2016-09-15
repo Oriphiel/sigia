@@ -34,7 +34,7 @@ from views import LoginView, WelcomeView, LogoutView, StudentCreateView, Student
     StudiesDeleteView, StudiesUpdateView, ReportView, EventsGroupListView, EventsGroupCreateView, EventsGroupListData, \
     EventsGroupDeleteView, EventsGroupUpdateView, AssignEventsGroupToStudentView, EventsGroupOfStudentView, \
     EmailBulkListView, TeachersAndAdminsListData, SendEmailView, SendWelcomeEmailView, MedicRecordCreateView, UserLista, \
-    Cie10Lista
+    Cie10Lista, MedicRecordListData, MedicRecordListView, MedicRecordDeleteView, MedicRecordUpdateView
 
 urlpatterns = [
     # Examples:
@@ -208,8 +208,11 @@ urlpatterns = [
     url(r'^static/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': os.path.join(BASE_DIR, 'static'),
          'show_indexes': True}),
-
-    url(r'^hola/$', MedicRecordCreateView.as_view()),
+    url(r'^medic/$', MedicRecordListView.as_view()),
+    url(r'^medic/new/$', MedicRecordCreateView.as_view()),
+    url(r'^medic/api/list/$', MedicRecordListData.as_view()),
+    url(r'^medic/(?P<pk>[^/]+)/delete/$', MedicRecordDeleteView.as_view()),
+    url(r'^medic/(?P<pk>[^/]+)/upgrade/$', MedicRecordUpdateView.as_view()),
     url(r'^api/medic/cie10/$', Cie10Lista.as_view()),
     url(r'^user/api/lista/$', UserLista.as_view()),
 ]
