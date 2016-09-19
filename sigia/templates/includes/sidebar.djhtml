@@ -149,6 +149,8 @@
                 <li><a class="ajax-link" href="/under_construction/">Acerca de SIGIA</a></li>
                 <li><a class="ajax-link" href="/medic/new/">Nueva historia</a></li>
                 <li><a class="ajax-link" href="/medic/">Historiales medicos</a></li>
+                <li><a class="ajax-link" href="/medic/patient/new/">Nuevo Paciente</a></li>
+                <li><a class="ajax-link" href="/medic/patient/">Lista de Pacientes</a></li>
             </ul>
         </li>
     </ul>

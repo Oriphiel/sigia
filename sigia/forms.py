@@ -136,6 +136,16 @@ class EventGroupForm(forms.ModelForm):
 class UserPersonalInfoForm(forms.ModelForm):
     nationality = NationalityModelChoiceField(widget=forms.Select(attrs={'class': 'form-control', }),
                                               queryset=Country.objects.all(), label="Nacionalidad")
+    birthplace_province = ModelChoiceField(widget=forms.Select(attrs={'class': 'form-control'}),
+                                           queryset=Province.objects.all())
+    birthplace_canton = ModelChoiceField(widget=forms.Select(attrs={'class': 'form-control'}),
+                                         queryset=Canton.objects.all())
+    birthplace_parish = ModelChoiceField(widget=forms.Select(attrs={'class': 'form-control'}),
+                                         queryset=Parish.objects.all())
+    address_canton = ModelChoiceField(widget=forms.Select(attrs={'class': 'form-control'}),
+                                      queryset=Canton.objects.all())
+    address_parish = ModelChoiceField(widget=forms.Select(attrs={'class': 'form-control'}),
+                                      queryset=Parish.objects.all())
 
     class Meta:
         model = UserProfile
@@ -278,21 +288,19 @@ class StudentEventForm(forms.ModelForm):
                                    queryset=Group.objects.get(name="secretary").user_set.all().
                                    order_by("last_name", "first_name"))
 
+    class Meta:
+        model = StudentEvent
+        fields = ['type', 'student', 'start_date', 'end_date', 'end_date', 'ini_obs', 'tutor', 'manager']
 
-class Meta:
-    model = StudentEvent
-    fields = ['type', 'student', 'start_date', 'end_date', 'end_date',
-              'ini_obs', 'tutor', 'manager']
-
-    widgets = {
-        'type': Select(attrs={'class': 'form-control', }),
-        'student': Select(attrs={'class': 'form-control', }),
-        'start_date': DateInput(attrs={'class': 'form-control', }),
-        'end_date': DateInput(attrs={'class': 'form-control', }),
-        'ini_obs': Textarea(attrs={'class': 'form-control', }),
-        'tutor': Select(attrs={'class': 'form-control', }),
-        'manager': Select(attrs={'class': 'form-control', }),
-    }
+        widgets = {
+            'type': Select(attrs={'class': 'form-control', }),
+            'student': Select(attrs={'class': 'form-control', }),
+            'start_date': DateInput(attrs={'class': 'form-control', }),
+            'end_date': DateInput(attrs={'class': 'form-control', }),
+            'ini_obs': Textarea(attrs={'class': 'form-control', }),
+            'tutor': Select(attrs={'class': 'form-control', }),
+            'manager': Select(attrs={'class': 'form-control', }),
+        }
 
 
 class EthnicGroupForm(forms.ModelForm):

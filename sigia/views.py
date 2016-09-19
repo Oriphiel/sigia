@@ -23,6 +23,7 @@ from sigia.forms import LoginForm, UserForm, UserPersonalInfoForm, \
     ParishForm, ReducedStudentForm, ContactForm, TeacherForm, EventTypeForm, \
     StudentEventForm, StudiesForm, EventGroupForm, EmailForm, InstitutionForm, CreateMedicRecordForm, personal, \
     personal_fem, family, contacto, fisico, diagnostic, presumptive
+from django.contrib.auth.models import Group
 from django.views.generic.base import TemplateView
 from sigia.models import Student, UserProfile, Career, Course, Enrollment, \
     Period, PaymentOrder, Province, Canton, Parish, EthnicGroup, BugReport, \
@@ -44,20 +45,14 @@ from sigia.utils import BreadCrumb, convert_enrrollment_type_to_payment_concept,
     chunks, send_emails, control_save, control_save_update
 from roman import fromRoman, toRoman
 from django.db.models import Q
-from cProfile import Profile
-from django.db.transaction import commit
 from django.views.decorators.gzip import gzip_page
-from datetime import datetime
 import pytz
-from django.utils.formats import date_format
 from django.db import connections
 from django.core.mail import get_connection, EmailMultiAlternatives, \
     send_mass_mail
 import re
 from bs4 import BeautifulSoup
 from django.template.loader import render_to_string
-from django.core.mail.message import EmailMessage
-from time import sleep
 import threading
 
 empty_over_none = lambda x: x == None and '' or x
@@ -3673,3 +3668,158 @@ class MedicRecordUpdateView(View):
                        "hour": hora, "registro_id": registro.id, "registro": registro}
             return render_to_response(self.template_name, RequestContext(request, context))
         return redirect_view(MedicRecordListView, request)
+
+
+class MedicPatientCreateView(View):
+    title = 'Registrar Paciente'
+    template_name = 'medic_patient.html'
+    breadCrumbEntries = (BreadCrumb("Bienvenido", "/welcome/"), BreadCrumb("Listado de pacientes", "/medic/patient/"),
+                         BreadCrumb("Registrar Paciente", "/medic/patient/new/"))
+    action = 'CREATE'
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(MedicPatientCreateView, cls).as_view(**initkwargs)
+        return login_required(view, "/")
+
+    def get(self, request, *args, **kwargs):
+        user_form = UserForm()
+        personal_info_form = UserPersonalInfoForm()
+        context = {'action': self.action, 'user_form': user_form, 'personal_info_form': personal_info_form,
+                   'title': self.title, 'breadCrumbEntries': self.breadCrumbEntries}
+        if not request.user.is_authenticated():
+            captcha_form = CaptchaForm()
+            context['captcha_form'] = captcha_form
+        return render_to_response(self.template_name, RequestContext(request, context))
+
+    def post(self, request, *args, **kwargs):
+        user_form = UserForm(request.POST)
+        personal_info_form = UserPersonalInfoForm(request.POST, request.FILES)
+        captcha_form = CaptchaForm(request.POST)
+        if user_form.is_valid() and personal_info_form.is_valid():
+            if not request.user.is_authenticated():
+                if not captcha_form.is_valid():
+                    message = 'Corrija el captcha antes de enviar el formulario.'
+                    messages.add_message(request, messages.ERROR, message)
+                    context = {'action': self.action, 'user_form': user_form, 'personal_info_form': personal_info_form,
+                               'captcha_form': captcha_form, 'title': self.title,
+                               'breadCrumbEntries': self.breadCrumbEntries}
+                    return render_to_response(self.template_name, RequestContext(request, context))
+            user = user_form.save()
+            userprofile = personal_info_form.save(commit=False)
+            userprofile.user = user
+            if not request.user.is_authenticated():
+                user.is_active = False
+            else:
+                user.is_active = True
+            userprofile.live = True
+            grupo, created = Group.objects.get_or_create(name="paciente")
+            user.groups.add(grupo)
+            user.save()
+            userprofile.save()
+            message = 'Se ha añadido correctamente al paciente %s %s.' % (user.first_name, user.last_name)
+            messages.add_message(request, messages.SUCCESS, message)
+            return redirect_view(MedicPatientListView, request)
+        else:
+            message = 'Por favor corrija los errores en el formulario'
+            messages.add_message(request, messages.ERROR, message)
+
+            context = {'action': self.action, 'user_form': user_form, 'personal_info_form': personal_info_form,
+                       'captcha_form': captcha_form, 'title': self.title, 'breadCrumbEntries': self.breadCrumbEntries}
+
+            return render_to_response(self.template_name, RequestContext(request, context))
+
+
+class MedicPatientListView(TemplateView):
+    title = 'Listado de pacientes'
+    template_name = 'medic_patient_list.html'
+    action = 'LIST'
+    breadCrumbEntries = (
+        BreadCrumb("Bienvenido", "/welcome/"), BreadCrumb("Listado de pacientes", "/medic/patient/"))
+
+    def get_context_data(self, **kwargs):
+        context = super(MedicPatientListView, self).get_context_data(**kwargs)
+        context['title'] = self.title
+        context['breadCrumbEntries'] = self.breadCrumbEntries
+        return context
+
+
+class MedicPatientListData(View):
+    def get(self, request, *args, **kwargs):
+        locale.setlocale(locale.LC_ALL, '')
+        array = []
+        records = Group.objects.get(name="paciente").user_set.filter(is_active=True).all()
+        for record in records:
+            std = {'id': record.id,
+                   'name': "%s %s" % (record.last_name, record.first_name),
+                   'date': "%s" % record.date_joined.strftime("%d de %B de %Y a las %H:%M")}
+            array.append(std)
+        return JsonResponse(array, safe=False)
+
+
+class MedicPatientUpdateView(View):
+    title = 'Actualizar Paciente'
+    template_name = 'medic_patient.html'
+    action = 'UPGRADE'
+    breadCrumbEntries = (BreadCrumb("Bienvenido", "/welcome/"),  BreadCrumb("Listado de pacientes", "/medic/patient/"))
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(MedicPatientUpdateView, cls).as_view(**initkwargs)
+        return login_required(view, "/")
+
+    def get(self, request, *args, **kwargs):
+        id_patient = kwargs['pk']
+        self.breadCrumbEntries += (BreadCrumb("Actualizar Paciente", "/medic/patient/%s/upgrade/" % id_patient),)
+        user = User.objects.get(id=id_patient)
+        profile = user.profile
+        user_form = UserForm(instance=user)
+        personal_info_form = UserPersonalInfoForm(instance=profile)
+
+        context = {'action': self.action, 'user_form': user_form, 'id_patient': id_patient,
+                   'personal_info_form': personal_info_form, 'title': self.title,
+                   'breadCrumbEntries': self.breadCrumbEntries}
+
+        return render_to_response(self.template_name, RequestContext(request, context))
+
+    def post(self, request, *args, **kwargs):
+        id_patient = kwargs['pk']
+        self.breadCrumbEntries += (BreadCrumb("Actualizar Paciente", "/medic/patient/%s/upgrade/" % id_patient),)
+        user = User.objects.get(id=id_patient)
+        profile = user.profile
+
+        user_form = UserForm(request.POST, instance=user)
+        personal_info_form = UserPersonalInfoForm(request.POST, request.FILES, instance=profile)
+
+        if user_form.is_valid() and personal_info_form.is_valid():
+            user_form.save()
+            personal_info_form.save()
+            message = 'Se ha actualizado correctamente al paciente %s %s.' % (user.first_name, user.last_name)
+            messages.add_message(request, messages.SUCCESS, message)
+            return redirect_view(MedicPatientListView, request)
+        else:
+            message = 'Por favor corrija los errores en el formulario'
+            messages.add_message(request, messages.ERROR, message)
+            context = {'action': self.action, 'user_form': user_form, 'id_student': id_patient,
+                       'personal_info_form': personal_info_form, 'title': self.title,
+                       'breadCrumbEntries': self.breadCrumbEntries}
+        return render_to_response(self.template_name, RequestContext(request, context))
+
+
+class MedicPatientDeleteView(View):
+    redirect_url = '/medic/patient/'
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(MedicPatientDeleteView, cls).as_view(**initkwargs)
+        return login_required(view, "/")
+
+    def post(self, request, *args, **kwargs):
+        id_register = kwargs['pk']
+        register = User.objects.get(id=id_register)
+        register.profile.delete()
+        register.is_active = False
+        register.save()
+        message = 'Se ha eliminado correctamente el registro.'
+        messages.add_message(request, messages.SUCCESS, message)
+        return redirect_view(MedicPatientListView, request)

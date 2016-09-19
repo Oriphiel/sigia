@@ -232,7 +232,7 @@ class UserProfile(LiveModel, TimeStampedModel, AuthStampedModel):
     birth_cert_img = models.ImageField(upload_to='birth_cert_img', null=True, blank=True,
                                        verbose_name="partida de nacimiento")
     disability = models.NullBooleanField(default=False, null=True, verbose_name="discapacidad")
-    disability_percent = models.IntegerField(default=0, verbose_name="porcentaje de discapacidad")
+    disability_percent = models.IntegerField(default=0, null=True, verbose_name="porcentaje de discapacidad")
     disability_id = models.CharField(max_length=20, null=True, blank=True, verbose_name="no. de carnet")
     ethnic_group = models.ForeignKey(EthnicGroup, null=True, related_name='ethnic_group', verbose_name="grupo étnico")
     email_confirmed = models.NullBooleanField(default=False, null=True, verbose_name="correo electrónico confirmado")
@@ -835,7 +835,7 @@ class SigiaMedicDiagnosticPresumptive(LiveModel, TimeStampedModel, AuthStampedMo
 
 
 def user_directory_path(instance, filename):
-    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    # file will be uploaded to MEDIA_ROOT/medicCenter_<id>/<filename>
     return 'medicCenter_{0}/{1}'.format(instance.id, filename)
 
 
