@@ -1,0 +1,115 @@
+{% extends 'ajax-content.djhtml' %}
+{% block styles %}
+    <style type="text/css">
+        select.form-control {
+            -webkit-appearance: menulist;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <h1 class="page-header">{{ title }} </h1>
+    <div class="box">
+        <div class="box-content" style="display: block;">
+
+            <blockquote>
+                {% if action == 'CREATE' %}
+                    Por favor llene los datos de la cita
+                {% else %}
+                    Puede editar los datos de la cita
+                {% endif %}
+            </blockquote>
+
+            <form id="medicoform" class="form-horizontal" method="post" enctype="multipart/form-data">{% csrf_token %}
+                <div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+                    <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all"
+                        role="tablist">
+                        <li class="ui-state-default ui-corner-top ui-tabs-active ui-state-active" role="tab"
+                            tabindex="0" aria-controls="tabs-1" aria-labelledby="ui-id-4" aria-selected="true"><a
+                                href="#tabs-1" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-4">REGISTRO
+                            DE CITA</a></li>
+                    </ul>
+                    <div id="tabs-1" aria-labelledby="ui-id-4" class="ui-tabs-panel ui-widget-content ui-corner-bottom"
+                         role="tabpanel" aria-expanded="true" aria-hidden="false">
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <label for="{{ user_form.id_patient.auto_id }}"
+                                           class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ user_form.id_patient.label }}</label>
+                                    {% if user_form.id_patient.errors %}
+                                        <label class="error" data-toggle="tooltip" data-placement="top"
+                                               title='{{ user_form.id_patient.errors.as_text }}'>*</label>
+                                    {% endif %}
+                                    <div class="col-sm-9 col-md-9 col-lg-9">
+                                        {{ user_form.id_patient }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2 col-md-2 col-lg-2"
+                                           for="{{ user_form.description.auto_id }}">{{ user_form.description.label }}</label>
+                                    <div class="col-sm-9 col-md-9 col-lg-9">
+                                        {{ user_form.description }}
+                                    </div>
+                                    {% if user_form.description.errors %}
+                                        <label class="error" data-toggle="tooltip" data-placement="top"
+                                               title='{{ user_form.description.errors.as_text }}'>*</label>
+                                    {% endif %}
+                                </div>
+                                <div class="form-group">
+                                    <label for="date1" class="control-label co2-sm-2 col-md-2 col-lg-2">Fecha</label>
+                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                        {{ user_form.date }}
+                                    </div>
+                                    <label for="time1" class="control-label col-sm-2 col-md-2 col-lg-2">Hora</label>
+                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                        <input type="time" class="form-control" id="time1" required name="hora">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-2 col-md-2 col-lg-2"
+                                       for="{{ user_form.done.auto_id }}">{{ user_form.done.label }}</label>
+                                <div class="col-sm-2 col-md-2 col-lg-2">
+                                    {{ user_form.done }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-lg-11 col-xs-11 col-md-11 col-sm-11">
+                                    <input class="btn btn-primary pull-right" type="button"
+                                            {% if action == 'CREATE' %} value="Registrar Cita"{% else %}
+                                           value="Actualizar Cita" {% endif %}
+                                           id="formulario"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_scripts %}
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-select.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="{{ STATIC_URL }}js/bootstrap-select.min.js"></script>
+    <script src="{{ STATIC_URL }}js/jquery.formset.js"></script>
+    <script>
+        {% if action == 'CREATE' %}
+            $('#formulario').click(function () {
+                $('#medicoform')[0].action = "/medic/appointment/new/";
+                PostAndLoadAjaxContent($('#medicoform'));
+            });
+        {% else %}
+            $('#formulario').click(function () {
+                $('#medicoform')[0].action = "/medic/appointment/" + {{ registro_id }} +"/upgrade/";
+                PostAndLoadAjaxContent($('#medicoform'));
+            });
+            $('#id_date').val("{{ registro.date|date:"Y-m-d"}}");
+            $('#time1').val("{{ registro.date|time:"H:i:s"}}");
+        {% endif %}
+        $('.id_paciente').selectpicker();
+        $('.id_paciente').selectpicker('render');
+    </script>
+{% endblock %}

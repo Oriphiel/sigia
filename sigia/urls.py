@@ -1,9 +1,11 @@
+import django
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic.base import RedirectView
 from django.views.generic import TemplateView
+from django.views.static import serve
 from sigia.settings import BASE_DIR
 import os
 
@@ -35,7 +37,9 @@ from views import LoginView, WelcomeView, LogoutView, StudentCreateView, Student
     EventsGroupDeleteView, EventsGroupUpdateView, AssignEventsGroupToStudentView, EventsGroupOfStudentView, \
     EmailBulkListView, TeachersAndAdminsListData, SendEmailView, SendWelcomeEmailView, MedicRecordCreateView, UserLista, \
     Cie10Lista, MedicRecordListData, MedicRecordListView, MedicRecordDeleteView, MedicRecordUpdateView, \
-    MedicPatientCreateView, MedicPatientListData, MedicPatientListView, MedicPatientUpdateView, MedicPatientDeleteView
+    MedicPatientCreateView, MedicPatientListData, MedicPatientListView, MedicPatientUpdateView, MedicPatientDeleteView, \
+    MedicAppointmentListView, MedicAppointmentListData, MedicAppointmentCreateView, MedicAppointmentUpdateView, \
+    MedicAppointmentDeleteView, MedicAppointmentRealize
 
 urlpatterns = [
     # Examples:
@@ -203,22 +207,29 @@ urlpatterns = [
     url(r'^contact/$', TemplateView.as_view(template_name='contact.djhtml')),
     url(r'^not_implemented/$', TemplateView.as_view(template_name='not_implemented.djhtml')),
 
-    url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
+    url(r'^media/(?P<path>.*)$', django.views.static.serve,
         {'document_root': os.path.join(BASE_DIR, 'media'),
          'show_indexes': True}),
-    url(r'^static/(?P<path>.*)$', 'django.views.static.serve',
+    url(r'^static/(?P<path>.*)$', django.views.static.serve,
         {'document_root': os.path.join(BASE_DIR, 'static'),
          'show_indexes': True}),
     url(r'^medic/$', MedicRecordListView.as_view()),
     url(r'^medic/new/$', MedicRecordCreateView.as_view()),
+    url(r'^medic/new/(?P<pk>[^/]+)/$', MedicRecordCreateView.as_view()),
     url(r'^medic/(?P<pk>[^/]+)/delete/$', MedicRecordDeleteView.as_view()),
     url(r'^medic/(?P<pk>[^/]+)/upgrade/$', MedicRecordUpdateView.as_view()),
+    url(r'^medic/appointment/$', MedicAppointmentListView.as_view()),
+    url(r'^medic/appointment/new/$', MedicAppointmentCreateView.as_view()),
+    url(r'^medic/appointment/(?P<pk>[^/]+)/upgrade/$', MedicAppointmentUpdateView.as_view()),
+    url(r'^medic/appointment/(?P<pk>[^/]+)/delete/$', MedicAppointmentDeleteView.as_view()),
+    url(r'^medic/appointment/(?P<pk>[^/]+)/realize/$', MedicAppointmentRealize.as_view()),
     url(r'^medic/patient/$', MedicPatientListView.as_view()),
     url(r'^medic/patient/(?P<pk>[^/]+)/upgrade/$', MedicPatientUpdateView.as_view()),
     url(r'^medic/patient/(?P<pk>[^/]+)/delete/$', MedicPatientDeleteView.as_view()),
     url(r'^medic/patient/new/$', MedicPatientCreateView.as_view()),
     url(r'^medic/api/list/$', MedicRecordListData.as_view()),
     url(r'^medic/api/list/patient/$', MedicPatientListData.as_view()),
+    url(r'^medic/api/list/appointment/$', MedicAppointmentListData.as_view()),
     url(r'^api/medic/cie10/$', Cie10Lista.as_view()),
     url(r'^user/api/lista/$', UserLista.as_view()),
 ]

@@ -219,7 +219,8 @@
                                 <div class="form-group">
                                     <div class="col-lg-11 col-xs-11 col-md-11 col-sm-11">
                                         <input class="btn btn-primary pull-right" type="button"
-                                               value="Registrar Paciente"
+                                                {% if action == 'CREATE' %} value="Registrar Paciente"{% else %}
+                                               value="Actualizar Paciente" {% endif %}
                                                id="formulario"/>
                                     </div>
                                 </div>
@@ -568,10 +569,10 @@
                 $('#medicoform')[0].action = "/medic/" + {{ registro_id }} +"/upgrade/";
                 PostAndLoadAjaxContent($('#medicoform'));
             });
-            $('#id_medico-id_patient').change();
             $('#id_medico-date').val("{{ registro.date|date:"Y-m-d"}}");
             $('#time1').val("{{ registro.date|time:"H:i:s"}}");
         {% endif %}
+        $('#id_medico-id_patient').change();
     </script>
     <style>
         .add-row {

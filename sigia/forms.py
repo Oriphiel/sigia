@@ -16,7 +16,7 @@ from sigia.models import UserProfile, Teacher, Career, Course, Matter, Studies, 
     SigiaMedicFamilyBackgroundDetail, SigiaMedicPersonalBackground, SigiaMedicPersonalBackgroundDetail, \
     SigiaMedicrecord, \
     SigiaMedicPhysicalExam, SigiaMedicPhysicalExamDetail, SigiaMedicDiagnosticPlan, SigiaMedicDiagnosticPlanDetail, \
-    SigiaMedicDiagnosticPresumptive, SigiaMedicCie10, SigiaMedicalCenter
+    SigiaMedicDiagnosticPresumptive, SigiaMedicCie10, SigiaMedicalCenter, SigiaMedicAppointment
 from django.contrib.auth.models import User, Group
 from captcha.fields import CaptchaField
 from django.forms.widgets import TextInput, EmailInput, \
@@ -650,7 +650,9 @@ class UpdateEnrollmentForm(forms.ModelForm):
 class CreateMedicRecordForm(forms.ModelForm):
     id_patient = UserModelChoiceField(
         widget=forms.Select(attrs={'class': 'form-control selectpicker id_paciente', 'data-live-search': "true"}),
-        queryset=User.objects.all().order_by("last_name", "first_name"), label="Paciente")
+        queryset=Group.objects.get(name="paciente").user_set.filter(is_active=True).all().order_by("last_name",
+                                                                                                   "first_name"),
+        label="Paciente")
 
     class Meta:
         model = SigiaMedicrecord
@@ -693,7 +695,7 @@ class CreateMedicRecordForm(forms.ModelForm):
                 attrs={'class': 'form-control', 'type': 'number', 'placeholder': 'm', 'step': "0.01", 'min': '0'}),
             'imc': TextInput(attrs={'class': 'form-control', 'type': 'number'}),
             'p_cephalico': TextInput(attrs={'class': 'form-control', 'type': 'number'}),
-            'date': DateInput(attrs={'class': 'form-control'}),
+            'date': DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         }
 
     def clean_id_patient(self):
@@ -833,6 +835,28 @@ class MedicalCenter(forms.ModelForm):
         exclude = ['live']
         widgets = {
             'report_image': ImageThumbnailFileInput(attrs={'class': 'form-control'})
+        }
+
+
+class PatientAppointment(forms.ModelForm):
+    id_patient = UserModelChoiceField(
+        widget=forms.Select(attrs={'class': 'form-control selectpicker id_paciente', 'data-live-search': "true"}),
+        queryset=Group.objects.get(name="paciente").user_set.filter(is_active=True).all().order_by("last_name",
+                                                                                                   "first_name"),
+        label="Paciente")
+    done = forms.BooleanField(widget=RadioSelect(choices=[(True, 'Si'),
+                                                          (False, 'No')]), label="Cita realizada",
+                              initial=False, required=False)
+
+    class Meta:
+        model = SigiaMedicAppointment
+        exclude = ['live']
+        widgets = {
+            'id_patient': Select(attrs={'class': 'form-control'}),
+            'description': Textarea(attrs={'class': 'form-control', 'rows': '2', 'style': "resize: none",
+                                           'placeholder': 'Escriba una breve descripción de la cita'}),
+            'date': DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'done': Select(attrs={'class': 'form-control'}),
         }
 
 

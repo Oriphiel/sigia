@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 import locale
 from django.utils import timezone
 from django.contrib import auth
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.shortcuts import render
 from django.views.generic import View
@@ -22,7 +22,7 @@ from sigia.forms import LoginForm, UserForm, UserPersonalInfoForm, \
     EthnicGroupForm, BugReportForm, CountryForm, ProvinceForm, CantonForm, \
     ParishForm, ReducedStudentForm, ContactForm, TeacherForm, EventTypeForm, \
     StudentEventForm, StudiesForm, EventGroupForm, EmailForm, InstitutionForm, CreateMedicRecordForm, personal, \
-    personal_fem, family, contacto, fisico, diagnostic, presumptive
+    personal_fem, family, contacto, fisico, diagnostic, presumptive, PatientAppointment
 from django.contrib.auth.models import Group
 from django.views.generic.base import TemplateView
 from sigia.models import Student, UserProfile, Career, Course, Enrollment, \
@@ -30,7 +30,7 @@ from sigia.models import Student, UserProfile, Career, Course, Enrollment, \
     Country, Teacher, EventType, StudentEvent, Studies, EventsGroup, \
     EventsGroupRelation, StudentEventsGroupRelation, EmailLog, Institution, SigiaMedicCie10, SigiaMedicrecord, \
     SigiaMedicPersonalBackground, SigiaMedicFamilyBackground, SigiaMedicContact, SigiaMedicPhysicalExam, \
-    SigiaMedicDiagnosticPlan, SigiaMedicDiagnosticPresumptive
+    SigiaMedicDiagnosticPlan, SigiaMedicDiagnosticPresumptive, SigiaMedicAppointment
 from django.http.response import JsonResponse, HttpResponse, \
     HttpResponseRedirect
 from django.contrib import messages
@@ -3441,7 +3441,7 @@ class MedicRecordCreateView(View):
     action = 'CREATE'
     breadCrumbEntries = (
         BreadCrumb("Bienvenido", "/welcome/"), BreadCrumb("Listado de Consultas", "/medic/"),
-        BreadCrumb("Nueva Consulta", "/new/"))
+        BreadCrumb("Nueva Consulta", "/medic/new/"))
 
     @classmethod
     def as_view(cls, **initkwargs):
@@ -3450,18 +3450,25 @@ class MedicRecordCreateView(View):
 
     def get(self, request, *args, **kwargs):
         medic_form = CreateMedicRecordForm(prefix="medico")
+        try:
+            id_register = kwargs['pk']
+            medic_form.fields["id_patient"].initial = SigiaMedicAppointment.objects.get(id=id_register).id_patient
+        except KeyError as e:
+            print e
         personal_form = personal(prefix='personal_form', queryset=SigiaMedicPersonalBackground.objects.none())
-        personal_fem_form = personal_fem(prefix='persona_fem_form', queryset=SigiaMedicPersonalBackground.objects.none())
+        personal_fem_form = personal_fem(prefix='persona_fem_form',
+                                         queryset=SigiaMedicPersonalBackground.objects.none())
         family_form = family(prefix='family_form', queryset=SigiaMedicFamilyBackground.objects.none())
         contacto_form = contacto(prefix='contacto_form', queryset=SigiaMedicContact.objects.none())
         fisico_form = fisico(prefix='physical_form', queryset=SigiaMedicPhysicalExam.objects.none())
         diagnostic_form = diagnostic(prefix='diagnostic_form', queryset=SigiaMedicDiagnosticPlan.objects.none())
-        presumptive_form = presumptive(prefix='presumptive_form', queryset=SigiaMedicDiagnosticPresumptive.objects.none())
+        presumptive_form = presumptive(prefix='presumptive_form',
+                                       queryset=SigiaMedicDiagnosticPresumptive.objects.none())
         context = {'action': self.action, 'medic_form': medic_form, 'title': self.title, 'formset': personal_form,
                    'breadCrumbEntries': self.breadCrumbEntries, 'personalFemForm': personal_fem_form,
                    'familyform': family_form, 'contacto_form': contacto_form, 'fisico_form': fisico_form,
                    'diagnostic_form': diagnostic_form, 'presumptive_form': presumptive_form}
-        return render_to_response(self.template_name, RequestContext(request, context))
+        return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         medic = CreateMedicRecordForm(request.POST, prefix='medico')
@@ -3501,7 +3508,9 @@ class MedicRecordCreateView(View):
                        'breadCrumbEntries': self.breadCrumbEntries, 'personalFemForm': personal_fem_form,
                        'familyform': family_form, 'contacto_form': contacto_form, 'fisico_form': fisico_form,
                        'diagnostic_form': diagnostic_form, 'presumptive_form': presumptive_form}
-            return render_to_response(self.template_name, RequestContext(request, context))
+            return render(request, self.template_name, context)
+        message = 'Se ha creado correctamente el historial clínico'
+        messages.add_message(request, messages.SUCCESS, message)
         return redirect_view(MedicRecordListView, request)
 
 
@@ -3620,14 +3629,12 @@ class MedicRecordUpdateView(View):
                    'familyform': family_form, 'contacto_form': contacto_form, 'fisico_form': fisico_form,
                    'diagnostic_form': diagnostic_form, 'presumptive_form': presumptive_form, "date1": fecha,
                    "hour": hora, "registro_id": register.id, "registro": register}
-        return render_to_response(self.template_name, RequestContext(request, context))
+        return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         id_register = kwargs['pk']
         self.breadCrumbEntries += (BreadCrumb("Actualizar Historial", "/medic/%s/upgrade/" % id_register),)
         registro = SigiaMedicrecord.objects.get(id=id_register)
-        fecha = registro.date.date()
-        hora = "%s:%s:%s" % (registro.date.hour, registro.date.minute, registro.date.second)
         medic = CreateMedicRecordForm(request.POST, prefix="medico", instance=registro)
         personal_form = personal(request.POST, prefix='personal_form', instance=registro)
         personal_fem_form = personal_fem(request.POST, prefix='persona_fem_form', instance=registro)
@@ -3664,9 +3671,11 @@ class MedicRecordUpdateView(View):
             context = {'action': self.action, 'medic_form': medic, 'title': self.title, 'formset': personal_form,
                        'breadCrumbEntries': self.breadCrumbEntries, 'personalFemForm': personal_fem_form,
                        'familyform': family_form, 'contacto_form': contacto_form, 'fisico_form': fisico_form,
-                       'diagnostic_form': diagnostic_form, 'presumptive_form': presumptive_form, "date1": fecha,
-                       "hour": hora, "registro_id": registro.id, "registro": registro}
-            return render_to_response(self.template_name, RequestContext(request, context))
+                       'diagnostic_form': diagnostic_form, 'presumptive_form': presumptive_form,
+                       "registro_id": registro.id, "registro": registro}
+            return render(request, self.template_name, context)
+        message = 'Se ha actualizado correctamente el historial clínico'
+        messages.add_message(request, messages.SUCCESS, message)
         return redirect_view(MedicRecordListView, request)
 
 
@@ -3690,7 +3699,7 @@ class MedicPatientCreateView(View):
         if not request.user.is_authenticated():
             captcha_form = CaptchaForm()
             context['captcha_form'] = captcha_form
-        return render_to_response(self.template_name, RequestContext(request, context))
+        return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         user_form = UserForm(request.POST)
@@ -3704,7 +3713,7 @@ class MedicPatientCreateView(View):
                     context = {'action': self.action, 'user_form': user_form, 'personal_info_form': personal_info_form,
                                'captcha_form': captcha_form, 'title': self.title,
                                'breadCrumbEntries': self.breadCrumbEntries}
-                    return render_to_response(self.template_name, RequestContext(request, context))
+                    return render(request, self.template_name, context)
             user = user_form.save()
             userprofile = personal_info_form.save(commit=False)
             userprofile.user = user
@@ -3727,7 +3736,7 @@ class MedicPatientCreateView(View):
             context = {'action': self.action, 'user_form': user_form, 'personal_info_form': personal_info_form,
                        'captcha_form': captcha_form, 'title': self.title, 'breadCrumbEntries': self.breadCrumbEntries}
 
-            return render_to_response(self.template_name, RequestContext(request, context))
+            return render(request, self.template_name, context)
 
 
 class MedicPatientListView(TemplateView):
@@ -3761,7 +3770,7 @@ class MedicPatientUpdateView(View):
     title = 'Actualizar Paciente'
     template_name = 'medic_patient.html'
     action = 'UPGRADE'
-    breadCrumbEntries = (BreadCrumb("Bienvenido", "/welcome/"),  BreadCrumb("Listado de pacientes", "/medic/patient/"))
+    breadCrumbEntries = (BreadCrumb("Bienvenido", "/welcome/"), BreadCrumb("Listado de pacientes", "/medic/patient/"))
 
     @classmethod
     def as_view(cls, **initkwargs):
@@ -3780,7 +3789,7 @@ class MedicPatientUpdateView(View):
                    'personal_info_form': personal_info_form, 'title': self.title,
                    'breadCrumbEntries': self.breadCrumbEntries}
 
-        return render_to_response(self.template_name, RequestContext(request, context))
+        return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         id_patient = kwargs['pk']
@@ -3803,7 +3812,7 @@ class MedicPatientUpdateView(View):
             context = {'action': self.action, 'user_form': user_form, 'id_student': id_patient,
                        'personal_info_form': personal_info_form, 'title': self.title,
                        'breadCrumbEntries': self.breadCrumbEntries}
-        return render_to_response(self.template_name, RequestContext(request, context))
+            return render(request, self.template_name, context)
 
 
 class MedicPatientDeleteView(View):
@@ -3823,3 +3832,145 @@ class MedicPatientDeleteView(View):
         message = 'Se ha eliminado correctamente el registro.'
         messages.add_message(request, messages.SUCCESS, message)
         return redirect_view(MedicPatientListView, request)
+
+
+class MedicAppointmentListView(TemplateView):
+    title = 'Listado de citas programadas'
+    template_name = 'medic_patient_appointment_list.html'
+    action = 'LIST'
+    breadCrumbEntries = (
+        BreadCrumb("Bienvenido", "/welcome/"), BreadCrumb("Listado de citas", "/medic/appointment/"))
+
+    def get_context_data(self, **kwargs):
+        context = super(MedicAppointmentListView, self).get_context_data(**kwargs)
+        context['title'] = self.title
+        context['breadCrumbEntries'] = self.breadCrumbEntries
+        return context
+
+
+class MedicAppointmentListData(View):
+    def get(self, request, *args, **kwargs):
+        locale.setlocale(locale.LC_ALL, '')
+        array = []
+        records = SigiaMedicAppointment.objects.all().order_by('id')
+        for record in records:
+            std = {'id': record.id,
+                   'name': "%s %s" % (record.id_patient.last_name, record.id_patient.first_name),
+                   'date': "%s" % record.date.strftime("%d de %B de %Y a las %H:%M"),
+                   'description': record.description,
+                   'done': "Realizada" if record.done else "Sin Realizar"}
+            array.append(std)
+        return JsonResponse(array, safe=False)
+
+
+class MedicAppointmentCreateView(View):
+    title = 'Registrar cita'
+    template_name = 'medic_appointment.html'
+    breadCrumbEntries = (BreadCrumb("Bienvenido", "/welcome/"), BreadCrumb("Listado de citas", "/medic/appointment/"),
+                         BreadCrumb("Registrar cita", "/medic/appointment/new/"))
+    action = 'CREATE'
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(MedicAppointmentCreateView, cls).as_view(**initkwargs)
+        return login_required(view, "/")
+
+    def get(self, request, *args, **kwargs):
+        user_form = PatientAppointment()
+        context = {'action': self.action, 'user_form': user_form, 'title': self.title,
+                   'breadCrumbEntries': self.breadCrumbEntries}
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        user_form = PatientAppointment(request.POST)
+        if user_form.is_valid():
+            nuevo = user_form.save(commit=False)
+            tiempo = request.POST['hora']
+            nuevo.date = "%s %s" % (nuevo.date.date(), tiempo)
+            nuevo.live = True
+            nuevo.save()
+            message = 'Se ha creado correctamente la cita'
+            messages.add_message(request, messages.SUCCESS, message)
+            return redirect_view(MedicAppointmentListView, request)
+        else:
+            message = 'Por favor corrija los errores en el formulario'
+            messages.add_message(request, messages.ERROR, message)
+            context = {'action': self.action, 'user_form': user_form, 'title': self.title,
+                       'breadCrumbEntries': self.breadCrumbEntries}
+            return render(request, self.template_name, context)
+
+
+class MedicAppointmentUpdateView(View):
+    title = 'Actualizar cita'
+    template_name = 'medic_appointment.html'
+    action = 'UPGRADE'
+    breadCrumbEntries = (BreadCrumb("Bienvenido", "/welcome/"),
+                         BreadCrumb("Listado de pacientes", "/medic/appointment/"))
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(MedicAppointmentUpdateView, cls).as_view(**initkwargs)
+        return login_required(view, "/")
+
+    def get(self, request, *args, **kwargs):
+        id_cita = kwargs['pk']
+        self.breadCrumbEntries += (BreadCrumb("Actualizar Paciente", "/medic/appointment/%s/upgrade/" % id_cita),)
+        user = SigiaMedicAppointment.objects.get(id=id_cita)
+        user_form = PatientAppointment(instance=user)
+        context = {'action': self.action, 'user_form': user_form, 'registro_id': id_cita, 'title': self.title,
+                   'breadCrumbEntries': self.breadCrumbEntries, 'registro': user}
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        id_cita = kwargs['pk']
+        self.breadCrumbEntries += (BreadCrumb("Actualizar Paciente", "/medic/appointment/%s/upgrade/" % id_cita),)
+        user = SigiaMedicAppointment.objects.get(id=id_cita)
+        user_form = PatientAppointment(request.POST, instance=user)
+        if user_form.is_valid():
+            nuevo = user_form.save(commit=False)
+            tiempo = request.POST['hora']
+            nuevo.date = "%s %s" % (nuevo.date.date(), tiempo)
+            nuevo.live = True
+            nuevo.save()
+            message = 'Se ha actualizado correctamente la cita'
+            messages.add_message(request, messages.SUCCESS, message)
+            return redirect_view(MedicAppointmentListView, request)
+        else:
+            message = 'Por favor corrija los errores en el formulario'
+            messages.add_message(request, messages.ERROR, message)
+            context = {'action': self.action, 'user_form': user_form, 'registro_id': id_cita, 'title': self.title,
+                       'breadCrumbEntries': self.breadCrumbEntries, 'registro': user}
+            return render(request, self.template_name, context)
+
+
+class MedicAppointmentDeleteView(View):
+    redirect_url = '/medic/appointment/'
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(MedicAppointmentDeleteView, cls).as_view(**initkwargs)
+        return login_required(view, "/")
+
+    def post(self, request, *args, **kwargs):
+        id_register = kwargs['pk']
+        register = SigiaMedicAppointment.objects.get(id=id_register)
+        register.delete()
+        message = 'Se ha eliminado correctamente la cita.'
+        messages.add_message(request, messages.SUCCESS, message)
+        return redirect_view(MedicAppointmentListView, request)
+
+
+class MedicAppointmentRealize(View):
+    redirect_url = '/medic/appointment/'
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(MedicAppointmentRealize, cls).as_view(**initkwargs)
+        return login_required(view, "/")
+
+    def post(self, request, *args, **kwargs):
+        id_register = kwargs['pk']
+        register = SigiaMedicAppointment.objects.get(id=id_register)
+        register.done = True
+        register.save()
+        return redirect('/medic/new/%s/' % id_register)

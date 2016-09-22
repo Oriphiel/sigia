@@ -754,7 +754,7 @@ class SigiaMedicFamilyBackground(LiveModel, TimeStampedModel, AuthStampedModel):
 class SigiaMedicContact(LiveModel, TimeStampedModel, AuthStampedModel):
     id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord',
                                               related_name="medic_contact")
-    relationship_type = models.CharField(max_length=40, blank=True, null=True)
+    relationship_type = models.CharField(max_length=40, blank=False, null=True)
     name = models.CharField(max_length=100, blank=False, null=False)
     phone_number = models.CharField(max_length=12, blank=True, null=True)
 
@@ -852,3 +852,15 @@ class SigiaMedicalCenter(LiveModel, TimeStampedModel, AuthStampedModel):
         managed = True
         verbose_name = "Centro medico"
         db_table = 'sigia_medical_center'
+
+
+class SigiaMedicAppointment(LiveModel, TimeStampedModel, AuthStampedModel):
+    id_patient = models.ForeignKey(User, models.DO_NOTHING, db_column='id_patient', blank=False, null=False)
+    description = models.CharField(max_length=200, blank=True, null=True, verbose_name="Descripción")
+    date = models.DateTimeField(null=True, verbose_name="fecha de consulta")
+    done = models.BooleanField(default=False, verbose_name="Realizada")
+
+    class Meta:
+        managed = True
+        verbose_name = "Cita medica"
+        db_table = 'sigia_medical_appointment'

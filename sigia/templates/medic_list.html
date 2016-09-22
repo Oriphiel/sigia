@@ -92,7 +92,7 @@
 		$('#tbb_edit').click(function(){
 			var historial = $('#table-pagination').bootstrapTable('getSelections')[0];
 			if (historial == null){
-				bootbox.alert('Debe seleccionar un historial primero.');
+				bootbox.alert('Debe seleccionar una consulta primero.');
 			} else {
 				LoadAjaxContent("/medic/" + historial.id + "/upgrade/");
 			}
@@ -101,7 +101,7 @@
 		$('#tbb_delete').click(function(){
 			var historial = $('#table-pagination').bootstrapTable('getSelections')[0];
 			if (historial == null){
-				bootbox.alert('Debe seleccionar un historial primero.');
+				bootbox.alert('Debe seleccionar una consulta primero.');
 			} else {
 				bootbox.confirm("Por favor confirme que desea eliminar la consulta de: " + historial.name, function(result) {
 					if(result){
