@@ -864,3 +864,14 @@ class SigiaMedicAppointment(LiveModel, TimeStampedModel, AuthStampedModel):
         managed = True
         verbose_name = "Cita medica"
         db_table = 'sigia_medical_appointment'
+
+
+class SigiaMedicConsulta(LiveModel, TimeStampedModel, AuthStampedModel):
+    id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord',
+                                              related_name="medic_consulta")
+    actual_problem = models.CharField(max_length=1000, blank=False, null=False, verbose_name="Detalle")
+
+    class Meta:
+        managed = True
+        verbose_name = "Consultas Paciente"
+        db_table = 'sigia_medical_consulta'

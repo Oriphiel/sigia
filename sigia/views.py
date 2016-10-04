@@ -3435,6 +3435,10 @@ class InstitutionDeleteView(View):
         return redirect_view(InstitutionListView, request)
 
 
+#######################################################
+#
+# Arturo Views
+#
 class MedicRecordCreateView(View):
     title = 'Historia Clínica'
     template_name = 'medic_form.html'
@@ -3518,6 +3522,8 @@ class UserLista(View):
     @staticmethod
     def get(request, *args, **kwargs):
         ids = request.GET.get('ids')
+        if not ids:
+            return JsonResponse({})
         pacientes = UserProfile.objects.get(user=ids)
         if pacientes.nationality is None:
             return JsonResponse(serializers.serialize('json', [pacientes, pacientes.user]),
