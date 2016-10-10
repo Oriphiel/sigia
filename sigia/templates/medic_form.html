@@ -311,34 +311,6 @@
 
                         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                             <div class="panel panel-default">
-                                <div class="panel-heading" role="tab" id="headingOne">
-                                    <h4 class="panel-title">
-                                        <a role="button" data-toggle="collapse" data-parent="#accordion"
-                                           href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                            ENFERMEDAD O PROBLEMA ACTUAL
-                                        </a>
-                                    </h4>
-                                </div>
-                                <div id="collapseOne" class="panel-collapse collapse" role="tabpanel"
-                                     aria-labelledby="headingOne">
-                                    <div class="row">
-                                        <div class="form-group">
-                                            <label for="{{ medic_form.actual_problem.auto_id }}"
-                                                   class="control-label col-sm-2 col-md-2 col-lg-2">{{ medic_form.actual_problem.label }}</label>
-                                            <div class="col-sm-9 col-md-9 col-lg-9">
-                                                {{ medic_form.actual_problem }}
-                                            </div>
-                                            {% if medic_form.actual_problem.errors %}
-                                                <label class="error" data-toggle="tooltip" data-placement="top"
-                                                       title='{{ medic_form.actual_problem.errors.as_text }}'>*</label>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <div class="panel panel-default">
                                 <div class="panel-heading" role="tab" id="headingTwo">
                                     <h4 class="panel-title">
                                         <a role="button" data-toggle="collapse" data-parent="#accordion"
@@ -416,130 +388,6 @@
                                 </div>
                             </div>
 
-                            <div class="panel panel-default">
-                                <div class="panel-heading" role="tab" id="headingThree">
-                                    <h4 class="panel-title">
-                                        <a role="button" data-toggle="collapse" data-parent="#accordion"
-                                           href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
-                                            EXAMEN FÍSICO
-                                        </a>
-                                    </h4>
-                                </div>
-
-                                <div id="collapseThree" class="panel-collapse collapse in" role="tabpanel"
-                                     aria-labelledby="headingThree">
-                                    <div class="row">
-                                        <div class="form-group">
-                                            {{ fisico_form.management_form }}
-                                            {% for form in fisico_form %}
-                                                <div class="form-group fisico" id="{{ form.prefix }}-row">
-                                                    {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
-                                                    {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
-                                                    <label for="{{ form.type_background.auto_id }}"
-                                                           class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.type_background.label }}</label>
-                                                    <div class="col-sm-4 col-md-4 col-lg-4">
-                                                        {{ form.type_background }}
-                                                    </div>
-                                                    <label class="control-label col-sm-1 col-md-1 col-lg-1"
-                                                           for="{{ form.typed.auto_id }}">{{ form.typed.label }}</label>
-                                                    <div class="col-sm-4 col-md-4 col-lg-4">
-                                                        {{ form.typed }}
-                                                    </div>
-                                                    <label class="control-label col-sm-2 col-md-2 col-lg-2"
-                                                           for="{{ form.cp.auto_id }}">{{ form.cp.label }}</label>
-                                                    <div class="col-sm-2 col-md-2 col-lg-2">
-                                                        {{ form.cp }}
-                                                    </div>
-                                                    <label class="control-label col-sm-4 col-md-4 col-lg-4"
-                                                           for="{{ form.sp.auto_id }}">{{ form.sp.label }}</label>
-                                                    <div class="col-sm-3 col-md-3 col-lg-3">
-                                                        {{ form.sp }}
-                                                    </div>
-                                                    <label class="control-label col-sm-2 col-md-2 col-lg-2"
-                                                           for="{{ form.detail_background.auto_id }}">{{ form.detail_background.label }}</label>
-                                                    <div class="col-sm-9 col-md-9 col-lg-9">
-                                                        {{ form.detail_background }}
-                                                    </div>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="panel panel-default">
-                                <div class="panel-heading" role="tab" id="headingFour">
-                                    <h4 class="panel-title">
-                                        <a role="button" data-toggle="collapse" data-parent="#accordion"
-                                           href="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
-                                            PLAN DIAGNÓSTICO
-                                        </a>
-                                    </h4>
-                                </div>
-
-                                <div id="collapseFour" class="panel-collapse collapse in" role="tabpanel"
-                                     aria-labelledby="headingFour">
-                                    <div class="row">
-                                        <div class="form-group">
-                                            {{ diagnostic_form.management_form }}
-                                            {% for form in diagnostic_form %}
-                                                <div class="form-group diagnostico" id="{{ form.prefix }}-row">
-                                                    {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
-                                                    {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
-                                                    <label for="{{ form.type_background.auto_id }}"
-                                                           class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.type_background.label }}</label>
-                                                    <div class="col-sm-9 col-md-9 col-lg-9">
-                                                        {{ form.type_background }}
-                                                    </div>
-                                                    <label class="control-label col-sm-2 col-md-2 col-lg-2"
-                                                           for="{{ form.detail_background.auto_id }}">{{ form.detail_background.label }}</label>
-                                                    <div class="col-sm-9 col-md-9 col-lg-9">
-                                                        {{ form.detail_background }}
-                                                    </div>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="panel panel-default">
-                                <div class="panel-heading" role="tab" id="headingFive">
-                                    <h4 class="panel-title">
-                                        <a role="button" data-toggle="collapse" data-parent="#accordion"
-                                           href="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
-                                            DIAGNÓSTICO PRESUNTIVO
-                                        </a>
-                                    </h4>
-                                </div>
-
-                                <div id="collapseFive" class="panel-collapse collapse in" role="tabpanel"
-                                     aria-labelledby="headingFive">
-                                    <div class="row">
-                                        <div class="form-group">
-                                            {{ presumptive_form.management_form }}
-                                            {% for form in presumptive_form %}
-                                                <div class="form-group presumptive" id="{{ form.prefix }}-row">
-                                                    {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
-                                                    {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
-                                                    <label for="{{ form.cie.auto_id }}"
-                                                           class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.cie.label }}</label>
-                                                    <div class="col-sm-9 col-md-9 col-lg-9">
-                                                        {{ form.cie }}
-                                                    </div>
-
-                                                    <label class="control-label col-sm-2 col-md-2 col-lg-2"
-                                                           for="{{ form.detail_background.auto_id }}">{{ form.detail_background.label }}</label>
-                                                    <div class="col-sm-9 col-md-9 col-lg-9">
-                                                        {{ form.detail_background }}
-                                                    </div>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
                         </div>
 
                     </div>
@@ -588,5 +436,6 @@
             color: #3c3c3c !important;
             background: url({{ STATIC_URL }}img/delete.png) no-repeat left center;
         }
+
     </style>
 {% endblock %}

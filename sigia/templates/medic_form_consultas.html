@@ -1,0 +1,283 @@
+{% extends 'ajax-content.djhtml' %}
+{% block styles %}
+    <style type="text/css">
+        select.form-control {
+            -webkit-appearance: menulist;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <h1 class="page-header">{{ title }} del paciente {{ name }}</h1>
+    <div class="box">
+        <div class="box-content" style="display: block;">
+
+            <blockquote>
+                {% if action == 'CREATE' %}
+                    Por favor llene los datos de la consulta
+                {% else %}
+                    Puede editar los datos de la consulta
+                {% endif %}
+            </blockquote>
+
+            <form id="medicoform" class="form-horizontal" method="post" enctype="multipart/form-data">{% csrf_token %}
+                <div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+                    <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all"
+                        role="tablist">
+                        <li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-4"
+                            aria-labelledby="ui-id-5" aria-selected="false"><a href="#tabs-4" class="ui-tabs-anchor"
+                                                                               role="presentation" tabindex="-1"
+                                                                               id="ui-id-5">DATOS</a>
+                        </li>
+                    </ul>
+
+                    <div id="tabs-4" aria-labelledby="ui-id-4" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
+                        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab" id="headingOne">
+                                    <h4 class="panel-title">
+                                        <a role="button" data-toggle="collapse" data-parent="#accordion"
+                                           href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                            ENFERMEDAD O PROBLEMA ACTUAL
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div id="collapseOne" class="panel-collapse collapse" role="tabpanel"
+                                     aria-labelledby="headingOne">
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <label for="{{ consulta.actual_problem.auto_id }}"
+                                                   class="control-label col-sm-2 col-md-2 col-lg-2">{{ consulta.actual_problem.label }}</label>
+                                            <div class="col-sm-9 col-md-9 col-lg-9">
+                                                {{ consulta.actual_problem }}
+                                            </div>
+                                            {% if consulta.actual_problem.errors %}
+                                                <label class="error" data-toggle="tooltip" data-placement="top"
+                                                       title='{{ consulta.actual_problem.errors.as_text }}'>*</label>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab" id="headingThree">
+                                    <h4 class="panel-title">
+                                        <a role="button" data-toggle="collapse" data-parent="#accordion"
+                                           href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                            EXAMEN FÍSICO
+                                        </a>
+                                    </h4>
+                                </div>
+
+                                <div id="collapseThree" class="panel-collapse collapse in" role="tabpanel"
+                                     aria-labelledby="headingThree">
+                                    <div class="row">
+                                        <div class="form-group">
+                                            {{ fisico_form.management_form }}
+                                            {% for form in fisico_form %}
+                                                <div class="form-group fisico" id="{{ form.prefix }}-row">
+                                                    {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
+                                                    {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+                                                    <label for="{{ form.type_background.auto_id }}"
+                                                           class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.type_background.label }}</label>
+                                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                                        {{ form.type_background }}
+                                                    </div>
+                                                    <label class="control-label col-sm-1 col-md-1 col-lg-1"
+                                                           for="{{ form.typed.auto_id }}">{{ form.typed.label }}</label>
+                                                    <div class="col-sm-4 col-md-4 col-lg-4">
+                                                        {{ form.typed }}
+                                                    </div>
+                                                    <label class="control-label col-sm-2 col-md-2 col-lg-2"
+                                                           for="{{ form.cp.auto_id }}">{{ form.cp.label }}</label>
+                                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                                        {{ form.cp }}
+                                                    </div>
+                                                    <label class="control-label col-sm-4 col-md-4 col-lg-4"
+                                                           for="{{ form.sp.auto_id }}">{{ form.sp.label }}</label>
+                                                    <div class="col-sm-3 col-md-3 col-lg-3">
+                                                        {{ form.sp }}
+                                                    </div>
+                                                    <label class="control-label col-sm-2 col-md-2 col-lg-2"
+                                                           for="{{ form.detail_background.auto_id }}">{{ form.detail_background.label }}</label>
+                                                    <div class="col-sm-9 col-md-9 col-lg-9">
+                                                        {{ form.detail_background }}
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab" id="headingFour">
+                                    <h4 class="panel-title">
+                                        <a role="button" data-toggle="collapse" data-parent="#accordion"
+                                           href="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                            PLAN DIAGNÓSTICO
+                                        </a>
+                                    </h4>
+                                </div>
+
+                                <div id="collapseFour" class="panel-collapse collapse in" role="tabpanel"
+                                     aria-labelledby="headingFour">
+                                    <div class="row">
+                                        <div class="form-group">
+                                            {{ diagnostic_form.management_form }}
+                                            {% for form in diagnostic_form %}
+                                                <div class="form-group diagnostico" id="{{ form.prefix }}-row">
+                                                    {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
+                                                    {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+                                                    <label for="{{ form.type_background.auto_id }}"
+                                                           class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.type_background.label }}</label>
+                                                    <div class="col-sm-9 col-md-9 col-lg-9">
+                                                        {{ form.type_background }}
+                                                    </div>
+                                                    <label class="control-label col-sm-2 col-md-2 col-lg-2"
+                                                           for="{{ form.detail_background.auto_id }}">{{ form.detail_background.label }}</label>
+                                                    <div class="col-sm-9 col-md-9 col-lg-9">
+                                                        {{ form.detail_background }}
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab" id="headingFive">
+                                    <h4 class="panel-title">
+                                        <a role="button" data-toggle="collapse" data-parent="#accordion"
+                                           href="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                                            DIAGNÓSTICO PRESUNTIVO
+                                        </a>
+                                    </h4>
+                                </div>
+
+                                <div id="collapseFive" class="panel-collapse collapse in" role="tabpanel"
+                                     aria-labelledby="headingFive">
+                                    <div class="row">
+                                        <div class="form-group">
+                                            {{ presumptive_form.management_form }}
+                                            {% for form in presumptive_form %}
+                                                <div class="form-group presumptive" id="{{ form.prefix }}-row">
+                                                    {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
+                                                    {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+                                                    <label for="{{ form.cie.auto_id }}"
+                                                           class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.cie.label }}</label>
+                                                    <div class="col-sm-9 col-md-9 col-lg-9">
+                                                        {{ form.cie }}
+                                                    </div>
+
+                                                    <label class="control-label col-sm-2 col-md-2 col-lg-2"
+                                                           for="{{ form.detail_background.auto_id }}">{{ form.detail_background.label }}</label>
+                                                    <div class="col-sm-9 col-md-9 col-lg-9">
+                                                        {{ form.detail_background }}
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{ consulta.id_sigia_medic_record.as_hidden }}
+                            <div class="form-group">
+                                <div class="col-lg-11 col-xs-11 col-md-11 col-sm-11">
+                                    <input class="btn btn-primary pull-right" type="button"
+                                            {% if action == 'CREATE' %} value="Registrar Consulta"{% else %}
+                                           value="Actualizar Consulta" {% endif %}
+                                           id="formulario"/>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_scripts %}
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-select.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="{{ STATIC_URL }}js/bootstrap-select.min.js"></script>
+    <script src="{{ STATIC_URL }}js/jquery.formset.js"></script>
+    <script>
+        {% if action == 'CREATE' %}
+            $('#formulario').click(function () {
+                $('#medicoform')[0].action = "/medic/" + {{ registro_id }} +"/consulta/new/";
+                PostAndLoadAjaxContent($('#medicoform'));
+            });
+        {% else %}
+            $('#formulario').click(function () {
+                $('#medicoform')[0].action = "/medic/" + {{ registro_id }} +"/consulta/" + {{ consulta_id }} + "/upgrade/";
+                PostAndLoadAjaxContent($('#medicoform'));
+            });
+        {% endif %}
+        var hola = "";
+        function log(message, context, id) {
+            $('input[class$=llenar]', context || null).val(message);
+        }
+        function enableAutocomplete(context) {
+            $('input[class$=autocomplete-me]', context || null).autocomplete({
+                source: "/api/medic/cie10/",
+                minLength: 2,
+                select: function (event, ui) {
+                    log(ui.item ?
+                    "" + ui.item.value :
+                    "Nothing selected, input was " + this.value, context, ui.item.id);
+                    hola = ui.item.id;
+                },
+                close: function (event, ui) {
+                    $('.cie10').val(hola)
+                }
+            });
+        }
+        $('.fisico').formset({
+            prefix: "physical_form",
+            deleteText: "Borrar",
+            formCssClass: 'fisico-formset',
+            deleteCssClass: 'delete-fisico-row delete-row'
+        });
+        $('.diagnostico').formset({
+            prefix: "diagnostic_form",
+            deleteText: "Borrar",
+            formCssClass: 'diagnostico-formset',
+            deleteCssClass: 'delete-diagnostico-row delete-row'
+        });
+        $('.presumptive').formset({
+            prefix: "presumptive_form",
+            deleteText: "Borrar",
+            added: function (row) {
+                enableAutocomplete(row);
+            },
+            formCssClass: 'presumptive-formset',
+            deleteCssClass: 'delete-presumptive-row delete-row'
+        });
+        enableAutocomplete();
+        $('.panel-collapse.in').collapse('hide');
+        $("#tabs").tabs();
+    </script>
+    <style>
+        .add-row {
+            color: #4cae4c !important;
+            padding-left: 18px;
+            background: url({{ STATIC_URL }}img/add.png) no-repeat left center;
+        }
+
+        .delete-row {
+            display: block;
+            margin: 6px 0 0 0;
+            padding-left: 18px;
+            color: #3c3c3c !important;
+            background: url({{ STATIC_URL }}img/delete.png) no-repeat left center;
+        }
+    </style>
+{% endblock %}

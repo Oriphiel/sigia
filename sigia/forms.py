@@ -16,7 +16,7 @@ from sigia.models import UserProfile, Teacher, Career, Course, Matter, Studies, 
     SigiaMedicFamilyBackgroundDetail, SigiaMedicPersonalBackground, SigiaMedicPersonalBackgroundDetail, \
     SigiaMedicrecord, \
     SigiaMedicPhysicalExam, SigiaMedicPhysicalExamDetail, SigiaMedicDiagnosticPlan, SigiaMedicDiagnosticPlanDetail, \
-    SigiaMedicDiagnosticPresumptive, SigiaMedicCie10, SigiaMedicalCenter, SigiaMedicAppointment
+    SigiaMedicDiagnosticPresumptive, SigiaMedicCie10, SigiaMedicalCenter, SigiaMedicAppointment, SigiaMedicConsulta
 from django.contrib.auth.models import User, Group
 from captcha.fields import CaptchaField
 from django.forms.widgets import TextInput, EmailInput, \
@@ -669,7 +669,7 @@ class CreateMedicRecordForm(forms.ModelForm):
         form_arrival_choice = (('Ambulatorio', 'Ambulatorio'),
                                ('Silla de ruedas', 'Silla de ruedas'),
                                ('Camilla', 'Camilla'))
-        exclude = []
+        exclude = ['actual_problem']
         widgets = {
             'id_patient': Select(attrs={'class': 'form-control'}),
             'blood_type_by': Select(attrs={'class': 'form-control'}, choices=blood_type_by),
@@ -679,11 +679,6 @@ class CreateMedicRecordForm(forms.ModelForm):
             'delivery_patient': TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Institución o persona que entrega al paciente'}),
             'phone_delivery': TextInput(attrs={'class': 'form-control', 'placeholder': 'Teléfono'}),
-            'actual_problem': Textarea(attrs={'class': 'form-control', 'rows': '6',
-                                              'placeholder': 'Cronología, Localización, Características, Intensidad, '
-                                                             'Causas Aparentes, Factores que agravan o mejoran,'
-                                                             'Síntomas asociados, Evolución, Medicamentos que reciben, '
-                                                             'Resultados de Exámenes Anteriores, Condición actual'}),
             'blood_pressure': TextInput(attrs={'class': 'form-control', 'type': 'number'}),
             'heart_rate': TextInput(attrs={'class': 'form-control', 'type': 'number', 'placeholder': 'min'}),
             'breathing_frequency': TextInput(attrs={'class': 'form-control', 'type': 'number', 'placeholder': 'min'}),
@@ -710,7 +705,8 @@ class PersonalMedicBackground(forms.ModelForm):
     type_background = ModelChoiceField(
         widget=forms.Select(
             attrs={'class': 'form-control', 'data-live-search': "true", 'autocomplete': 'off'}),
-        queryset=SigiaMedicPersonalBackgroundDetail.objects.filter(id__range=[1, 24]), label="General")
+        queryset=SigiaMedicPersonalBackgroundDetail.objects.filter(id__range=[1, 24]), label="General",
+        empty_label=None)
 
     class Meta:
         model = SigiaMedicPersonalBackground
@@ -727,7 +723,8 @@ class PersonalFemMedicBackground(forms.ModelForm):
     type_background = ModelChoiceField(
         widget=forms.Select(
             attrs={'class': 'form-control', 'data-live-search': "true", 'autocomplete': 'off'}),
-        queryset=SigiaMedicPersonalBackgroundDetail.objects.filter(id__range=[25, 41]), label="General Femenino")
+        queryset=SigiaMedicPersonalBackgroundDetail.objects.filter(id__range=[25, 41]), label="General Femenino",
+        empty_label=None)
 
     class Meta:
         model = SigiaMedicPersonalBackground
@@ -744,7 +741,7 @@ class FamilyMedicBackground(forms.ModelForm):
     type_background = ModelChoiceField(
         widget=forms.Select(
             attrs={'class': 'form-control', 'data-live-search': "true", 'autocomplete': 'off'}),
-        queryset=SigiaMedicFamilyBackgroundDetail.objects.filter(id__range=[1, 11]), label="General")
+        queryset=SigiaMedicFamilyBackgroundDetail.objects.filter(id__range=[1, 11]), label="General", empty_label=None)
 
     class Meta:
         model = SigiaMedicFamilyBackground
@@ -776,7 +773,7 @@ class PhysicalExam(forms.ModelForm):
     type_background = ModelChoiceField(
         widget=forms.Select(
             attrs={'class': 'form-control', 'data-live-search': "true", 'autocomplete': 'off'}),
-        queryset=SigiaMedicPhysicalExamDetail.objects.filter(id__range=[1, 25]), label="General")
+        queryset=SigiaMedicPhysicalExamDetail.objects.filter(id__range=[1, 25]), label="General", empty_label=None)
     cp = forms.BooleanField(widget=RadioSelect(choices=[(True, 'Si'),
                                                         (False, 'No')]), label="Con evidencia de patología",
                             initial=False, required=False)
@@ -860,6 +857,20 @@ class PatientAppointment(forms.ModelForm):
         }
 
 
+class ConsultaForm(forms.ModelForm):
+    class Meta:
+        model = SigiaMedicConsulta
+        exclude = ['live']
+        widgets = {
+            'actual_problem': Textarea(attrs={'class': 'form-control', 'rows': '6',
+                                              'placeholder': 'Cronología, Localización, Características, Intensidad, '
+                                                             'Causas Aparentes, Factores que agravan o mejoran,'
+                                                             'Síntomas asociados, Evolución, Medicamentos que reciben, '
+                                                             'Resultados de Exámenes Anteriores, Condición actual'}),
+            'id_sigia_medic_record': Select(attrs={'class': 'form-control'}),
+        }
+
+
 personal = inlineformset_factory(parent_model=SigiaMedicrecord, model=SigiaMedicPersonalBackground,
                                  form=PersonalMedicBackground, min_num=0, max_num=24, can_delete=True, can_order=True,
                                  validate_min=0, extra=1)
@@ -871,10 +882,10 @@ family = inlineformset_factory(parent_model=SigiaMedicrecord, model=SigiaMedicFa
                                validate_min=0, extra=1)
 contacto = inlineformset_factory(parent_model=SigiaMedicrecord, model=SigiaMedicContact, form=MedicContact, min_num=0,
                                  max_num=5, can_delete=True, can_order=True, validate_min=0, extra=1)
-fisico = inlineformset_factory(parent_model=SigiaMedicrecord, model=SigiaMedicPhysicalExam, form=PhysicalExam,
+fisico = inlineformset_factory(parent_model=SigiaMedicConsulta, model=SigiaMedicPhysicalExam, form=PhysicalExam,
                                min_num=0, max_num=20, can_delete=True, can_order=True, validate_min=0, extra=1)
-diagnostic = inlineformset_factory(parent_model=SigiaMedicrecord, model=SigiaMedicDiagnosticPlan, form=DiagnosticPlan,
+diagnostic = inlineformset_factory(parent_model=SigiaMedicConsulta, model=SigiaMedicDiagnosticPlan, form=DiagnosticPlan,
                                    min_num=0, max_num=20, can_delete=True, can_order=True, validate_min=0, extra=1)
-presumptive = inlineformset_factory(parent_model=SigiaMedicrecord, model=SigiaMedicDiagnosticPresumptive,
+presumptive = inlineformset_factory(parent_model=SigiaMedicConsulta, model=SigiaMedicDiagnosticPresumptive,
                                     form=DiagnosticPresumptive, min_num=0, max_num=20, can_delete=True, can_order=True,
                                     validate_min=0, extra=1)

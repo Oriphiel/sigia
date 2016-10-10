@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<h1 class="page-header">Listado de Consultas</h1>
+<h1 class="page-header">Historiales Medicos</h1>
 <div class="box">
 	<div class="box-content" style="display: block;">
 		
@@ -10,6 +10,9 @@
 	    <div class="btn-group" role="group">
 	        <button class="btn btn-default" onclick="LoadAjaxContent('/medic/new/');">
 				<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Nuevo
+	    	</button>
+            <button class="btn btn-default" id="tbb_consulta">
+				<span class="glyphicon glyphicon-list2" aria-hidden="true"></span> Ver Consultas
 	    	</button>
 	    	<button class="btn btn-default" id="tbb_print">
 				<span class="glyphicon glyphicon-print" aria-hidden="true"></span> Ver/Imprimir
@@ -92,7 +95,7 @@
 		$('#tbb_edit').click(function(){
 			var historial = $('#table-pagination').bootstrapTable('getSelections')[0];
 			if (historial == null){
-				bootbox.alert('Debe seleccionar una consulta primero.');
+				bootbox.alert('Debe seleccionar un historial primero.');
 			} else {
 				LoadAjaxContent("/medic/" + historial.id + "/upgrade/");
 			}
@@ -101,9 +104,9 @@
 		$('#tbb_delete').click(function(){
 			var historial = $('#table-pagination').bootstrapTable('getSelections')[0];
 			if (historial == null){
-				bootbox.alert('Debe seleccionar una consulta primero.');
+				bootbox.alert('Debe seleccionar un historial primero.');
 			} else {
-				bootbox.confirm("Por favor confirme que desea eliminar la consulta de: " + historial.name, function(result) {
+				bootbox.confirm("Por favor confirme que desea eliminar el historial de: " + historial.name, function(result) {
 					if(result){
 						$('#du_form')[0].action= "/medic/" + historial.id + "/delete/";
 						$('#du_form')[0].method = "POST";
@@ -116,6 +119,15 @@
 						  }).show();
 					}
 				}); 
+			}
+		});
+
+        $('#tbb_consulta').click(function(){
+			var historial = $('#table-pagination').bootstrapTable('getSelections')[0];
+			if (historial == null){
+				bootbox.alert('Debe seleccionar un historial primero.');
+			} else {
+				LoadAjaxContent("/medic/" + historial.id + "/consulta/");
 			}
 		});
 	});

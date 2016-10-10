@@ -704,7 +704,7 @@ class SigiaMedicrecord(LiveModel, TimeStampedModel, AuthStampedModel):
     source_information = models.CharField(max_length=40, blank=False, null=False)
     delivery_patient = models.CharField(max_length=40, blank=False, null=False)
     phone_delivery = models.CharField(max_length=12, blank=False, null=False)
-    actual_problem = models.CharField(max_length=1000, blank=False, null=False, verbose_name="Detalle")
+    actual_problem = models.CharField(max_length=1000, default="Campo sin usar", verbose_name="Detalle")
     blood_pressure = models.DecimalField(max_digits=5, decimal_places=2, blank=False, null=False,
                                          verbose_name="Presión arterial")
     heart_rate = models.IntegerField(blank=False, null=False, verbose_name="Frecuencia cardiaca")
@@ -724,12 +724,23 @@ class SigiaMedicrecord(LiveModel, TimeStampedModel, AuthStampedModel):
         db_table = 'sigia_medic_record'
 
 
+class SigiaMedicConsulta(LiveModel, TimeStampedModel, AuthStampedModel):
+    id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord',
+                                              related_name="medic_consulta")
+    actual_problem = models.CharField(max_length=1000, blank=False, null=False, verbose_name="Detalle")
+
+    class Meta:
+        managed = True
+        verbose_name = "Consultas Paciente"
+        db_table = 'sigia_medical_consulta'
+
+
 class SigiaMedicPersonalBackground(LiveModel, TimeStampedModel, AuthStampedModel):
     id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord',
                                               related_name="personal_background")
     type_background = models.ForeignKey(SigiaMedicPersonalBackgroundDetail, models.DO_NOTHING,
                                         db_column='type_background', blank=False, null=False)
-    detail_background = models.CharField(max_length=200, blank=False, null=False, verbose_name="Detalle")
+    detail_background = models.CharField(max_length=200, blank=True, null=True, verbose_name="Detalle")
 
     class Meta:
         managed = True
@@ -744,7 +755,7 @@ class SigiaMedicFamilyBackground(LiveModel, TimeStampedModel, AuthStampedModel):
                                               related_name="family_background")
     type_background = models.ForeignKey(SigiaMedicFamilyBackgroundDetail, models.DO_NOTHING,
                                         db_column='type_background', blank=False, null=False)
-    detail_background = models.CharField(max_length=200, blank=False, null=False, verbose_name="Detalle")
+    detail_background = models.CharField(max_length=200, blank=True, null=True, verbose_name="Detalle")
 
     class Meta:
         managed = True
@@ -776,11 +787,11 @@ class SigiaMedicPhysicalExamDetail(LiveModel, TimeStampedModel, AuthStampedModel
 
 
 class SigiaMedicPhysicalExam(LiveModel, TimeStampedModel, AuthStampedModel):
-    id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord',
+    id_sigia_medic_record = models.ForeignKey(SigiaMedicConsulta, models.DO_NOTHING, db_column='id_sigiamedicrecord',
                                               related_name="physical_exam")
     type_background = models.ForeignKey(SigiaMedicPhysicalExamDetail, models.DO_NOTHING,
                                         db_column='type_background', blank=False, null=False)
-    detail_background = models.CharField(max_length=200, blank=False, null=False, verbose_name="Detalle")
+    detail_background = models.CharField(max_length=200, blank=True, null=True,  verbose_name="Detalle")
     typed = models.CharField(max_length=10, blank=False, null=False, verbose_name="Tipo", db_column='type')
     cp = models.BooleanField(default=False, verbose_name="Con evidencia de patología")
     sp = models.BooleanField(default=False, verbose_name="Sin evidencia de patología")
@@ -803,7 +814,7 @@ class SigiaMedicDiagnosticPlanDetail(LiveModel, TimeStampedModel, AuthStampedMod
 
 
 class SigiaMedicDiagnosticPlan(LiveModel, TimeStampedModel, AuthStampedModel):
-    id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord',
+    id_sigia_medic_record = models.ForeignKey(SigiaMedicConsulta, models.DO_NOTHING, db_column='id_sigiamedicrecord',
                                               related_name="diagnostic_plan")
     type_background = models.ForeignKey(SigiaMedicDiagnosticPlanDetail, models.DO_NOTHING,
                                         db_column='type_background', blank=False, null=False)
@@ -824,7 +835,7 @@ class SigiaMedicCie10(LiveModel, TimeStampedModel, AuthStampedModel):
 
 
 class SigiaMedicDiagnosticPresumptive(LiveModel, TimeStampedModel, AuthStampedModel):
-    id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord',
+    id_sigia_medic_record = models.ForeignKey(SigiaMedicConsulta, models.DO_NOTHING, db_column='id_sigiamedicrecord',
                                               related_name="diagnostic_presumptive")
     detail_background = models.CharField(max_length=200, blank=False, null=False, verbose_name="Detalle")
     cie = models.ForeignKey(SigiaMedicCie10, models.DO_NOTHING, db_column="cie", verbose_name="CIE-10")
@@ -866,12 +877,13 @@ class SigiaMedicAppointment(LiveModel, TimeStampedModel, AuthStampedModel):
         db_table = 'sigia_medical_appointment'
 
 
-class SigiaMedicConsulta(LiveModel, TimeStampedModel, AuthStampedModel):
+class SigiaMedicPrescription(LiveModel, TimeStampedModel, AuthStampedModel):
     id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord',
-                                              related_name="medic_consulta")
-    actual_problem = models.CharField(max_length=1000, blank=False, null=False, verbose_name="Detalle")
+                                              related_name="receta_medicas")
+    active_name = models.CharField(max_length=100, blank=False, null=False, verbose_name="Principio Activo")
+    dosage = models.CharField(max_length=200, blank=False, null=False, verbose_name="Prescripción")
 
     class Meta:
         managed = True
-        verbose_name = "Consultas Paciente"
-        db_table = 'sigia_medical_consulta'
+        verbose_name = "Receta medica"
+        db_table = 'sigia_medical_appointment'

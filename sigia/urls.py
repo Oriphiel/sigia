@@ -39,7 +39,8 @@ from views import LoginView, WelcomeView, LogoutView, StudentCreateView, Student
     Cie10Lista, MedicRecordListData, MedicRecordListView, MedicRecordDeleteView, MedicRecordUpdateView, \
     MedicPatientCreateView, MedicPatientListData, MedicPatientListView, MedicPatientUpdateView, MedicPatientDeleteView, \
     MedicAppointmentListView, MedicAppointmentListData, MedicAppointmentCreateView, MedicAppointmentUpdateView, \
-    MedicAppointmentDeleteView, MedicAppointmentRealize
+    MedicAppointmentDeleteView, MedicAppointmentRealize, MedicConsultaCreateView, MedicConsultaListView, \
+    MedicConsultaListData, MedicConsultaDeleteView, MedicConsultaUpdateView
 
 urlpatterns = [
     # Examples:
@@ -218,6 +219,10 @@ urlpatterns = [
     url(r'^medic/new/(?P<pk>[^/]+)/$', MedicRecordCreateView.as_view()),
     url(r'^medic/(?P<pk>[^/]+)/delete/$', MedicRecordDeleteView.as_view()),
     url(r'^medic/(?P<pk>[^/]+)/upgrade/$', MedicRecordUpdateView.as_view()),
+    url(r'^medic/(?P<pk>[^/]+)/consulta/$', MedicConsultaListView.as_view()),
+    url(r'^medic/(?P<pk>[^/]+)/consulta/new/$', MedicConsultaCreateView.as_view()),
+    url(r'^medic/(?P<pk>[^/]+)/consulta/(?P<id_consulta>[^/]+)/delete/$', MedicConsultaDeleteView.as_view()),
+    url(r'^medic/(?P<pk>[^/]+)/consulta/(?P<id_consulta>[^/]+)/upgrade/$', MedicConsultaUpdateView.as_view()),
     url(r'^medic/appointment/$', MedicAppointmentListView.as_view()),
     url(r'^medic/appointment/new/$', MedicAppointmentCreateView.as_view()),
     url(r'^medic/appointment/(?P<pk>[^/]+)/upgrade/$', MedicAppointmentUpdateView.as_view()),
@@ -230,6 +235,7 @@ urlpatterns = [
     url(r'^medic/api/list/$', MedicRecordListData.as_view()),
     url(r'^medic/api/list/patient/$', MedicPatientListData.as_view()),
     url(r'^medic/api/list/appointment/$', MedicAppointmentListData.as_view()),
+    url(r'^medic/api/list/(?P<pk>[^/]+)/consulta/$', MedicConsultaListData.as_view()),
     url(r'^api/medic/cie10/$', Cie10Lista.as_view()),
     url(r'^user/api/lista/$', UserLista.as_view()),
 ]

@@ -8,6 +8,8 @@ Created on 12/12/2014
 from __future__ import unicode_literals
 
 import locale
+
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from django.contrib import auth
 from django.shortcuts import render_to_response, redirect
@@ -22,7 +24,7 @@ from sigia.forms import LoginForm, UserForm, UserPersonalInfoForm, \
     EthnicGroupForm, BugReportForm, CountryForm, ProvinceForm, CantonForm, \
     ParishForm, ReducedStudentForm, ContactForm, TeacherForm, EventTypeForm, \
     StudentEventForm, StudiesForm, EventGroupForm, EmailForm, InstitutionForm, CreateMedicRecordForm, personal, \
-    personal_fem, family, contacto, fisico, diagnostic, presumptive, PatientAppointment
+    personal_fem, family, contacto, fisico, diagnostic, presumptive, PatientAppointment, ConsultaForm
 from django.contrib.auth.models import Group
 from django.views.generic.base import TemplateView
 from sigia.models import Student, UserProfile, Career, Course, Enrollment, \
@@ -30,7 +32,7 @@ from sigia.models import Student, UserProfile, Career, Course, Enrollment, \
     Country, Teacher, EventType, StudentEvent, Studies, EventsGroup, \
     EventsGroupRelation, StudentEventsGroupRelation, EmailLog, Institution, SigiaMedicCie10, SigiaMedicrecord, \
     SigiaMedicPersonalBackground, SigiaMedicFamilyBackground, SigiaMedicContact, SigiaMedicPhysicalExam, \
-    SigiaMedicDiagnosticPlan, SigiaMedicDiagnosticPresumptive, SigiaMedicAppointment
+    SigiaMedicDiagnosticPlan, SigiaMedicDiagnosticPresumptive, SigiaMedicAppointment, SigiaMedicConsulta
 from django.http.response import JsonResponse, HttpResponse, \
     HttpResponseRedirect
 from django.contrib import messages
@@ -3456,7 +3458,11 @@ class MedicRecordCreateView(View):
         medic_form = CreateMedicRecordForm(prefix="medico")
         try:
             id_register = kwargs['pk']
-            medic_form.fields["id_patient"].initial = SigiaMedicAppointment.objects.get(id=id_register).id_patient
+            paciente = SigiaMedicAppointment.objects.get(id=id_register).id_patient
+            medic_form.fields["id_patient"].initial = paciente
+            if SigiaMedicrecord.objects.filter(id_patient=paciente).exists():
+                pacient = SigiaMedicrecord.objects.get(id_patient=paciente)
+                return redirect('/medic/%s/consulta/new/' % pacient.id)
         except KeyError as e:
             print e
         personal_form = personal(prefix='personal_form', queryset=SigiaMedicPersonalBackground.objects.none())
@@ -3464,14 +3470,9 @@ class MedicRecordCreateView(View):
                                          queryset=SigiaMedicPersonalBackground.objects.none())
         family_form = family(prefix='family_form', queryset=SigiaMedicFamilyBackground.objects.none())
         contacto_form = contacto(prefix='contacto_form', queryset=SigiaMedicContact.objects.none())
-        fisico_form = fisico(prefix='physical_form', queryset=SigiaMedicPhysicalExam.objects.none())
-        diagnostic_form = diagnostic(prefix='diagnostic_form', queryset=SigiaMedicDiagnosticPlan.objects.none())
-        presumptive_form = presumptive(prefix='presumptive_form',
-                                       queryset=SigiaMedicDiagnosticPresumptive.objects.none())
         context = {'action': self.action, 'medic_form': medic_form, 'title': self.title, 'formset': personal_form,
                    'breadCrumbEntries': self.breadCrumbEntries, 'personalFemForm': personal_fem_form,
-                   'familyform': family_form, 'contacto_form': contacto_form, 'fisico_form': fisico_form,
-                   'diagnostic_form': diagnostic_form, 'presumptive_form': presumptive_form}
+                   'familyform': family_form, 'contacto_form': contacto_form}
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
@@ -3480,12 +3481,8 @@ class MedicRecordCreateView(View):
         personal_fem_form = personal_fem(request.POST, prefix='persona_fem_form')
         family_form = family(request.POST, prefix='family_form')
         contacto_form = contacto(request.POST, prefix='contacto_form')
-        fisico_form = fisico(request.POST, prefix='physical_form')
-        diagnostic_form = diagnostic(request.POST, prefix='diagnostic_form')
-        presumptive_form = presumptive(request.POST, prefix='presumptive_form')
         if medic.is_valid() and personal_form.is_valid() and personal_fem_form.is_valid() and family_form.is_valid() \
-                and contacto_form.is_valid() and fisico_form.is_valid() and diagnostic_form.is_valid() \
-                and presumptive_form.is_valid():
+                and contacto_form.is_valid():
             nuevo = medic.save(commit=False)
             tiempo = request.POST['hora']
             nuevo.date = "%s %s" % (nuevo.date.date(), tiempo)
@@ -3499,19 +3496,12 @@ class MedicRecordCreateView(View):
                 control_save(form, nuevo)
             for form in contacto_form.forms:
                 control_save(form, nuevo)
-            for form in fisico_form.forms:
-                control_save(form, nuevo)
-            for form in diagnostic_form:
-                control_save(form, nuevo)
-            for form in presumptive_form.forms:
-                control_save(form, nuevo)
         else:
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
             context = {'action': self.action, 'medic_form': medic, 'title': self.title, 'formset': personal_form,
                        'breadCrumbEntries': self.breadCrumbEntries, 'personalFemForm': personal_fem_form,
-                       'familyform': family_form, 'contacto_form': contacto_form, 'fisico_form': fisico_form,
-                       'diagnostic_form': diagnostic_form, 'presumptive_form': presumptive_form}
+                       'familyform': family_form, 'contacto_form': contacto_form}
             return render(request, self.template_name, context)
         message = 'Se ha creado correctamente el historial clínico'
         messages.add_message(request, messages.SUCCESS, message)
@@ -3556,7 +3546,7 @@ class MedicRecordListView(TemplateView):
     template_name = 'medic_list.html'
     action = 'LIST'
     breadCrumbEntries = (
-        BreadCrumb("Bienvenido", "/welcome/"), BreadCrumb("Listado de Consultas", "/medic/"))
+        BreadCrumb("Bienvenido", "/welcome/"), BreadCrumb("Listado de Historiales", "/medic/"))
 
     def get_context_data(self, **kwargs):
         context = super(MedicRecordListView, self).get_context_data(**kwargs)
@@ -3593,10 +3583,12 @@ class MedicRecordDeleteView(View):
         SigiaMedicPersonalBackground.objects.filter(id_sigia_medic_record=register).update(live=False)
         SigiaMedicFamilyBackground.objects.filter(id_sigia_medic_record=register).update(live=False)
         SigiaMedicContact.objects.filter(id_sigia_medic_record=register).update(live=False)
-        SigiaMedicPhysicalExam.objects.filter(id_sigia_medic_record=register).update(live=False)
-        SigiaMedicDiagnosticPlan.objects.filter(id_sigia_medic_record=register).update(live=False)
-        SigiaMedicDiagnosticPresumptive.objects.filter(id_sigia_medic_record=register).update(live=False)
+        register_1 = SigiaMedicConsulta.objects.get(id=id_register)
+        SigiaMedicPhysicalExam.objects.filter(id_sigia_medic_record=register_1).update(live=False)
+        SigiaMedicDiagnosticPlan.objects.filter(id_sigia_medic_record=register_1).update(live=False)
+        SigiaMedicDiagnosticPresumptive.objects.filter(id_sigia_medic_record=register_1).update(live=False)
         register.delete()
+        register_1.delete()
         message = 'Se ha eliminado correctamente el registro.'
         messages.add_message(request, messages.SUCCESS, message)
         return redirect_view(MedicRecordListView, request)
@@ -3607,7 +3599,7 @@ class MedicRecordUpdateView(View):
     template_name = 'medic_form.html'
     action = 'UPGRADE'
     breadCrumbEntries = (
-        BreadCrumb("Bienvenido", "/welcome/"), BreadCrumb("Listado de Consultas", "/medic/"))
+        BreadCrumb("Bienvenido", "/welcome/"), BreadCrumb("Listado de Historiales", "/medic/"))
 
     @classmethod
     def as_view(cls, **initkwargs):
@@ -3627,13 +3619,9 @@ class MedicRecordUpdateView(View):
         personal_fem_form = personal_fem(prefix='persona_fem_form', instance=register, queryset=personal_fem_query)
         family_form = family(prefix='family_form', instance=register)
         contacto_form = contacto(prefix='contacto_form', instance=register)
-        fisico_form = fisico(prefix='physical_form', instance=register)
-        diagnostic_form = diagnostic(prefix='diagnostic_form', instance=register)
-        presumptive_form = presumptive(prefix='presumptive_form', instance=register)
         context = {'action': self.action, 'medic_form': medic, 'title': self.title, 'formset': personal_form,
                    'breadCrumbEntries': self.breadCrumbEntries, 'personalFemForm': personal_fem_form,
-                   'familyform': family_form, 'contacto_form': contacto_form, 'fisico_form': fisico_form,
-                   'diagnostic_form': diagnostic_form, 'presumptive_form': presumptive_form, "date1": fecha,
+                   'familyform': family_form, 'contacto_form': contacto_form, "date1": fecha,
                    "hour": hora, "registro_id": register.id, "registro": register}
         return render(request, self.template_name, context)
 
@@ -3646,12 +3634,8 @@ class MedicRecordUpdateView(View):
         personal_fem_form = personal_fem(request.POST, prefix='persona_fem_form', instance=registro)
         family_form = family(request.POST, prefix='family_form', instance=registro)
         contacto_form = contacto(request.POST, prefix='contacto_form', instance=registro)
-        fisico_form = fisico(request.POST, prefix='physical_form', instance=registro)
-        diagnostic_form = diagnostic(request.POST, prefix='diagnostic_form', instance=registro)
-        presumptive_form = presumptive(request.POST, prefix='presumptive_form', instance=registro)
         if medic.is_valid() and personal_form.is_valid() and personal_fem_form.is_valid() and family_form.is_valid() \
-                and contacto_form.is_valid() and fisico_form.is_valid() and diagnostic_form.is_valid() \
-                and presumptive_form.is_valid():
+                and contacto_form.is_valid():
             nuevo = medic.save(commit=False)
             tiempo = request.POST['hora']
             nuevo.date = "%s %s" % (nuevo.date.date(), tiempo)
@@ -3665,20 +3649,13 @@ class MedicRecordUpdateView(View):
                 control_save_update(form, nuevo)
             for form in contacto_form.forms:
                 control_save_update(form, nuevo)
-            for form in fisico_form.forms:
-                control_save_update(form, nuevo)
-            for form in diagnostic_form:
-                control_save_update(form, nuevo)
-            for form in presumptive_form.forms:
-                control_save_update(form, nuevo)
         else:
             message = 'Por favor corrija los errores en el formulario'
             messages.add_message(request, messages.ERROR, message)
             context = {'action': self.action, 'medic_form': medic, 'title': self.title, 'formset': personal_form,
                        'breadCrumbEntries': self.breadCrumbEntries, 'personalFemForm': personal_fem_form,
-                       'familyform': family_form, 'contacto_form': contacto_form, 'fisico_form': fisico_form,
-                       'diagnostic_form': diagnostic_form, 'presumptive_form': presumptive_form,
-                       "registro_id": registro.id, "registro": registro}
+                       'familyform': family_form, 'contacto_form': contacto_form, "registro_id": registro.id,
+                       "registro": registro}
             return render(request, self.template_name, context)
         message = 'Se ha actualizado correctamente el historial clínico'
         messages.add_message(request, messages.SUCCESS, message)
@@ -3980,3 +3957,195 @@ class MedicAppointmentRealize(View):
         register.done = True
         register.save()
         return redirect('/medic/new/%s/' % id_register)
+
+
+class MedicConsultaCreateView(View):
+    title = 'Registrar Consulta'
+    template_name = 'medic_form_consultas.html'
+    breadCrumbEntries = (BreadCrumb("Bienvenido", "/welcome/"),)
+    action = 'CREATE'
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(MedicConsultaCreateView, cls).as_view(**initkwargs)
+        return login_required(view, "/")
+
+    def get(self, request, *args, **kwargs):
+        id_register = kwargs['pk']
+        self.breadCrumbEntries += (BreadCrumb("Listado de Consulta", "/medic/%s/consulta/" % id_register),
+                                   BreadCrumb("Realizar Consulta", "/medic/%s/consulta/new" % id_register),)
+        register = ConsultaForm(prefix='consulta')
+        registro = SigiaMedicrecord.objects.get(id=id_register)
+        nombre = "%s %s" % (registro.id_patient.last_name, registro.id_patient.first_name)
+        register.fields["id_sigia_medic_record"].initial = registro
+        fisico_form = fisico(prefix='physical_form', queryset=SigiaMedicPhysicalExam.objects.none())
+        diagnostic_form = diagnostic(prefix='diagnostic_form', queryset=SigiaMedicDiagnosticPlan.objects.none())
+        presumptive_form = presumptive(prefix='presumptive_form',
+                                       queryset=SigiaMedicDiagnosticPresumptive.objects.none())
+        context = {'action': self.action, 'title': self.title, 'breadCrumbEntries': self.breadCrumbEntries,
+                   'fisico_form': fisico_form, 'diagnostic_form': diagnostic_form, 'name': nombre,
+                   'presumptive_form': presumptive_form, "registro_id": id_register, "consulta": register}
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        id_register = kwargs['pk']
+        self.breadCrumbEntries += (BreadCrumb("Listado de Consulta", "/medic/%s/consulta/" % id_register),
+                                   BreadCrumb("Realizar Consulta", "/medic/%s/consulta/new" % id_register),)
+        register = ConsultaForm(request.POST, prefix='consulta')
+        fisico_form = fisico(request.POST, prefix='physical_form')
+        diagnostic_form = diagnostic(request.POST, prefix='diagnostic_form')
+        presumptive_form = presumptive(request.POST, prefix='presumptive_form')
+        if register.is_valid() and fisico_form.is_valid() and diagnostic_form.is_valid() \
+                and presumptive_form.is_valid():
+            nuevo = register.save(commit=False)
+            nuevo.live = True
+            nuevo.save()
+            for form in fisico_form.forms:
+                control_save(form, nuevo)
+            for form in diagnostic_form.forms:
+                control_save(form, nuevo)
+            for form in presumptive_form.forms:
+                control_save(form, nuevo)
+            message = 'Se ha creado correctamente la consulta'
+            messages.add_message(request, messages.SUCCESS, message)
+            return redirect('/medic/%s/consulta/' % id_register)
+        registro = SigiaMedicrecord.objects.get(id=id_register)
+        nombre = "%s %s" % (registro.id_patient.last_name, registro.id_patient.first_name)
+        message = 'Por favor corrija los errores en el formulario'
+        messages.add_message(request, messages.ERROR, message)
+        context = {'action': self.action, 'title': self.title, 'breadCrumbEntries': self.breadCrumbEntries,
+                   'fisico_form': fisico_form, 'diagnostic_form': diagnostic_form, 'name': nombre,
+                   'presumptive_form': presumptive_form, "registro_id": id_register, "consulta": register}
+        return render(request, self.template_name, context)
+
+
+class MedicConsultaListView(TemplateView):
+    title = 'Lista de consultas'
+    template_name = 'medic_form_consultas_lista.html'
+    action = 'LIST'
+    breadCrumbEntries = (BreadCrumb("Bienvenido", "/welcome/"), BreadCrumb("Listado de Historiales", "/medic/"))
+
+    def get_context_data(self, **kwargs):
+        id_register = kwargs['pk']
+        self.breadCrumbEntries += (BreadCrumb("Listado de Consulta", "/medic/%s/consulta/" % id_register),)
+        register = SigiaMedicrecord.objects.get(id=id_register)
+        nombre = "%s %s" % (register.id_patient.last_name, register.id_patient.first_name)
+        context = super(MedicConsultaListView, self).get_context_data(**kwargs)
+        context['title'] = self.title
+        context['breadCrumbEntries'] = self.breadCrumbEntries
+        context['id_registro'] = id_register
+        context['name'] = nombre
+        return context
+
+
+class MedicConsultaListData(View):
+    def get(self, request, *args, **kwargs):
+        locale.setlocale(locale.LC_ALL, '')
+        array = []
+        id_register = kwargs['pk']
+        records = SigiaMedicrecord.objects.get(id=id_register).medic_consulta.all()
+        for record in records:
+            fisico = ""
+            diagnostico = ""
+            presumptive = ""
+            for x in record.physical_exam.all():
+                fisico += "%s <br>" % x.detail_background
+            for x in record.diagnostic_plan.all():
+                diagnostico += "%s <br>" % x.detail_background
+            for x in record.diagnostic_presumptive.all():
+                presumptive += "%s <br>" % x.detail_background
+            std = {'id': record.id,
+                   'actual': record.actual_problem,
+                   'fisico': fisico,
+                   'diagnostico': diagnostico,
+                   'presumptive': presumptive}
+            array.append(std)
+        return JsonResponse(array, safe=False)
+
+
+class MedicConsultaDeleteView(View):
+    redirect_url = '/medic/appointment/'
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(MedicConsultaDeleteView, cls).as_view(**initkwargs)
+        return login_required(view, "/")
+
+    def post(self, request, *args, **kwargs):
+        print kwargs
+        id_register = kwargs['id_consulta']
+        id_historial = kwargs['pk']
+        register_1 = SigiaMedicConsulta.objects.get(id=id_register)
+        SigiaMedicPhysicalExam.objects.filter(id_sigia_medic_record=register_1).update(live=False)
+        SigiaMedicDiagnosticPlan.objects.filter(id_sigia_medic_record=register_1).update(live=False)
+        SigiaMedicDiagnosticPresumptive.objects.filter(id_sigia_medic_record=register_1).update(live=False)
+        register_1.delete()
+        message = 'Se ha eliminado correctamente la consulta.'
+        messages.add_message(request, messages.SUCCESS, message)
+        return redirect('/medic/%s/consulta/' % id_historial)
+
+
+class MedicConsultaUpdateView(View):
+    title = 'Actualizar Consulta'
+    template_name = 'medic_form_consultas.html'
+    breadCrumbEntries = (BreadCrumb("Bienvenido", "/welcome/"),)
+    action = 'UPDATE'
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(MedicConsultaUpdateView, cls).as_view(**initkwargs)
+        return login_required(view, "/")
+
+    def get(self, request, *args, **kwargs):
+        id_register = kwargs['pk']
+        id_consulta = kwargs['id_consulta']
+        self.breadCrumbEntries += (BreadCrumb("Listado de Consulta", "/medic/%s/consulta/" % id_register),
+                                   BreadCrumb("Actualizar Consulta",
+                                              "medic/%s/consulta/%s/upgrade/" % (id_register, id_consulta)),)
+        consulta = SigiaMedicConsulta.objects.get(id=id_consulta)
+        register = ConsultaForm(prefix='consulta', instance=consulta)
+        registro = SigiaMedicrecord.objects.get(id=id_register)
+        nombre = "%s %s" % (registro.id_patient.last_name, registro.id_patient.first_name)
+        fisico_form = fisico(prefix='physical_form', instance=consulta)
+        diagnostic_form = diagnostic(prefix='diagnostic_form', instance=consulta)
+        presumptive_form = presumptive(prefix='presumptive_form', instance=consulta)
+        context = {'action': self.action, 'title': self.title, 'breadCrumbEntries': self.breadCrumbEntries,
+                   'fisico_form': fisico_form, 'diagnostic_form': diagnostic_form, 'name': nombre,
+                   'presumptive_form': presumptive_form, "registro_id": id_register, "consulta": register,
+                   "consulta_id": id_consulta}
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        id_register = kwargs['pk']
+        id_consulta = kwargs['id_consulta']
+        self.breadCrumbEntries += (BreadCrumb("Listado de Consulta", "/medic/%s/consulta/" % id_register),
+                                   BreadCrumb("Actualizar Consulta",
+                                              "medic/%s/consulta/%s/upgrade/" % (id_register, id_consulta)),)
+        consulta = SigiaMedicConsulta.objects.get(id=id_consulta)
+        register = ConsultaForm(request.POST, prefix='consulta', instance=consulta)
+        fisico_form = fisico(request.POST, prefix='physical_form', instance=consulta)
+        diagnostic_form = diagnostic(request.POST, prefix='diagnostic_form', instance=consulta)
+        presumptive_form = presumptive(request.POST, prefix='presumptive_form', instance=consulta)
+        if register.is_valid() and fisico_form.is_valid() and diagnostic_form.is_valid() \
+                and presumptive_form.is_valid():
+            nuevo = register.save(commit=False)
+            nuevo.live = True
+            nuevo.save()
+            for form in fisico_form.forms:
+                control_save_update(form, nuevo)
+            for form in diagnostic_form.forms:
+                control_save_update(form, nuevo)
+            for form in presumptive_form.forms:
+                control_save_update(form, nuevo)
+            message = 'Se ha actualizado correctamente la consulta'
+            messages.add_message(request, messages.SUCCESS, message)
+            return redirect('/medic/%s/consulta/' % id_register)
+        registro = SigiaMedicrecord.objects.get(id=id_register)
+        nombre = "%s %s" % (registro.id_patient.last_name, registro.id_patient.first_name)
+        message = 'Por favor corrija los errores en el formulario'
+        messages.add_message(request, messages.ERROR, message)
+        context = {'action': self.action, 'title': self.title, 'breadCrumbEntries': self.breadCrumbEntries,
+                   'fisico_form': fisico_form, 'diagnostic_form': diagnostic_form, 'name': nombre,
+                   'presumptive_form': presumptive_form, "registro_id": id_register, "consulta": register,
+                   "consulta_id": id_consulta}
+        return render(request, self.template_name, context)
