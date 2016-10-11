@@ -791,7 +791,7 @@ class SigiaMedicPhysicalExam(LiveModel, TimeStampedModel, AuthStampedModel):
                                               related_name="physical_exam")
     type_background = models.ForeignKey(SigiaMedicPhysicalExamDetail, models.DO_NOTHING,
                                         db_column='type_background', blank=False, null=False)
-    detail_background = models.CharField(max_length=200, blank=True, null=True,  verbose_name="Detalle")
+    detail_background = models.CharField(max_length=200, blank=True, null=True, verbose_name="Detalle")
     typed = models.CharField(max_length=10, blank=False, null=False, verbose_name="Tipo", db_column='type')
     cp = models.BooleanField(default=False, verbose_name="Con evidencia de patología")
     sp = models.BooleanField(default=False, verbose_name="Sin evidencia de patología")
@@ -878,12 +878,13 @@ class SigiaMedicAppointment(LiveModel, TimeStampedModel, AuthStampedModel):
 
 
 class SigiaMedicPrescription(LiveModel, TimeStampedModel, AuthStampedModel):
-    id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord',
+    id_sigia_medic_record = models.ForeignKey(SigiaMedicConsulta, models.DO_NOTHING, db_column='id_sigiamedicrecord',
                                               related_name="receta_medicas")
     active_name = models.CharField(max_length=100, blank=False, null=False, verbose_name="Principio Activo")
-    dosage = models.CharField(max_length=200, blank=False, null=False, verbose_name="Prescripción")
+    detail_background = models.CharField(max_length=200, blank=False, null=False, verbose_name="Prescripción",
+                                         db_column='prescription', )
 
     class Meta:
         managed = True
         verbose_name = "Receta medica"
-        db_table = 'sigia_medical_appointment'
+        db_table = 'sigia_medic_prescription'

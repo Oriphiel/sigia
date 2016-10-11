@@ -24,7 +24,7 @@ from sigia.forms import LoginForm, UserForm, UserPersonalInfoForm, \
     EthnicGroupForm, BugReportForm, CountryForm, ProvinceForm, CantonForm, \
     ParishForm, ReducedStudentForm, ContactForm, TeacherForm, EventTypeForm, \
     StudentEventForm, StudiesForm, EventGroupForm, EmailForm, InstitutionForm, CreateMedicRecordForm, personal, \
-    personal_fem, family, contacto, fisico, diagnostic, presumptive, PatientAppointment, ConsultaForm
+    personal_fem, family, contacto, fisico, diagnostic, presumptive, PatientAppointment, ConsultaForm, prescription
 from django.contrib.auth.models import Group
 from django.views.generic.base import TemplateView
 from sigia.models import Student, UserProfile, Career, Course, Enrollment, \
@@ -32,7 +32,8 @@ from sigia.models import Student, UserProfile, Career, Course, Enrollment, \
     Country, Teacher, EventType, StudentEvent, Studies, EventsGroup, \
     EventsGroupRelation, StudentEventsGroupRelation, EmailLog, Institution, SigiaMedicCie10, SigiaMedicrecord, \
     SigiaMedicPersonalBackground, SigiaMedicFamilyBackground, SigiaMedicContact, SigiaMedicPhysicalExam, \
-    SigiaMedicDiagnosticPlan, SigiaMedicDiagnosticPresumptive, SigiaMedicAppointment, SigiaMedicConsulta
+    SigiaMedicDiagnosticPlan, SigiaMedicDiagnosticPresumptive, SigiaMedicAppointment, SigiaMedicConsulta, \
+    SigiaMedicPrescription
 from django.http.response import JsonResponse, HttpResponse, \
     HttpResponseRedirect
 from django.contrib import messages
@@ -3982,9 +3983,11 @@ class MedicConsultaCreateView(View):
         diagnostic_form = diagnostic(prefix='diagnostic_form', queryset=SigiaMedicDiagnosticPlan.objects.none())
         presumptive_form = presumptive(prefix='presumptive_form',
                                        queryset=SigiaMedicDiagnosticPresumptive.objects.none())
+        prescription_form = prescription(prefix='prescription_form', queryset=SigiaMedicPrescription.objects.none())
         context = {'action': self.action, 'title': self.title, 'breadCrumbEntries': self.breadCrumbEntries,
                    'fisico_form': fisico_form, 'diagnostic_form': diagnostic_form, 'name': nombre,
-                   'presumptive_form': presumptive_form, "registro_id": id_register, "consulta": register}
+                   'prescription_form': prescription_form, 'presumptive_form': presumptive_form,
+                   "registro_id": id_register, "consulta": register}
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
@@ -3995,8 +3998,9 @@ class MedicConsultaCreateView(View):
         fisico_form = fisico(request.POST, prefix='physical_form')
         diagnostic_form = diagnostic(request.POST, prefix='diagnostic_form')
         presumptive_form = presumptive(request.POST, prefix='presumptive_form')
+        prescription_form = prescription(request.POST, prefix='prescription_form')
         if register.is_valid() and fisico_form.is_valid() and diagnostic_form.is_valid() \
-                and presumptive_form.is_valid():
+                and presumptive_form.is_valid() and prescription_form.is_valid():
             nuevo = register.save(commit=False)
             nuevo.live = True
             nuevo.save()
@@ -4005,6 +4009,8 @@ class MedicConsultaCreateView(View):
             for form in diagnostic_form.forms:
                 control_save(form, nuevo)
             for form in presumptive_form.forms:
+                control_save(form, nuevo)
+            for form in prescription_form.forms:
                 control_save(form, nuevo)
             message = 'Se ha creado correctamente la consulta'
             messages.add_message(request, messages.SUCCESS, message)
@@ -4015,7 +4021,8 @@ class MedicConsultaCreateView(View):
         messages.add_message(request, messages.ERROR, message)
         context = {'action': self.action, 'title': self.title, 'breadCrumbEntries': self.breadCrumbEntries,
                    'fisico_form': fisico_form, 'diagnostic_form': diagnostic_form, 'name': nombre,
-                   'presumptive_form': presumptive_form, "registro_id": id_register, "consulta": register}
+                   'prescription_form': prescription_form, 'presumptive_form': presumptive_form,
+                   "registro_id": id_register, "consulta": register}
         return render(request, self.template_name, context)
 
 
@@ -4109,10 +4116,11 @@ class MedicConsultaUpdateView(View):
         fisico_form = fisico(prefix='physical_form', instance=consulta)
         diagnostic_form = diagnostic(prefix='diagnostic_form', instance=consulta)
         presumptive_form = presumptive(prefix='presumptive_form', instance=consulta)
+        prescription_form = prescription(prefix='prescription_form', instance=consulta)
         context = {'action': self.action, 'title': self.title, 'breadCrumbEntries': self.breadCrumbEntries,
                    'fisico_form': fisico_form, 'diagnostic_form': diagnostic_form, 'name': nombre,
                    'presumptive_form': presumptive_form, "registro_id": id_register, "consulta": register,
-                   "consulta_id": id_consulta}
+                   "consulta_id": id_consulta, 'prescription_form': prescription_form}
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
@@ -4126,8 +4134,9 @@ class MedicConsultaUpdateView(View):
         fisico_form = fisico(request.POST, prefix='physical_form', instance=consulta)
         diagnostic_form = diagnostic(request.POST, prefix='diagnostic_form', instance=consulta)
         presumptive_form = presumptive(request.POST, prefix='presumptive_form', instance=consulta)
+        prescription_form = prescription(request.POST, prefix='prescription_form', instance=consulta)
         if register.is_valid() and fisico_form.is_valid() and diagnostic_form.is_valid() \
-                and presumptive_form.is_valid():
+                and presumptive_form.is_valid() and prescription_form.is_valid():
             nuevo = register.save(commit=False)
             nuevo.live = True
             nuevo.save()
@@ -4136,6 +4145,8 @@ class MedicConsultaUpdateView(View):
             for form in diagnostic_form.forms:
                 control_save_update(form, nuevo)
             for form in presumptive_form.forms:
+                control_save_update(form, nuevo)
+            for form in prescription_form.forms:
                 control_save_update(form, nuevo)
             message = 'Se ha actualizado correctamente la consulta'
             messages.add_message(request, messages.SUCCESS, message)
@@ -4147,5 +4158,5 @@ class MedicConsultaUpdateView(View):
         context = {'action': self.action, 'title': self.title, 'breadCrumbEntries': self.breadCrumbEntries,
                    'fisico_form': fisico_form, 'diagnostic_form': diagnostic_form, 'name': nombre,
                    'presumptive_form': presumptive_form, "registro_id": id_register, "consulta": register,
-                   "consulta_id": id_consulta}
+                   "consulta_id": id_consulta, 'prescription_form': prescription_form}
         return render(request, self.template_name, context)

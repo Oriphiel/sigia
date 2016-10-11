@@ -16,7 +16,8 @@ from sigia.models import UserProfile, Teacher, Career, Course, Matter, Studies, 
     SigiaMedicFamilyBackgroundDetail, SigiaMedicPersonalBackground, SigiaMedicPersonalBackgroundDetail, \
     SigiaMedicrecord, \
     SigiaMedicPhysicalExam, SigiaMedicPhysicalExamDetail, SigiaMedicDiagnosticPlan, SigiaMedicDiagnosticPlanDetail, \
-    SigiaMedicDiagnosticPresumptive, SigiaMedicCie10, SigiaMedicalCenter, SigiaMedicAppointment, SigiaMedicConsulta
+    SigiaMedicDiagnosticPresumptive, SigiaMedicCie10, SigiaMedicalCenter, SigiaMedicAppointment, SigiaMedicConsulta, \
+    SigiaMedicPrescription
 from django.contrib.auth.models import User, Group
 from captcha.fields import CaptchaField
 from django.forms.widgets import TextInput, EmailInput, \
@@ -871,6 +872,18 @@ class ConsultaForm(forms.ModelForm):
         }
 
 
+class RecetaForm(forms.ModelForm):
+    class Meta:
+        model = SigiaMedicPrescription
+        exclude = ["id_sigia_medic_record", 'live']
+        widgets = {
+            'detail_background': Textarea(attrs={'class': 'form-control', 'rows': '2',
+                                            'placeholder': 'Escriba la prescripción'}),
+            'active_name': TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Escriba el medicamento o principio activo'})
+        }
+
+
 personal = inlineformset_factory(parent_model=SigiaMedicrecord, model=SigiaMedicPersonalBackground,
                                  form=PersonalMedicBackground, min_num=0, max_num=24, can_delete=True, can_order=True,
                                  validate_min=0, extra=1)
@@ -889,3 +902,6 @@ diagnostic = inlineformset_factory(parent_model=SigiaMedicConsulta, model=SigiaM
 presumptive = inlineformset_factory(parent_model=SigiaMedicConsulta, model=SigiaMedicDiagnosticPresumptive,
                                     form=DiagnosticPresumptive, min_num=0, max_num=20, can_delete=True, can_order=True,
                                     validate_min=0, extra=1)
+prescription = inlineformset_factory(parent_model=SigiaMedicConsulta, model=SigiaMedicPrescription,
+                                     form=RecetaForm, min_num=0, max_num=24, can_delete=True, can_order=True,
+                                     validate_min=0, extra=1)
