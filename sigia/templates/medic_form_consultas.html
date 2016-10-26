@@ -93,16 +93,14 @@
                                                     <div class="col-sm-2 col-md-2 col-lg-2">
                                                         {{ form.cp }}
                                                     </div>
-                                                    <label class="control-label col-sm-4 col-md-4 col-lg-4"
-                                                           for="{{ form.sp.auto_id }}">{{ form.sp.label }}</label>
-                                                    <div class="col-sm-3 col-md-3 col-lg-3">
-                                                        {{ form.sp }}
-                                                    </div>
+                                                        {{ form.sp.as_hidden }}
+                                                <div class="form-group">                                                </div>
                                                     <label class="control-label col-sm-2 col-md-2 col-lg-2"
                                                            for="{{ form.detail_background.auto_id }}">{{ form.detail_background.label }}</label>
                                                     <div class="col-sm-9 col-md-9 col-lg-9">
                                                         {{ form.detail_background }}
                                                     </div>
+
                                                 </div>
                                             {% endfor %}
                                         </div>
@@ -204,10 +202,14 @@
                                                     {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
                                                     <label for="{{ form.active_name.auto_id }}"
                                                            class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.active_name.label }}</label>
-                                                    <div class="col-sm-9 col-md-9 col-lg-9">
+                                                    <div class="col-sm-5 col-md-5 col-lg-5">
                                                         {{ form.active_name }}
                                                     </div>
-
+                                                    <label for="{{ form.quantity.auto_id }}"
+                                                           class="control-label col-sm-2 col-md-2 col-lg-2 ">{{ form.quantity.label }}</label>
+                                                    <div class="col-sm-2 col-md-2 col-lg-2">
+                                                        {{ form.quantity }}
+                                                    </div>
                                                     <label class="control-label col-sm-2 col-md-2 col-lg-2"
                                                            for="{{ form.detail_background.auto_id }}">{{ form.detail_background.label }}</label>
                                                     <div class="col-sm-9 col-md-9 col-lg-9">

@@ -688,8 +688,10 @@ class CreateMedicRecordForm(forms.ModelForm):
             'weight': TextInput(
                 attrs={'class': 'form-control', 'type': 'number', 'placeholder': 'KG', 'step': "0.01", 'min': '0'}),
             'height': TextInput(
-                attrs={'class': 'form-control', 'type': 'number', 'placeholder': 'm', 'step': "0.01", 'min': '0'}),
-            'imc': TextInput(attrs={'class': 'form-control', 'type': 'number'}),
+                attrs={'class': 'form-control', 'type': 'number', 'placeholder': 'm', 'step': "0.01", 'min': '0',
+                       'max': '3'}),
+            'imc': TextInput(
+                attrs={'class': 'form-control', 'type': 'number', 'placeholder': '%', 'step': "0.01", 'min': '0'}),
             'p_cephalico': TextInput(attrs={'class': 'form-control', 'type': 'number'}),
             'date': DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         }
@@ -878,9 +880,10 @@ class RecetaForm(forms.ModelForm):
         exclude = ["id_sigia_medic_record", 'live']
         widgets = {
             'detail_background': Textarea(attrs={'class': 'form-control', 'rows': '2',
-                                            'placeholder': 'Escriba la prescripción'}),
+                                                 'placeholder': 'Escriba la prescripción'}),
             'active_name': TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'Escriba el medicamento o principio activo'})
+                attrs={'class': 'form-control', 'placeholder': 'Escriba el medicamento o principio activo'}),
+            'quantity': TextInput(attrs={'class': 'form-control', 'type': 'number'})
         }
 
 

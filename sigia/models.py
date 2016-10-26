@@ -883,6 +883,7 @@ class SigiaMedicPrescription(LiveModel, TimeStampedModel, AuthStampedModel):
     active_name = models.CharField(max_length=100, blank=False, null=False, verbose_name="Principio Activo")
     detail_background = models.CharField(max_length=200, blank=False, null=False, verbose_name="Prescripción",
                                          db_column='prescription', )
+    quantity = models.IntegerField(blank=True, null=True, verbose_name="Cantidad")
 
     class Meta:
         managed = True

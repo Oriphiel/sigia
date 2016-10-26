@@ -3564,8 +3564,7 @@ class MedicRecordListData(View):
         for record in records:
             std = {'id': record.id,
                    'name': "%s %s" % (record.id_patient.last_name, record.id_patient.first_name),
-                   'date': "%s" % record.date.strftime("%d de %B de %Y a las %H:%M"),
-                   'actual': record.actual_problem}
+                   'date': "%s" % record.date.strftime("%d de %B de %Y a las %H:%M")}
             array.append(std)
         return JsonResponse(array, safe=False)
 

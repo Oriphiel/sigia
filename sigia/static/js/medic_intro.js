@@ -5,11 +5,18 @@
  */
 
 $(document).ready(function () {
+    var generate_imc = function () {
+        var altura = parseFloat($('#id_medico-height')[0].value);
+        var peso = parseFloat($('#id_medico-weight')[0].value);
+        $('#id_medico-imc')[0].value = (peso / (altura * altura)).toFixed(2);
+    };
     Date.prototype.toDateInputValue = (function () {
         var local = new Date(this);
         local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
         return local.toJSON().slice(0, 10);
     });
+    $('#id_medico-height')[0].onchange = generate_imc;
+    $('#id_medico-weight')[0].onchange = generate_imc;
     $('#id_medico-date').val(new Date().toDateInputValue());
     var dt = new Date();
     var time = dt.toTimeString().split(' ')[0];
