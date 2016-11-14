@@ -17,7 +17,7 @@ from sigia.models import UserProfile, Teacher, Career, Course, Matter, Studies, 
     SigiaMedicrecord, \
     SigiaMedicPhysicalExam, SigiaMedicPhysicalExamDetail, SigiaMedicDiagnosticPlan, SigiaMedicDiagnosticPlanDetail, \
     SigiaMedicDiagnosticPresumptive, SigiaMedicCie10, SigiaMedicalCenter, SigiaMedicAppointment, SigiaMedicConsulta, \
-    SigiaMedicPrescription
+    SigiaMedicPrescription, SigiaMedicCertificado, SigiaMedicPermiso
 from django.contrib.auth.models import User, Group
 from captcha.fields import CaptchaField
 from django.forms.widgets import TextInput, EmailInput, \
@@ -886,6 +886,26 @@ class RecetaForm(forms.ModelForm):
             'quantity': TextInput(attrs={'class': 'form-control', 'type': 'number'})
         }
 
+
+class CertificadoForm(forms.ModelForm):
+    class Meta:
+        model = SigiaMedicCertificado
+        exclude = ['live']
+        widgets = {
+            'date': DateInput(attrs={'class': 'form-control', 'type': 'date'})
+        }
+
+
+class PermisoForm(forms.ModelForm):
+    class Meta:
+        model = SigiaMedicPermiso
+        exclude = ["id_sigia_medic_record", 'live']
+        widgets = {
+            'detail_background': Textarea(attrs={'class': 'form-control', 'rows': '2',
+                                                 'placeholder': 'Escriba la prescripción'}),
+            'dateInitial': DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'dateEnd': DateInput(attrs={'class': 'form-control', 'type': 'date'})
+        }
 
 personal = inlineformset_factory(parent_model=SigiaMedicrecord, model=SigiaMedicPersonalBackground,
                                  form=PersonalMedicBackground, min_num=0, max_num=24, can_delete=True, can_order=True,

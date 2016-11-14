@@ -24,7 +24,8 @@ from sigia.forms import LoginForm, UserForm, UserPersonalInfoForm, \
     EthnicGroupForm, BugReportForm, CountryForm, ProvinceForm, CantonForm, \
     ParishForm, ReducedStudentForm, ContactForm, TeacherForm, EventTypeForm, \
     StudentEventForm, StudiesForm, EventGroupForm, EmailForm, InstitutionForm, CreateMedicRecordForm, personal, \
-    personal_fem, family, contacto, fisico, diagnostic, presumptive, PatientAppointment, ConsultaForm, prescription
+    personal_fem, family, contacto, fisico, diagnostic, presumptive, PatientAppointment, ConsultaForm, prescription, \
+    CertificadoForm
 from django.contrib.auth.models import Group
 from django.views.generic.base import TemplateView
 from sigia.models import Student, UserProfile, Career, Course, Enrollment, \
@@ -33,7 +34,7 @@ from sigia.models import Student, UserProfile, Career, Course, Enrollment, \
     EventsGroupRelation, StudentEventsGroupRelation, EmailLog, Institution, SigiaMedicCie10, SigiaMedicrecord, \
     SigiaMedicPersonalBackground, SigiaMedicFamilyBackground, SigiaMedicContact, SigiaMedicPhysicalExam, \
     SigiaMedicDiagnosticPlan, SigiaMedicDiagnosticPresumptive, SigiaMedicAppointment, SigiaMedicConsulta, \
-    SigiaMedicPrescription
+    SigiaMedicPrescription, SigiaMedicCertificado
 from django.http.response import JsonResponse, HttpResponse, \
     HttpResponseRedirect
 from django.contrib import messages
@@ -57,7 +58,7 @@ import re
 from bs4 import BeautifulSoup
 from django.template.loader import render_to_string
 import threading
-
+from django.utils import timezone
 empty_over_none = lambda x: x == None and '' or x
 
 ecu_tz = pytz.timezone("America/Guayaquil")
@@ -4159,3 +4160,16 @@ class MedicConsultaUpdateView(View):
                    'presumptive_form': presumptive_form, "registro_id": id_register, "consulta": register,
                    "consulta_id": id_consulta, 'prescription_form': prescription_form}
         return render(request, self.template_name, context)
+
+
+class MedicCertificadoCreateView(View):
+    def get(self, request, *args, **kwargs):
+        locale.setlocale(locale.LC_ALL, '')
+        array = []
+        id_register = request.GET.get('pk')
+        record = SigiaMedicrecord.objects.get(id=id_register)
+        certificado = SigiaMedicCertificado()
+        certificado.date = timezone.now()
+        certificado.id_sigia_medic_record = record
+        certificado.save()
+        return JsonResponse(array, safe=False)

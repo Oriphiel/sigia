@@ -889,3 +889,28 @@ class SigiaMedicPrescription(LiveModel, TimeStampedModel, AuthStampedModel):
         managed = True
         verbose_name = "Receta medica"
         db_table = 'sigia_medic_prescription'
+
+
+class SigiaMedicCertificado(LiveModel, TimeStampedModel, AuthStampedModel):
+    id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord',
+                                              related_name="medic_certificate")
+    date = models.DateTimeField(null=True, verbose_name="fecha de certificado")
+
+    class Meta:
+        managed = True
+        verbose_name = "Certificado medico"
+        db_table = 'sigia_medic_certificate'
+
+
+class SigiaMedicPermiso(LiveModel, TimeStampedModel, AuthStampedModel):
+    id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord',
+                                              related_name="medic_permission")
+    detail_background = models.CharField(max_length=200, blank=False, null=False, verbose_name="Detalle permiso",
+                                         db_column='detalle', )
+    dateInitial = models.DateTimeField(null=True, verbose_name="fecha de certificado")
+    dateEnd = models.DateTimeField(null=True, verbose_name="fecha de certificado")
+
+    class Meta:
+        managed = True
+        verbose_name = "Permiso medico"
+        db_table = 'sigia_medic_permission'

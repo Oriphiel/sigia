@@ -40,7 +40,7 @@ from views import LoginView, WelcomeView, LogoutView, StudentCreateView, Student
     MedicPatientCreateView, MedicPatientListData, MedicPatientListView, MedicPatientUpdateView, MedicPatientDeleteView, \
     MedicAppointmentListView, MedicAppointmentListData, MedicAppointmentCreateView, MedicAppointmentUpdateView, \
     MedicAppointmentDeleteView, MedicAppointmentRealize, MedicConsultaCreateView, MedicConsultaListView, \
-    MedicConsultaListData, MedicConsultaDeleteView, MedicConsultaUpdateView
+    MedicConsultaListData, MedicConsultaDeleteView, MedicConsultaUpdateView, MedicCertificadoCreateView
 
 urlpatterns = [
     # Examples:
@@ -236,6 +236,7 @@ urlpatterns = [
     url(r'^medic/api/list/patient/$', MedicPatientListData.as_view()),
     url(r'^medic/api/list/appointment/$', MedicAppointmentListData.as_view()),
     url(r'^medic/api/list/(?P<pk>[^/]+)/consulta/$', MedicConsultaListData.as_view()),
+    url(r'^medic/api/certificado/$', MedicCertificadoCreateView.as_view()),
     url(r'^api/medic/cie10/$', Cie10Lista.as_view()),
     url(r'^user/api/lista/$', UserLista.as_view()),
 ]

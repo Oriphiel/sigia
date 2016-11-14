@@ -121,7 +121,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-REPORT_SERVER = "192.168.201.6:8080"
+REPORT_SERVER = "181.196.187.66:8080"
 
 TEMPLATES = [
     {

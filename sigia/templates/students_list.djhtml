@@ -16,10 +16,10 @@
     	{% if user|has_group:"general_secretary" %}
         <button class="btn btn-default" id="tbb_delete" title="Eliminar Estudiante">
 			<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Eliminar
-    	</button>      
+    	</button>
     	{% endif %}
     </div>
-    
+
     <div class="btn-group" role="group">
     	<button class="btn btn-default" id="tbb_print" title="Ver/Imprimir">
 			<span class="glyphicon glyphicon-print" aria-hidden="true"></span> Ver/Imprimir
@@ -28,7 +28,7 @@
 			<span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Excel
     	</button>
     </div>
-   
+
    {% if user|has_group:"secretary" %}
     <div class="btn-group">
 	  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true">
@@ -40,7 +40,7 @@
 		    <a id="tbb_enrollment" title="Matricular Estudiante">
 		    	<span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>Matricular
 		    </a>
-    	</li> 
+    	</li>
     	<li>
 		    <a id="tbb_student_event" title="Registrar Evento de Estudiante">
 		    	<span class="glyphicon glyphicon-time" aria-hidden="true"></span>Registar Evento
@@ -48,21 +48,21 @@
     	</li>
     	<li>
 		    <a id="tbb_assign_eventgroup_dialog" title="Asociar Grupo de Eventos al Estudiante">
-		    	<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>Asociar Grupo de Eventos 
+		    	<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>Asociar Grupo de Eventos
 		    </a>
-    	</li> 
+    	</li>
     	<li>
 		    <a id="tbb_payment_order" title="Emitir orden de pago a estudiante">
 		    	<span class="glyphicon glyphicon-usd" aria-hidden="true"></span>Emitir Orden de Pago
 		    </a>
     	</li>
-    	
+
 <!---	    <li class="divider"></li> -->
 	  </ul>
 	</div>
-	
+
 	{% endif %}
-	
+
 	<div class="btn-group">
 	  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true">
     	<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Ver
@@ -73,7 +73,7 @@
 		    <a id="tbb_view_enrollment" title="Ver Matrículas de Estudiante">
 		    	<span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>Matrículas
 		    </a>
-    	</li> 	  
+    	</li>
        <li>
 		    <a id="tbb_view_student_event" title="Ver Eventos del Estudiante">
 		    	<span class="glyphicon glyphicon-time" aria-hidden="true"></span>Eventos del Estudiante
@@ -83,17 +83,17 @@
 		    <a id="tbb_view_student_event_print" title="Ver Eventos del Estudiante (Imprimir)">
 		    	<span class="glyphicon glyphicon-time" aria-hidden="true"></span>Eventos del Estudiante (Imprimir)
 		    </a>
-    	</li> 
+    	</li>
     	<li>
 		    <a id="tbb_view_eventgroup_dialog" title="Ver Grupo de Eventos Asociados al Estudiante">
-		    	<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>Ver Grupo de Eventos 
+		    	<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>Ver Grupo de Eventos
 		    </a>
-    	</li> 
+    	</li>
 	    <li>
 		    <a id="tbb_view_payment_orders" title="Ver órdenes de pago de este estudiante">
 		    	<span class="glyphicon glyphicon-usd" aria-hidden="true"></span>Órdenes de Pago
 		    </a>
-    	</li> 
+    	</li>
 	  </ul>
 	</div>
 </div>
@@ -129,12 +129,12 @@
         if (row.approved == false ) return {classes: 'warning-text'};
         return {classes: 'success-text'};
     };
-    
+
     $(document).ready(function() {
     	 $('#table-pagination').mutate('height width', function(el,info) {
 	        $('#table-pagination').bootstrapTable('resetView');
 	    });
-    	
+
     	$('#table-pagination').bootstrapTable({
                 method: 'get',
                 url: '/students/api/list/',
@@ -239,11 +239,11 @@
                     filterControl: 'input'
                 }]
             });
-    
+
     	$('#eventgroup-table').mutate('height width', function(el,info) {
 	        $('#eventgroup-table').bootstrapTable('resetView');
 	    });
-    	
+
     	$('#eventgroup-table').bootstrapTable({
                 method: 'get',
                 url: '/event_group/api/list/',
@@ -277,7 +277,7 @@
                     sortable: true,
                 }]
             });
-    
+
     	$('#tbb_assign_eventgroup_dialog').click(function(){
 			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
 			if (student == null){
@@ -302,7 +302,7 @@
 							}
 				        }
 				    }];
-					
+
 					$.jsPanel({
 					  id:       "find_eventgroup_dialog",
 					  selector: "#e-jspanelclosed",
@@ -321,7 +321,7 @@
 					  size:     { width:  1000, height: 450 },
 					  content: $('#find_eventgroup_div'),
 					});
-					
+
 					$("#find_eventgroup_dialog").on("jspanelbeforeclose", function (event, id) {
 					    if( id === "find_eventgroup_dialog" ) {
 					        $('#find_eventgroup_div').appendTo('#eventgroup_dialog_container');
@@ -332,7 +332,7 @@
 					}
 				}
 		});
-    
+
 	    $('#tbb_edit').click(function(){
 			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
 			if (student == null){
@@ -341,7 +341,7 @@
 				LoadAjaxContent("/students/" + student.id + "/upgrade/");
 			}
 		});
-		
+
 		$('#tbb_view_student_event').click(function(){
 			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
 			if (student == null){
@@ -350,11 +350,11 @@
 				LoadAjaxContent("/student_event/student/" + student.id + "/");
 			}
 		});
-		
+
 		$('#tbb_export').click(function(){
 			window.open("http://{{ REPORT_SERVER }}/pentaho/api/repos/%3Aaitec%3Astudent_excel.prpt/viewer", '_blank');
 		});
-		
+
 		$('#tbb_print').click(function(){
 		var student = $('#table-pagination').bootstrapTable('getSelections')[0];
 			if (student == null){
@@ -369,7 +369,7 @@
 				});
 			}
 		});
-		
+
 		$('#tbb_view_student_event_print').click(function(){
 		var student = $('#table-pagination').bootstrapTable('getSelections')[0];
 			if (student == null){
@@ -384,7 +384,7 @@
 				});
 			}
 		});
-		
+
 		$('#tbb_view_eventgroup_dialog').click(function(){
 			var toolbar_footer = [{
 		        item: '<button type="button"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>',
@@ -395,7 +395,7 @@
 					event.data.close();
 		        }
 		    }];
-					    
+
 			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
 				if (student == null){
 					bootbox.alert('Debe seleccionar un estudiante primero.');
@@ -412,7 +412,7 @@
 					});
 				}
 		});
-		
+
 		$('#tbb_enrollment').click(function(){
 			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
 			if (student == null){
@@ -425,7 +425,7 @@
 				}
 			}
 		});
-		
+
 		$('#tbb_view_enrollment').click(function(){
 			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
 			if (student == null){
@@ -438,7 +438,7 @@
 				}
 			}
 		});
-		
+
 		$('#tbb_student_event').click(function(){
 			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
 			if (student == null){
@@ -451,7 +451,7 @@
 				}
 			}
 		});
-		
+
 		$('#tbb_view_payment_orders').click(function(){
 			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
 			if (student == null){
@@ -464,7 +464,7 @@
 				}
 			}
 		});
-		
+
 		$('#tbb_payment_order').click(function(){
 			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
 			if (student == null){
@@ -477,13 +477,13 @@
 				}
 			}
 		});
-		
+
 		$('#tbb_delete').click(function(){
 			var student = $('#table-pagination').bootstrapTable('getSelections')[0];
 			if (student == null){
 				bootbox.alert('Debe seleccionar un estudiante primero.');
 			} else {
-				
+
 				var toolbar_footer = [{
 			        item: '<button type="button"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>',
 			        event: 'click',
@@ -496,13 +496,13 @@
 					//	$('#du_student_id')[0].value = student.id;
 						$('#du_comentario').val($("#id_end_obs").val());
 						PostAndLoadAjaxContent($('#du_form'));
-			        	
+
 			    //    <!--	var student_event = $('#table-pagination').bootstrapTable('getAllSelections');
 			    //    	var str_ids = "";
-		       // 		for (var x = 0; x < student_event.length; x++){ 
-	        	//			str_ids  += student_event[x].id + ",";		        			
+		       // 		for (var x = 0; x < student_event.length; x++){
+	        	//			str_ids  += student_event[x].id + ",";
 		        //		}
-		        		
+
 		        //		$('#du_ids').val(str_ids.substring(0, str_ids.length - 1));
 			     //   	$('#du_form')[0].action="/student_event/change_state/ABO/";
 			     //   	$("#du_end_obs").val($("#id_end_obs").val());
@@ -522,8 +522,8 @@
 						  event.data.close();
 			    	}
 			    }];
-				
-				
+
+
 					$.jsPanel({
 				  id:       "obs_dialog",
 				  selector: "#e-jspanelclosed",
