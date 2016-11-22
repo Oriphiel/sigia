@@ -125,7 +125,18 @@
                 </a>
             </li>
         {% endif %}
-
+        {% if user|has_group:"medico" %}
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle">
+                    <i class="fa fa-heartbeat "></i>
+                    <span class="hidden-xs">Control medico</span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="ajax-link" href="/medic/">Historiales medicos</a></li>
+                    <li><a class="ajax-link" href="/medic/appointment/">Citas programadas</a></li>
+                </ul>
+            </li>
+        {% endif %}
         {% if user.is_authenticated %}
 
             <li>

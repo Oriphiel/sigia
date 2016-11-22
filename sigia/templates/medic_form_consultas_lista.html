@@ -212,7 +212,7 @@
                                     bootstrap: true,
                                     position: "center",
                                     size: {width: 800, height: 600},
-                                    content: '<embed src="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3AReportes%3ACertificadoCopia.prpt/generatedContent?userid=admin&password=password&output-type=pageable/pdf&esto=' + {{ id_registro }}+'" width="100%" height="100%">'
+                                    content: '<embed src="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3AReportes%3ACertificadoCopia.prpt/generatedContent?userid=admin&password=password&output-type=pageable/pdf&esto=' + data[0].id_registro+'" width="100%" height="100%">'
                                 });
                             }
                         });
