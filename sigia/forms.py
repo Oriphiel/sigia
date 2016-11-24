@@ -651,9 +651,7 @@ class UpdateEnrollmentForm(forms.ModelForm):
 class CreateMedicRecordForm(forms.ModelForm):
     id_patient = UserModelChoiceField(
         widget=forms.Select(attrs={'class': 'form-control selectpicker id_paciente', 'data-live-search': "true"}),
-        queryset=Group.objects.get(name="paciente").user_set.filter(is_active=True).all().order_by("last_name",
-                                                                                                   "first_name"),
-        label="Paciente")
+        queryset=User.objects.filter(is_active=True).all().order_by("last_name", "first_name"), label="Paciente")
 
     class Meta:
         model = SigiaMedicrecord
@@ -841,9 +839,7 @@ class MedicalCenter(forms.ModelForm):
 class PatientAppointment(forms.ModelForm):
     id_patient = UserModelChoiceField(
         widget=forms.Select(attrs={'class': 'form-control selectpicker id_paciente', 'data-live-search': "true"}),
-        queryset=Group.objects.get(name="paciente").user_set.filter(is_active=True).all().order_by("last_name",
-                                                                                                   "first_name"),
-        label="Paciente")
+        queryset=User.objects.filter(is_active=True).all().order_by("last_name", "first_name"), label="Paciente")
     done = forms.BooleanField(widget=RadioSelect(choices=[(True, 'Si'),
                                                           (False, 'No')]), label="Cita realizada",
                               initial=False, required=False)
@@ -906,6 +902,7 @@ class PermisoForm(forms.ModelForm):
             'dateInitial': DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'dateEnd': DateInput(attrs={'class': 'form-control', 'type': 'date'})
         }
+
 
 personal = inlineformset_factory(parent_model=SigiaMedicrecord, model=SigiaMedicPersonalBackground,
                                  form=PersonalMedicBackground, min_num=0, max_num=24, can_delete=True, can_order=True,
