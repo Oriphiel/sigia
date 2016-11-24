@@ -698,7 +698,7 @@ class SigiaMedicPersonalBackgroundDetail(LiveModel, TimeStampedModel, AuthStampe
 
 class SigiaMedicrecord(LiveModel, TimeStampedModel, AuthStampedModel):
     id_patient = models.ForeignKey(User, models.DO_NOTHING, db_column='id_patient', blank=False, null=False)
-    blood_type_by = models.IntegerField(blank=True, null=True, verbose_name="Tipo de sangre")
+    blood_type_by = models.IntegerField(blank=True, null=True, verbose_name="Tipo de seguro")
     blood_type = models.CharField(max_length=4, blank=True, null=True, verbose_name="Grupo sanguíneo")
     form_arrival = models.CharField(max_length=40, blank=False, null=False, verbose_name="Forma de llegada")
     source_information = models.CharField(max_length=40, blank=False, null=False)

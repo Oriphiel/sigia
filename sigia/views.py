@@ -4172,6 +4172,5 @@ class MedicCertificadoCreateView(View):
         certificado.date = timezone.now()
         certificado.id_sigia_medic_record = record
         certificado.save()
-        print certificado.id
         array.append({'id_registro': certificado.id})
         return JsonResponse(array, safe=False)

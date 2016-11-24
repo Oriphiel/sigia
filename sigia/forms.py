@@ -697,9 +697,21 @@ class CreateMedicRecordForm(forms.ModelForm):
     def clean_id_patient(self):
         id_patient = self.cleaned_data['id_patient']
         if id_patient:
+            if SigiaMedicrecord.objects.filter(id_patient=id_patient, live=True).exists():
+                raise forms.ValidationError("Este paciente ya tiene un formulario")
             return id_patient
         else:
             raise forms.ValidationError("Este campo es obligatorio")
+
+    def clean_phone_delivery(self):
+        phone = self.cleaned_data['phone_delivery']
+        if phone:
+            if phone.isdigit():
+                return phone
+            else:
+                raise forms.ValidationError("Ingrese un numero telefónico valido")
+        else:
+            return phone
 
 
 class PersonalMedicBackground(forms.ModelForm):
@@ -768,6 +780,16 @@ class MedicContact(forms.ModelForm):
     def __init__(self, *arg, **kwarg):
         super(MedicContact, self).__init__(*arg, **kwarg)
         self.empty_permitted = False
+
+    def clean_phone_number(self):
+        phone = self.cleaned_data['phone_number']
+        if phone:
+            if phone.isdigit():
+                return phone
+            else:
+                raise forms.ValidationError("Ingrese un numero telefónico valido")
+        else:
+            return phone
 
 
 class PhysicalExam(forms.ModelForm):
