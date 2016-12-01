@@ -40,8 +40,8 @@
                                 </a>
                             </li>
                             <li>
-                                <a id="tbb_print_permiso" title="Ver Permisos">
-                                    <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>Permisos Medicos
+                                <a id="tbb_print_permiso" title="Crear Permiso">
+                                    <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>Permiso Medico
                                 </a>
                             </li>
                         </ul>
@@ -77,7 +77,7 @@
 
             $('#table-pagination').bootstrapTable({
                 method: 'get',
-                url: 'medic/api/list/' + {{ id_registro }} +'/consulta/',
+                url: 'medic/api/list/' + {{ id_registro }} +'/permiso/',
                 cache: true,
                 height: 600,
                 striped: false,
@@ -105,32 +105,24 @@
                     sortable: true,
                     filterControl: 'input'
                 }, {
-                    field: 'actual',
-                    title: 'Problema Actual',
+                    field: 'dateInitial',
+                    title: 'Fecha Inicio',
                     sortable: true,
                     filterControl: 'input'
                 }, {
-                    field: 'diagnostico',
-                    title: 'Diagnostico',
+                    field: 'dateEnd',
+                    title: 'Fecha Final',
                     sortable: true,
                     filterControl: 'input'
                 }, {
-                    field: 'fisico',
-                    title: 'Examen Fisico',
-                    sortable: true,
-                    filterControl: 'input'
-                }, {
-                    field: 'presumptive',
-                    title: 'Posible Enfermedad',
+                    field: 'detalle',
+                    title: 'Detalle',
                     sortable: true,
                     filterControl: 'input'
                 }]
             });
             $('#tbb_new').click(function () {
-                LoadAjaxContent("/medic/" + {{ id_registro }} +"/consulta/new/");
-            });
-            $('#tbb_print_permiso').click(function () {
-                LoadAjaxContent("/medic/" + {{ id_registro }} +"/consulta/permiso/");
+                LoadAjaxContent("/medic/" + {{ id_registro }} +"/consulta/permiso/new/");
             });
             $('#tbb_edit').click(function () {
                 var historial = $('#table-pagination').bootstrapTable('getSelections')[0];

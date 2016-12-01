@@ -40,7 +40,8 @@ from views import LoginView, WelcomeView, LogoutView, StudentCreateView, Student
     MedicPatientCreateView, MedicPatientListData, MedicPatientListView, MedicPatientUpdateView, MedicPatientDeleteView, \
     MedicAppointmentListView, MedicAppointmentListData, MedicAppointmentCreateView, MedicAppointmentUpdateView, \
     MedicAppointmentDeleteView, MedicAppointmentRealize, MedicConsultaCreateView, MedicConsultaListView, \
-    MedicConsultaListData, MedicConsultaDeleteView, MedicConsultaUpdateView, MedicCertificadoCreateView
+    MedicConsultaListData, MedicConsultaDeleteView, MedicConsultaUpdateView, MedicCertificadoCreateView, \
+    MedicPermisoListView, MedicPermisoCreateView, MedicPermisoListData
 
 urlpatterns = [
     # Examples:
@@ -223,6 +224,8 @@ urlpatterns = [
     url(r'^medic/(?P<pk>[^/]+)/consulta/new/$', MedicConsultaCreateView.as_view()),
     url(r'^medic/(?P<pk>[^/]+)/consulta/(?P<id_consulta>[^/]+)/delete/$', MedicConsultaDeleteView.as_view()),
     url(r'^medic/(?P<pk>[^/]+)/consulta/(?P<id_consulta>[^/]+)/upgrade/$', MedicConsultaUpdateView.as_view()),
+    url(r'^medic/(?P<pk>[^/]+)/consulta/permiso/$', MedicPermisoListView.as_view()),
+    url(r'^medic/(?P<pk>[^/]+)/consulta/permiso/new/$', MedicPermisoCreateView.as_view()),
     url(r'^medic/appointment/$', MedicAppointmentListView.as_view()),
     url(r'^medic/appointment/new/$', MedicAppointmentCreateView.as_view()),
     url(r'^medic/appointment/(?P<pk>[^/]+)/upgrade/$', MedicAppointmentUpdateView.as_view()),
@@ -236,6 +239,7 @@ urlpatterns = [
     url(r'^medic/api/list/patient/$', MedicPatientListData.as_view()),
     url(r'^medic/api/list/appointment/$', MedicAppointmentListData.as_view()),
     url(r'^medic/api/list/(?P<pk>[^/]+)/consulta/$', MedicConsultaListData.as_view()),
+    url(r'^medic/api/list/(?P<pk>[^/]+)/permiso/$',  MedicPermisoListData.as_view()),
     url(r'^medic/api/certificado/$', MedicCertificadoCreateView.as_view()),
     url(r'^api/medic/cie10/$', Cie10Lista.as_view()),
     url(r'^user/api/lista/$', UserLista.as_view()),

@@ -905,10 +905,10 @@ class SigiaMedicCertificado(LiveModel, TimeStampedModel, AuthStampedModel):
 class SigiaMedicPermiso(LiveModel, TimeStampedModel, AuthStampedModel):
     id_sigia_medic_record = models.ForeignKey(SigiaMedicrecord, models.DO_NOTHING, db_column='id_sigiamedicrecord',
                                               related_name="medic_permission")
-    detail_background = models.CharField(max_length=200, blank=False, null=False, verbose_name="Detalle permiso",
+    detail_background = models.CharField(max_length=200, blank=False, null=False, verbose_name="Detalle",
                                          db_column='detalle', )
-    dateInitial = models.DateTimeField(null=True, verbose_name="fecha de certificado")
-    dateEnd = models.DateTimeField(null=True, verbose_name="fecha de certificado")
+    dateInitial = models.DateTimeField(null=True, verbose_name="fecha de Inicio")
+    dateEnd = models.DateTimeField(null=True, verbose_name="fecha final")
 
     class Meta:
         managed = True

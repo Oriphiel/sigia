@@ -920,7 +920,7 @@ class PermisoForm(forms.ModelForm):
         exclude = ["id_sigia_medic_record", 'live']
         widgets = {
             'detail_background': Textarea(attrs={'class': 'form-control', 'rows': '2',
-                                                 'placeholder': 'Escriba la prescripción'}),
+                                                 'placeholder': 'Escriba el detalle'}),
             'dateInitial': DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'dateEnd': DateInput(attrs={'class': 'form-control', 'type': 'date'})
         }

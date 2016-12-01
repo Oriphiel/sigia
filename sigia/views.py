@@ -25,7 +25,7 @@ from sigia.forms import LoginForm, UserForm, UserPersonalInfoForm, \
     ParishForm, ReducedStudentForm, ContactForm, TeacherForm, EventTypeForm, \
     StudentEventForm, StudiesForm, EventGroupForm, EmailForm, InstitutionForm, CreateMedicRecordForm, personal, \
     personal_fem, family, contacto, fisico, diagnostic, presumptive, PatientAppointment, ConsultaForm, prescription, \
-    CertificadoForm
+    CertificadoForm, PermisoForm
 from django.contrib.auth.models import Group
 from django.views.generic.base import TemplateView
 from sigia.models import Student, UserProfile, Career, Course, Enrollment, \
@@ -4173,4 +4173,85 @@ class MedicCertificadoCreateView(View):
         certificado.id_sigia_medic_record = record
         certificado.save()
         array.append({'id_registro': certificado.id})
+        return JsonResponse(array, safe=False)
+
+
+class MedicPermisoCreateView(View):
+    title = 'Permiso medico'
+    template_name = 'medic_form_permiso.html'
+    breadCrumbEntries = (BreadCrumb("Bienvenido", "/welcome/"),)
+    action = 'CREATE'
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(MedicPermisoCreateView, cls).as_view(**initkwargs)
+        return login_required(view, "/")
+
+    def get(self, request, *args, **kwargs):
+        id_register = kwargs['pk']
+        self.breadCrumbEntries += (BreadCrumb("Listado de Consulta", "/medic/%s/consulta/" % id_register),
+                                   BreadCrumb("Listado de Permisos", "/medic/%s/consulta/permiso/" % id_register),
+                                   BreadCrumb("Nuevo Permiso", "/medic/%s/consulta/permiso/new" % id_register),)
+        user_form = PermisoForm()
+        registro = SigiaMedicrecord.objects.get(id=id_register)
+        nombre = "%s %s" % (registro.id_patient.last_name, registro.id_patient.first_name)
+        context = {'action': self.action, 'user_form': user_form, 'title': self.title, "registro_id": id_register,
+                   'breadCrumbEntries': self.breadCrumbEntries,  'name': nombre}
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        id_register = kwargs['pk']
+        registro = SigiaMedicrecord.objects.get(id=id_register)
+        user_form = PermisoForm(request.POST)
+        if user_form.is_valid():
+            nuevo = user_form.save(commit=False)
+            nuevo.id_sigia_medic_record = registro
+            nuevo.save()
+            message = 'Se ha creado correctamente el permiso'
+            messages.add_message(request, messages.SUCCESS, message)
+            return redirect('/medic/%s/consulta/permiso/' % id_register)
+        else:
+            self.breadCrumbEntries += (BreadCrumb("Listado de Consulta", "/medic/%s/consulta/" % id_register),
+                                       BreadCrumb("Listado de Permisos", "/medic/%s/consulta/permiso/" % id_register),
+                                       BreadCrumb("Nuevo Permiso", "/medic/%s/consulta/permiso/new" % id_register),)
+            nombre = "%s %s" % (registro.id_patient.last_name, registro.id_patient.first_name)
+            message = 'Por favor corrija los errores en el formulario'
+            messages.add_message(request, messages.ERROR, message)
+            context = {'action': self.action, 'user_form': user_form, 'title': self.title, "registro_id": id_register,
+                       'breadCrumbEntries': self.breadCrumbEntries, 'name': nombre}
+            return render(request, self.template_name, context)
+
+
+class MedicPermisoListView(TemplateView):
+    title = 'Lista de permisos'
+    template_name = 'medic_form_permiso_lista.html'
+    action = 'LIST'
+    breadCrumbEntries = (BreadCrumb("Bienvenido", "/welcome/"), BreadCrumb("Listado de Historiales", "/medic/"))
+
+    def get_context_data(self, **kwargs):
+        id_register = kwargs['pk']
+        self.breadCrumbEntries += (BreadCrumb("Listado de Consulta", "/medic/%s/consulta/" % id_register),
+                                   BreadCrumb("Listado de Permisos", "/medic/%s/consulta/permiso" % id_register),)
+        register = SigiaMedicrecord.objects.get(id=id_register)
+        nombre = "%s %s" % (register.id_patient.last_name, register.id_patient.first_name)
+        context = super(MedicPermisoListView, self).get_context_data(**kwargs)
+        context['title'] = self.title
+        context['breadCrumbEntries'] = self.breadCrumbEntries
+        context['id_registro'] = id_register
+        context['name'] = nombre
+        return context
+
+
+class MedicPermisoListData(View):
+    def get(self, request, *args, **kwargs):
+        locale.setlocale(locale.LC_ALL, '')
+        array = []
+        id_register = kwargs['pk']
+        records = SigiaMedicrecord.objects.get(id=id_register).medic_permission.all()
+        for record in records:
+            std = {'id': record.id,
+                   'dateInitial': "%s" % record.dateInitial.strftime("%d de %B de %Y"),
+                   'dateEnd': "%s" % record.dateEnd.strftime("%d de %B de %Y"),
+                   'detalle': record.detail_background}
+            array.append(std)
         return JsonResponse(array, safe=False)
