@@ -41,7 +41,7 @@ from views import LoginView, WelcomeView, LogoutView, StudentCreateView, Student
     MedicAppointmentListView, MedicAppointmentListData, MedicAppointmentCreateView, MedicAppointmentUpdateView, \
     MedicAppointmentDeleteView, MedicAppointmentRealize, MedicConsultaCreateView, MedicConsultaListView, \
     MedicConsultaListData, MedicConsultaDeleteView, MedicConsultaUpdateView, MedicCertificadoCreateView, \
-    MedicPermisoListView, MedicPermisoCreateView, MedicPermisoListData
+    MedicPermisoListView, MedicPermisoCreateView, MedicPermisoListData, MedicPermisoUpdateView, MedicPermisoDeleteView
 
 urlpatterns = [
     # Examples:
@@ -226,6 +226,8 @@ urlpatterns = [
     url(r'^medic/(?P<pk>[^/]+)/consulta/(?P<id_consulta>[^/]+)/upgrade/$', MedicConsultaUpdateView.as_view()),
     url(r'^medic/(?P<pk>[^/]+)/consulta/permiso/$', MedicPermisoListView.as_view()),
     url(r'^medic/(?P<pk>[^/]+)/consulta/permiso/new/$', MedicPermisoCreateView.as_view()),
+    url(r'^medic/(?P<pk>[^/]+)/permiso/(?P<id_consulta>[^/]+)/delete/$',MedicPermisoDeleteView.as_view()),
+    url(r'^medic/(?P<pk>[^/]+)/permiso/(?P<id_consulta>[^/]+)/upgrade/$', MedicPermisoUpdateView.as_view()),
     url(r'^medic/appointment/$', MedicAppointmentListView.as_view()),
     url(r'^medic/appointment/new/$', MedicAppointmentCreateView.as_view()),
     url(r'^medic/appointment/(?P<pk>[^/]+)/upgrade/$', MedicAppointmentUpdateView.as_view()),

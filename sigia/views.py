@@ -34,7 +34,7 @@ from sigia.models import Student, UserProfile, Career, Course, Enrollment, \
     EventsGroupRelation, StudentEventsGroupRelation, EmailLog, Institution, SigiaMedicCie10, SigiaMedicrecord, \
     SigiaMedicPersonalBackground, SigiaMedicFamilyBackground, SigiaMedicContact, SigiaMedicPhysicalExam, \
     SigiaMedicDiagnosticPlan, SigiaMedicDiagnosticPresumptive, SigiaMedicAppointment, SigiaMedicConsulta, \
-    SigiaMedicPrescription, SigiaMedicCertificado
+    SigiaMedicPrescription, SigiaMedicCertificado, SigiaMedicPermiso
 from django.http.response import JsonResponse, HttpResponse, \
     HttpResponseRedirect
 from django.contrib import messages
@@ -59,6 +59,7 @@ from bs4 import BeautifulSoup
 from django.template.loader import render_to_string
 import threading
 from django.utils import timezone
+
 empty_over_none = lambda x: x == None and '' or x
 
 ecu_tz = pytz.timezone("America/Guayaquil")
@@ -4196,7 +4197,7 @@ class MedicPermisoCreateView(View):
         registro = SigiaMedicrecord.objects.get(id=id_register)
         nombre = "%s %s" % (registro.id_patient.last_name, registro.id_patient.first_name)
         context = {'action': self.action, 'user_form': user_form, 'title': self.title, "registro_id": id_register,
-                   'breadCrumbEntries': self.breadCrumbEntries,  'name': nombre}
+                   'breadCrumbEntries': self.breadCrumbEntries, 'name': nombre}
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
@@ -4255,3 +4256,72 @@ class MedicPermisoListData(View):
                    'detalle': record.detail_background}
             array.append(std)
         return JsonResponse(array, safe=False)
+
+
+class MedicPermisoUpdateView(View):
+    title = 'Permiso medico'
+    template_name = 'medic_form_permiso.html'
+    breadCrumbEntries = (BreadCrumb("Bienvenido", "/welcome/"),)
+    action = 'UPDATE'
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(MedicPermisoUpdateView, cls).as_view(**initkwargs)
+        return login_required(view, "/")
+
+    def get(self, request, *args, **kwargs):
+        id_register = kwargs['pk']
+        id_consulta = kwargs['id_consulta']
+        self.breadCrumbEntries += (BreadCrumb("Listado de Consulta", "/medic/%s/consulta/" % id_register),
+                                   BreadCrumb("Listado de Permisos", "/medic/%s/consulta/permiso/" % id_register),
+                                   BreadCrumb("Editar Permiso",
+                                              "/medic/%s/permiso/%s/upgrade/" % (id_register, id_consulta)),)
+        record = SigiaMedicPermiso.objects.get(id=id_consulta)
+        user_form = PermisoForm(instance=record)
+        registro = SigiaMedicrecord.objects.get(id=id_register)
+        nombre = "%s %s" % (registro.id_patient.last_name, registro.id_patient.first_name)
+        context = {'action': self.action, 'user_form': user_form, 'title': self.title, "registro_id": id_register,
+                   'breadCrumbEntries': self.breadCrumbEntries, 'name': nombre, "consulta_id": id_consulta,
+                   "nuevo": record}
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        id_register = kwargs['pk']
+        id_consulta = kwargs['id_consulta']
+        registro = SigiaMedicrecord.objects.get(id=id_register)
+        record = SigiaMedicPermiso.objects.get(id=id_consulta)
+        user_form = PermisoForm(request.POST, instance=record)
+        if user_form.is_valid():
+            nuevo = user_form.save(commit=False)
+            nuevo.id_sigia_medic_record = registro
+            nuevo.save()
+            message = 'Se ha creado correctamente el permiso'
+            messages.add_message(request, messages.SUCCESS, message)
+            return redirect('/medic/%s/consulta/permiso/' % id_register)
+        self.breadCrumbEntries += (BreadCrumb("Listado de Consulta", "/medic/%s/consulta/" % id_register),
+                                   BreadCrumb("Listado de Permisos", "/medic/%s/consulta/permiso/" % id_register),
+                                   BreadCrumb("Editar Permiso",
+                                              "/medic/%s/permiso/%s/upgrade/" % (id_register, id_consulta)))
+        nombre = "%s %s" % (registro.id_patient.last_name, registro.id_patient.first_name)
+        message = 'Por favor corrija los errores en el formulario'
+        messages.add_message(request, messages.ERROR, message)
+        context = {'action': self.action, 'user_form': user_form, 'title': self.title, "registro_id": id_register,
+                   'breadCrumbEntries': self.breadCrumbEntries, 'name': nombre, "consulta_id": id_consulta,
+                   "nuevo": record}
+        return render(request, self.template_name, context)
+
+
+class MedicPermisoDeleteView(View):
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(MedicPermisoDeleteView, cls).as_view(**initkwargs)
+        return login_required(view, "/")
+
+    def post(self, request, *args, **kwargs):
+        id_register = kwargs['id_consulta']
+        id_historial = kwargs['pk']
+        register_1 = SigiaMedicPermiso.objects.get(id=id_register)
+        register_1.delete()
+        message = 'Se ha eliminado correctamente el permiso.'
+        messages.add_message(request, messages.SUCCESS, message)
+        return redirect('/medic/%s/consulta/permiso/' % id_historial)

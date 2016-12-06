@@ -23,17 +23,25 @@
                         <ul class="dropdown-menu" role="menu">
                             <li>
                                 <a id="tbb_print" title="Paciente Individual">
-                                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>Individual
+                                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>Paciente Individual
                                 </a>
                             </li>
                             <li>
                                 <a id="tbb_print_all" title="Todos los pacientes">
-                                    <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>Todos
+                                    <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>Todos los
+                                    pacientes
                                 </a>
                             </li>
                             <li>
                                 <a id="tbb_print_all_time" title="Todos los pacientes">
-                                    <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>Todos con rango Fecha
+                                    <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>Todos con rango
+                                    Fecha
+                                </a>
+                            </li>
+                            <li>
+                                <a id="tbb_print_permiso_all" title="Ver Permisos">
+                                    <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>Permisos
+                                    Medicos por fecha
                                 </a>
                             </li>
                         </ul>
@@ -178,6 +186,15 @@
                     position: "center",
                     size: {width: 800, height: 600},
                     content: '<embed src="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3AReportes%3AListaHistorialesFecha.prpt/viewer?userid=admin&password=password" width="100%" height="100%">'
+                });
+            });
+            $('#tbb_print_permiso_all').click(function () {
+                $.jsPanel({
+                    title: 'Datos del historial: ',
+                    bootstrap: true,
+                    position: "center",
+                    size: {width: 800, height: 600},
+                    content: '<embed src="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3AReportes%3ACertificadoPermisoListaFecha.prpt/viewer?userid=admin&password=password" width="100%" height="100%">'
                 });
             });
         });

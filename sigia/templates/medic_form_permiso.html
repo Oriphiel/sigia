@@ -88,11 +88,11 @@
             });
         {% else %}
             $('#formulario').click(function () {
-                $('#medicoform')[0].action = "/medic/appointment/" + {{ registro_id }} +"/upgrade/";
+                $('#medicoform')[0].action = "/medic/" + {{ registro_id }} +"/permiso/" + {{ id_consulta }} + "/upgrade/";
                 PostAndLoadAjaxContent($('#medicoform'));
             });
-            $('#id_date').val("{{ registro.date|date:"Y-m-d"}}");
-            $('#time1').val("{{ registro.date|time:"H:i:s"}}");
+            $('#id_dateInitial').val("{{ nuevo.dateInitial|date:"Y-m-d"}}");
+            $('#id_dateEnd').val("{{ nuevo.dateEnd|date:"Y-m-d"}}");
         {% endif %}
     </script>
 {% endblock %}

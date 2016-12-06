@@ -19,29 +19,13 @@
                         </button>
                         <ul class="dropdown-menu" role="menu">
                             <li>
-                                <a id="tbb_print" title="Consulta elegida">
-                                    <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>Consulta
+                                <a id="tbb_print" title="Permiso elegido">
+                                    <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>Permiso Individual
                                 </a>
                             </li>
                             <li>
-                                <a id="tbb_print_all" title="Todos las consultas del paciente">
+                                <a id="tbb_print_all" title="Todos los permisos del paciente">
                                     <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>Todos
-                                </a>
-                            </li>
-                            <li>
-                                <a id="tbb_print_receta" title="Receta de la consulta">
-                                    <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>Receta
-                                </a>
-                            </li>
-                            <li>
-                                <a id="tbb_print_medico" title="Crear Certificado">
-                                    <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span>Certificado
-                                    Medico
-                                </a>
-                            </li>
-                            <li>
-                                <a id="tbb_print_permiso" title="Crear Permiso">
-                                    <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>Permiso Medico
                                 </a>
                             </li>
                         </ul>
@@ -127,20 +111,20 @@
             $('#tbb_edit').click(function () {
                 var historial = $('#table-pagination').bootstrapTable('getSelections')[0];
                 if (historial == null) {
-                    bootbox.alert('Debe seleccionar una consulta primero.');
+                    bootbox.alert('Debe seleccionar un permiso primero.');
                 } else {
-                    LoadAjaxContent("/medic/" + {{ id_registro }} +"/consulta/" + historial.id + "/upgrade/");
+                    LoadAjaxContent("/medic/" + {{ id_registro }} +"/permiso/" + historial.id + "/upgrade/");
                 }
             });
 
             $('#tbb_delete').click(function () {
                 var historial = $('#table-pagination').bootstrapTable('getSelections')[0];
                 if (historial == null) {
-                    bootbox.alert('Debe seleccionar una consulta primero.');
+                    bootbox.alert('Debe seleccionar un permiso primero.');
                 } else {
-                    bootbox.confirm("Por favor confirme que desea eliminar la consulta", function (result) {
+                    bootbox.confirm("Por favor confirme que desea eliminar el permiso", function (result) {
                         if (result) {
-                            $('#du_form')[0].action = "/medic/" + {{ id_registro }} +"/consulta/" + historial.id + "/delete/";
+                            $('#du_form')[0].action = "/medic/" + {{ id_registro }} +"/permiso/" + historial.id + "/delete/";
                             $('#du_form')[0].method = "POST";
                             $('#du_course_id')[0].value = historial.id;
                             PostAndLoadAjaxContent($('#du_form'));
@@ -157,14 +141,14 @@
             $('#tbb_print').click(function () {
                 var student = $('#table-pagination').bootstrapTable('getSelections')[0];
                 if (student == null) {
-                    bootbox.alert('Debe seleccionar una consulta primero.');
+                    bootbox.alert('Debe seleccionar un permiso primero.');
                 } else {
                     $.jsPanel({
                         title: 'Datos del historial: ',
                         bootstrap: true,
                         position: "center",
                         size: {width: 800, height: 600},
-                        content: '<embed src="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3AReportes%3AConsultaIndividual.prpt/generatedContent?userid=admin&password=password&output-type=pageable/pdf&esto=' + student.id + '" width="100%" height="100%">'
+                        content: '<embed src="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3AReportes%3ACertificadoPermiso.prpt/generatedContent?userid=admin&password=password&output-type=pageable/pdf&esto=' + student.id + '" width="100%" height="100%">'
                     });
                 }
             });
@@ -175,53 +159,9 @@
                     bootstrap: true,
                     position: "center",
                     size: {width: 800, height: 600},
-                    content: '<embed src="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3AReportes%3AListaDeConsultas2.prpt/generatedContent?userid=admin&password=password&output-type=pageable/pdf&esto1={{ id_registro }}" width="100%" height="100%">'
-                });
-            });
-
-            $('#tbb_print_receta').click(function () {
-                var historial = $('#table-pagination').bootstrapTable('getSelections')[0];
-                if (historial == null) {
-                    bootbox.alert('Debe seleccionar una consulta primero.');
-                } else {
-                    $.jsPanel({
-                        title: 'Datos del historial: ',
-                        bootstrap: true,
-                        position: "center",
-                        size: {width: 800, height: 600},
-                        content: '<embed src="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3AReportes%3AReceta.prpt/generatedContent?userid=admin&password=password&output-type=pageable/pdf&esto=' + historial.id + '" width="100%" height="100%">'
-                    });
-                }
-            });
-            $('#tbb_print_medico').click(function () {
-                bootbox.confirm("Por favor confirme que desea crear un certificado", function (result) {
-                    if (result) {
-                        $.ajax({
-                            type: 'GET',
-                            url: '/medic/api/certificado/',
-                            data: {
-                                pk: {{ id_registro }}
-                            },
-                            contentType: 'json',
-                            success: function (data) {
-                                $.jsPanel({
-                                    title: 'Datos del historial: ',
-                                    bootstrap: true,
-                                    position: "center",
-                                    size: {width: 800, height: 600},
-                                    content: '<embed src="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3AReportes%3ACertificadoCopia.prpt/generatedContent?userid=admin&password=password&output-type=pageable/pdf&esto=' + data[0].id_registro + '" width="100%" height="100%">'
-                                });
-                            }
-                        });
-                    } else {
-                        $('.top-right').notify({
-                            message: {text: 'Operación cancelada por el usuario.'},
-                            type: 'warning'
-                        }).show();
-                    }
+                    content: '<embed src="http://{{ REPORT_SERVER }}/pentaho/api/repos/%3AReportes%3ACertificadoPermisoListaIndividual.prpt/generatedContent?userid=admin&password=password&output-type=pageable/pdf&esto={{ id_registro }}" width="100%" height="100%">'
                 });
             });
         })
-
     </script>
 {% endblock %}
