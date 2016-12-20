@@ -18,7 +18,7 @@ JS_MESSAGE = 127;
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'fxs3+-@-$j=a0f5uqo8o_qg)$cxdh1aqzj-q_pvd__$!*y43=h'
+SECRET_KEY = ''
 
 SECRETARIA_EMAIL = 'secretaria@aitec.edu.ec'
 
@@ -31,9 +31,9 @@ TEMPLATE_DEBUG = True
 
 LOGIN_URL = '/login/'
 
-EMAIL_HOST = 'mail.aitec.edu.ec'
-EMAIL_HOST_USER = 'sigia@aitec.edu.ec'
-EMAIL_HOST_PASSWORD = 'Sigia*2015'
+EMAIL_HOST = ''
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
 EMAIL_PORT = 25
 
 REPORT_SERVER = "192.168.201.6:8080"
@@ -78,9 +78,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'sigia',                      # Or path to database file if using sqlite3.
-        'USER': 'sigia',                      # Not used with sqlite3.
-        'PASSWORD': 'sigia2015',                  # Not used with sqlite3.
-        'HOST': 'db.sigia.aitec.edu.ec',                      # Set to empty string for localhost. Not used with sqlite3.
+        'USER': '',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
+        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
